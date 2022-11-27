@@ -1,0 +1,181 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+th,
+a,
+span,
+li,
+img {
+    transition-duration: 0.2s;
+}
+
+// h1,
+// h2,
+// h3,
+// h4,
+// h5,
+// h6,
+// th,
+// a {
+//     color: #ffffff
+// }
+.background-color {
+    background: $background-color !important;
+}
+
+.dropdown-menu {
+    z-index: 2000;
+}
+
+.dropdown-menu a {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    //border-bottom: 1px solid $theme-color-1;
+}
+
+.ql-container {
+    min-height: 200px;
+}
+
+.main-menu a {
+    font-weight: bold;
+}
+
+.has-float-label,
+.table-divided tr {
+    transition-duration: 0.5s;
+}
+
+.table-divided tr:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+//
+.table-divided td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: middle;
+    .btn {
+        margin-bottom: 0px !important;
+    }
+}
+
+.table-divided tbody tr {
+    cursor: pointer;
+}
+
+.vuetable tr td {
+    background: transparent;
+    border-bottom: 0px solid #313131 !important;
+    max-width: 200px;
+    overflow-wrap: break-word;
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.vuetable th {
+    color: $theme-color-1;
+    font-weight: bold !important;
+}
+
+.nav-tabs .nav-link {
+    font-size: 15px !important;
+}
+
+.vuetable {
+    button i:before {
+        transform: rotateZ(0deg);
+        font-size: 23px;
+        transition-duration: 0.5s;
+    }
+    button:hover i:before {
+        transform: rotateZ(100deg) !important;
+        transition-duration: 0.5s;
+    }
+}
+
+i {
+    // color: #145388 !important;
+    font-weight: bold !important;
+}
+
+.biaf-blue {
+    //color: #145388 !important
+}
+
+.order-with-arrow thead th {
+    //color: #145388 !important;
+    font-size: 14px !important;
+}
+
+.rounded .table-divided td {
+    font-size: 14px !important;
+}
+
+.order-itemsList {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.form-group {
+    transition-duration: 0.5s;
+    input {
+        transition-duration: 0.5s;
+    }
+    .vs__dropdown-toggle,
+    .vs__selected-options {
+        transition-duration: 0.5s;
+    }
+}
+
+.laffah-shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.was-validated .custom-control-input:valid:checked~.custom-control-label::before,
+.custom-control-input.is-valid:checked~.custom-control-label::before {
+    border-color: #bf160f !important;
+    background-color: #bf160f !important;
+}
+
+.w-16 {
+    width: 16.6666% !important
+}
+
+.list-thumbnail {
+    width: 160px !important;
+    height: 160px !important;
+    border: 3px solid $theme-color-2;
+    transition-duration: 0.5s;
+}
+
+.list-thumbnail.ssmal {
+    width: 60px !important;
+    height: 60px !important;
+}
+
+.table-divided .list-thumbnail {
+    width: 60px !important;
+    height: 60px !important;
+}
+
+
+/* Notifications style*/
+
+.notes-container {
+    transition-duration: 0.5s !important;
+    border: 1px solid transparent;
+}
+
+.notes-container:hover {
+    border: 1px solid $theme-color-1;
+}
+
+
+/*end Notifications style*/

@@ -1,0 +1,218 @@
+<template>
+  <b-card v-if="visible" bg-variant="light"
+          :class="className">
+    <b-row no-gutters class="justify-content-between">
+      <b-colxx xxs="12" lg="3">
+        <b-card
+          class="flex-row listing-card-container h-100 pointer-event" no-body>
+          <div class="w-100 d-flex align-items-center">
+            <b-card-body>
+              <vue-perfect-scrollbar :settings="{ suppressScrollX: true, wheelPropagation: false }">
+                <h6 class="mb-3 listing-heading" v-line-clamp="2">
+                  <b-badge variant="outline-secondary">{{ order.order_key }}</b-badge>
+                </h6>
+                <p class="font-weight-medium mb-0 text-muted">{{ order.contact_name }}</p>
+                Branch : <span class="text-danger">{{ order.branch_name }}</span>
+                {{ order.order_details }}
+                <br>
+              </vue-perfect-scrollbar>
+              <b-badge
+                variant="primary" pill class="position-absolute badge-top-left ">
+                {{ order.entry_date }}
+              </b-badge>
+            </b-card-body>
+          </div>
+        </b-card>
+      </b-colxx>
+      <b-colxx xxs="12" lg="2" v-for="(status,orderIndex) in allStatus" :key="orderIndex">
+        <b-card
+          :class="{'card-scale':status.status_value == order.status}"
+          :key="order.status"
+          class="flex-row listing-card-container p-3 " no-body>
+          <div class="w-100 position-relative d-flex flex-column align-content-center">
+            <div
+              :ref="`element${order.id}`"
+              class="order-step mb-3 align-self-center"
+              :class="{'bg-danger text-white':status.status_value == order.status}">
+              <h2 class="mb-0 font-weight-bold">{{ orderIndex + 1 }}</h2></div>
+            <!--                      <p class="text-center">{{ $t(`orderStatus.${status.status_value}`) }}</p>-->
+            <b-button
+              :disabled="status.status_value != order.status"
+              class="text-small text-nowrap font-weight-bolder"
+              :variant="parseInt(orderIndex) === parseInt(allStatus.length) - 1 ? 'success':'primary'"
+              @click="orderNextStep(order.id,status,$event)">
+              {{ parseInt(orderIndex) === 0 ? 'Accept' : $t(`orderStatus.${status.status_value}`) }}
+            </b-button>
+          </div>
+        </b-card>
+      </b-colxx>
+      <b-badge variant="default" pill
+               class="w-100 position-absolute badge-top-right badge-type d-flex justify-content-between">
+        <div>
+          Type: {{ order.is_pickup == 0 ? 'Delivery' : 'Pickup' }} |
+          {{
+            order.is_pickup == 0 ? `Address: ${((order || {}).address || {}).street || ''}-${((order || {}).address || {}).building || ''}-${((order || {}).address || {}).floor || ''}` : ` Created Time: ${order.created_at}`
+          }}
+        </div>
+        <b-button size="sm" pill @click="showOrderDetails(order)">
+          <b-icon v-if="fetchingOrder !== order.id" icon="eye-fill"/>
+          <div
+            v-if="fetchingOrder === order.id"
+            class="spinner d-inline-block"
+          >
+            <span class="bounce1"></span>
+            <span class="bounce2"></span>
+            <span class="bounce3"></span>
+          </div>
+        </b-button>
+      </b-badge>
+    </b-row>
+  </b-card>
+</template>
+
+<script>
+import axios from "axios";
+import _ from "lodash"
+
+export default {
+  name: "queueItem",
+  props: ['data', 'changeStatus', 'showOrderDetails', 'fetchingOrder', 'allStatus', 'className'],
+  data() {
+    return {
+      visible: true
+    }
+  },
+  computed: {
+    order: {
+      get: function () {
+        return this.data
+      },
+      set: function (newValue) {
+        Object.assign(this.data, newValue)
+      }
+    }
+  },
+  methods: {
+    getAddressById(id) {
+      return axios
+        .get(`addresses/${id}`)
+        .then(res => {
+          Object.assign(this.order, {address: res.data.data})
+          this.updateLocalStorage(this.order)
+          return res.data.data
+        })
+        .catch(err => {
+          console.log(err);
+          return err
+        })
+    },
+    updateLocalStorage(order) {
+      const localData = JSON.parse(localStorage.getItem('currentOrders'));
+      const orderIndex = localData.findIndex(i => i.id == order.id)
+      localData[orderIndex] = order
+      localStorage.setItem('currentOrders', JSON.stringify(localData))
+    },
+    orderNextStep(orderID, status, e) {
+      const nextStepID = parseInt(status.status_id) + 1
+
+      //this.$refs[`btn-${orderID}`].classList.add('bg-danger')
+      // let el;
+      // eval('el=element' + orderID);
+      // this.$refs[el].classList.add('bg-danger')
+      const localData = JSON.parse(localStorage.getItem('currentOrders'));
+      const orderIndex = localData.findIndex(i => i.id == orderID)
+      if (parseInt(status.status_id) != 6) {
+        this.changeStatus(orderID, nextStepID)
+        let nextStepValue = this.allStatus.find(s => s.status_id == nextStepID).status_value
+        console.log(nextStepValue)
+        this.order.status = nextStepValue
+        localData[orderIndex].status = nextStepValue
+      }
+      e.target.disabled = true
+      if (parseInt(status.status_id) == 6) {
+        console.log(orderIndex, 'orderIndex')
+        this.visible = false
+
+        localData.splice(orderIndex, 1)
+        // console.log(localData)
+        // this.fetchOrders()
+      }
+      localStorage.setItem('currentOrders', JSON.stringify(localData))
+    },
+  },
+  watch: {
+    'data.address_id': {
+      handler: function (val) {
+        // console.log(JSON.parse(localStorage.getItem('currentOrders')))
+        let {order} = this
+        if (val !== null) {
+          if (_.isEmpty(order.address)) {
+            console.log('getting the address');
+            this.getAddressById(val)
+          }
+          this.$emit('update', order)
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+/deep/ .badge-type {
+  /*top: 45% !important;*/
+  /*right: -22px !important;*/
+  /*transform: rotate(-90deg);*/
+  top: -24px !important;
+  right: unset !important;
+  font-size: 100%;
+}
+
+/deep/ .pointer-event {
+  cursor: pointer;
+}
+
+/deep/ .order-steps .ps {
+  max-height: 116px;
+}
+
+/deep/ .order-step {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #efeeee;
+}
+
+/deep/ .new-orders .loading {
+  position: relative !important;
+}
+
+/deep/ .card-scale {
+  transform: scale(1.1);
+}
+
+/deep/ .new-orders .app-menu-button {
+  position: absolute;
+  left: 0;
+  background: #fff;
+  top: 45px;
+  padding: 12px 8px 12px 5px;
+  border-radius: .2rem;
+  color: #8f8f8f;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, .04);
+  font-size: 15px;
+  line-height: 0;
+  z-index: 80;
+}
+
+/deep/ .border-bottom {
+  border-bottom: 1px solid #dad5d5 !important;
+}
+
+</style>

@@ -1,0 +1,420 @@
+<template>
+  <div class="rounded new-orders">
+    <b-container fluid class="position-relative">
+      <b-row class=" app-row h-100">
+        <b-colxx xxs="12" xl="12">
+          <h2 class="text-center">Orders in Queue
+            <b-badge pill variant="light">{{ Array.isArray(ordersManageArray) ? ordersManageArray.length : 0 }}
+            </b-badge>
+          </h2>
+          <b-card class="mb-4 bg-transparent shadow-none order-steps " no-body v-if="!isLoadStatus">
+            <b-card-body
+              v-if="Array.isArray(ordersManageArray) && ordersManageArray.length > 0"
+              :key="Array.isArray(ordersManageArray) && ordersManageArray.length" class="bg-transparent px-1">
+              <queue-item
+                class-name="position-relative mb-5"
+                v-for="(order,index) in ordersManageArray"
+                :key="`item_${index}`"
+                :data="order" :all-status="allStatus" :fetching-order="fetchingOrder"
+                :change-status="changeStatus"
+                :show-order-details="showOrderDetails"/>
+            </b-card-body>
+          </b-card>
+          <template v-if="isLoadStatus ">
+            <div class="loading"></div>
+          </template>
+        </b-colxx>
+      </b-row>
+    </b-container>
+    <b-card class="mb-4 app-menu " :class="{ 'shown' : isOpen}" @mouseenter="isMenuOver=true"
+            @mouseleave="isMenuOver=false">
+      <h2 class="text-center">Recent Orders
+        <b-refresh-button v-if="!isLoad" class="p-2" @click="fetchOrders()"/>
+        <b-icon v-if="isLoad" icon="arrow-repeat" animation="spin"/>
+      </h2>
+      <vue-perfect-scrollbar
+        class="scroll dashboard-list-with-user"
+        :settings="{ suppressScrollX: true, wheelPropagation: false }"
+      >
+        <div class="mb-3 p-2 h-100">
+          <div
+            v-for="order in pendingOrders"
+            :id="order.id"
+            class="d-flex flex-column mb-3 border-bottom justify-content-between">
+            <div class="d-flex justify-content-between align-content-start">
+              <img
+                src="/assets/logos/logo.png"
+                :alt="order.name"
+                class="img-thumbnail border-0 rounded-circle align-self-center xsmall w-20"
+              />
+              <div class="pl-3 flex-grow-1">
+                <p class="font-weight-medium mb-0">{{ order.contact_name }}</p>
+                <p class="text-muted mb-3 text-small">{{ order.order_key }}</p>
+              </div>
+            </div>
+            <div class="text-danger text-right">{{ order.created_at }}</div>
+            <div class="d-flex justify-content-between align-content-center my-2">
+              <b-button size="sm" pill @click="ordersInProgress(order,$event)">
+                <b-icon icon="play-fill"/>
+              </b-button>
+              <b-button size="sm" pill @click="showOrderDetails(order)">
+                <b-icon v-if="fetchingOrder !== order.id" icon="eye-fill"/>
+                <div
+                  v-if="fetchingOrder === order.id"
+                  class="spinner d-inline-block"
+                >
+                  <span class="bounce1"></span>
+                  <span class="bounce2"></span>
+                  <span class="bounce3"></span>
+                </div>
+              </b-button>
+              <b-button size="sm" pill @click="showRejectionMsgOk(order.id)">
+                <span v-if="rejectOrder !== order.id">{{ $t('pages.reject') }}</span>
+                <div
+                  v-if="rejectOrder === order.id"
+                  class="spinner d-inline-block"
+                >
+                  <span class="bounce1"></span>
+                  <span class="bounce2"></span>
+                  <span class="bounce3"></span>
+                </div>
+              </b-button>
+            </div>
+          </div>
+          <template v-if="isLoad">
+            <div class="loading-left loading"></div>
+          </template>
+        </div>
+      </vue-perfect-scrollbar>
+    </b-card>
+    <a class="app-menu-button d-inline-block d-xl-none" @click.prevent="toggle"><i class="simple-icon-options"/></a>
+    <order-modal :orderDetails="order"></order-modal>
+  </div>
+</template>
+<script>
+import Vue from "vue";
+import axios from "axios";
+import {apiUrl} from "@/constants/config";
+import {BootstrapVueIcons} from 'bootstrap-vue'
+import 'bootstrap-vue/dist/bootstrap-vue-icons.css'
+import orderModal from "./orderModal";
+import queueItem from "./queueItem";
+import {setTimeout} from "timers";
+
+Vue.use(BootstrapVueIcons)
+export default {
+  name: 'queueOrders',
+  components: {
+    'order-modal': orderModal,
+    'queue-item': queueItem
+  },
+  data() {
+    return {
+      isLoad: false,
+      isLoadStatus: false,
+      fetchingOrder: null,
+      rejectOrder: null,
+      apiBase: 'orders?status_id[]=1&status_id[]=2',
+      rejectionReason: '',
+      orders: [],
+      waitingOrders: [],
+      ordersManageArray: JSON.parse(localStorage.getItem('currentOrders')),
+      currentPage: 1,
+      order: [],
+      allStatus: [],
+      isOpen: false,
+      isMenuOver: false,
+      timer: null
+    }
+  },
+  computed: {
+    pendingOrders: ({orders}) => {
+      if (Array.isArray(orders) && orders.length > 0) {
+        return orders
+      }
+      return []
+    },
+  },
+  methods: {
+    showRejectionMsgOk(orderID) {
+      let res = false
+      const self = this
+      const h = this.$createElement
+      // Using HTML string
+      const titleVNode = h('div', {domProps: {innerHTML: this.$t('modal.rejection-reason')}})
+      // More complex structure
+      const messageVNode = h('div', {class: ['foobar']}, [
+        h('b-form', {class: ['text-center']}, [
+          h('b-form-textarea', {
+            props: {
+              id: "rejection-reason",
+              value: this.rejectionReason,
+              required: true,
+              placeholder: this.$t('modal.rejection-reason-placeholder'),
+              rows: "3",
+              maxRows: "6",
+            },
+            on: {
+              input: function (value) {
+                self.rejectionReason = value
+              }
+            }
+          }),
+        ]),
+        // h('p', {class: ['text-center']}, [h('b-spinner')]),
+      ])
+      // We must pass the generated VNodes as arrays
+      this.$bvModal.msgBoxOk([messageVNode], {
+        title: [titleVNode],
+        okTitle: this.$t('modal.submit'),
+        centered: true,
+      }).then(value => value && this.rejectionReason !== '' ?
+        (this.rejectOrder = orderID, this.changeStatus(orderID, 7))
+        :
+        value
+      )
+    },
+    manageOrder(order) {
+      // if(this.ordersManageArray.filter(i=>i==order.id) ==undefined){
+      //   this.ordersManageArray.push(order)
+      // }
+      const itemIndex = this.ordersManageArray.findIndex(i => i.id == order.id);
+      console.log(order.id, 'itemIndex')
+      if (itemIndex == -1) {
+        this.ordersManageArray.push(order)
+      }
+    },
+    ordersInProgress(order, e) {
+      //here we need to change all pending orders to in progress
+      if (Array.isArray(this.pendingOrders) && this.pendingOrders.length > 0) {
+        e.target.disabled = true
+        const statusInProgress = this.allStatus.filter(s => s.status_id == 3)
+        order.status = statusInProgress[0].status_value
+        let localData = []
+        if (localStorage.getItem('currentOrders') == undefined) {
+          localData.push(order)
+          localStorage.setItem('currentOrders', JSON.stringify(localData))
+        } else {
+          localData = JSON.parse(localStorage.getItem('currentOrders'));
+          const localDataIDS = localData.map(i => i.id);
+          const oIndex = localData.findIndex(x => x.id == order.id);
+          if (oIndex == -1) {
+            console.log(order);
+            localData.unshift(order)
+            localStorage.setItem('currentOrders', JSON.stringify(localData))
+          } else {
+            console.log('order found ')
+          }
+          console.log(oIndex, 'oIndex')
+        }
+        this.ordersManageArray = JSON.parse(localStorage.getItem('currentOrders'));
+        const status = 3
+        this.changeStatus(order.id, status)
+        console.log(e, 'e start')
+        // this.fetchOrders();
+      }
+
+    },
+    fetchOrders() {
+      this.isLoad = true;
+      return axios
+        .get(`${this.apiBase}`)
+        .then(res => {
+          let resultData = res.data.data;
+          this.orders = resultData
+          this.isLoad = !this.isLoad;
+          return res
+        }).catch(err => {
+          console.log(err);
+          return err
+        })
+
+    },
+    showOrderDetails(order) {
+      this.fetchingOrder = order.id
+      axios.get(`${apiUrl}orders/${order.id}`).then(res => {
+        this.order = res.data.data
+        this.$bvModal.show('orderrightmodal')
+        this.fetchingOrder = null
+      })
+    },
+    changeStatus(orderID, statusID) {
+      let data = {
+        status: statusID,
+        rejection_reason: this.rejectionReason
+      }
+      axios
+        .post(`orders/updatestatus/${orderID}`,
+          data, {
+            params: {
+              _method: 'put'
+            }
+          })
+        .then(response => {
+          this.rejectionReason = ''
+          this.rejectOrder = null
+          this.fetchOrders()
+          console.log('get new items');
+          this.ordersManageArray = JSON.parse(localStorage.getItem('currentOrders'));
+        }).catch(err => {
+        console.log(err)
+      })
+    },
+    toggle() {
+      this.isOpen = !this.isOpen
+    }
+
+  },
+  async mounted() {
+    this.isLoadStatus = true
+    await this.fetchOrders().then(res => res ? this.timer = setTimeout(() => {
+        console.log('new fetch')
+        this.fetchOrders();
+      }, 60000)
+      : null
+    )
+    await axios.get(`orders/getstatuses`).then(res => {
+      //this.allStatus = res.data.data;
+      console.log(res.data.data, 'res.data.data')
+      for (var key in res.data.data) {
+        if (key == 4 || key == 5 || key == 6) {
+          this.allStatus.push({status_id: key, status_value: res.data.data[key], active: false})
+        }
+        if (key == 3) {
+          this.allStatus.push({status_id: key, status_value: res.data.data[key], active: true})
+        }
+
+      }
+      this.isLoadStatus = !this.isLoadStatus
+    }).catch(err => {
+      console.log(err);
+    })
+
+  },
+  beforeDestroy() {
+    clearTimeout(this.timer);
+  }
+}
+</script>
+<style>
+.new-orders .app-menu .ps-container {
+  height: 600px !important;
+}
+
+.new-orders .app-menu .ps__rail-y, .new-orders .app-menu.ps__rail-y:hover {
+  height: 580px !important;
+  width: 6px;
+  padding: 0 !important;
+}
+
+.new-orders .app-menu .ps__rail-y:hover > .ps__thumb-y, .ps__thumb-y {
+  height: 25px !important;
+  width: 6px !important;
+  cursor: pointer;
+}
+
+.app-menu .card-body {
+  padding: 10px;
+}
+
+.badge-date {
+  top: 45% !important;
+  left: -60px !important;
+  transform: rotate(-90deg);
+}
+
+.badge-type {
+  /*top: 45% !important;*/
+  /*right: -22px !important;*/
+  /*transform: rotate(-90deg);*/
+  top: -24px !important;
+  right: unset !important;
+  font-size: 100%;
+}
+
+.pointer-event {
+  cursor: pointer;
+}
+
+.order-steps .ps {
+  max-height: 116px;
+}
+
+.new-orders .app-row {
+  padding-left: 258px;
+  padding-right: unset !important;
+}
+
+.new-orders .app-menu {
+  float: left;
+  left: 0;
+  right: unset !important;
+}
+
+.order-step {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #efeeee;
+}
+
+.badge-danger {
+  background-color: #da1c15;
+}
+
+.border-row {
+  border: 1px solid #c8040e87;
+  border-radius: 10px;
+}
+
+.new-orders .loading {
+  position: relative !important;
+}
+
+.card-scale {
+  transform: scale(1.1);
+}
+
+@media (max-width: 1199px) {
+  .app-row {
+    padding-left: 0 !important;
+  }
+
+  .app-menu {
+    transform: translateX(-280px);
+  }
+
+  .app-menu.shown {
+    transform: translateX(0);
+  }
+}
+
+.new-orders .app-menu-button {
+  position: absolute;
+  left: 0;
+  background: #fff;
+  top: 45px;
+  padding: 12px 8px 12px 5px;
+  border-radius: .2rem;
+  color: #8f8f8f;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, .04);
+  font-size: 15px;
+  line-height: 0;
+  z-index: 80;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #dad5d5 !important;
+}
+
+.new-orders .loading-left {
+  border-color: transparent;
+}
+
+.app-menu .badge-danger {
+  font-size: 0.8rem;
+}
+</style>

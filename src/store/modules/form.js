@@ -8,6 +8,7 @@ const state = {
   form_Data: null,
   status: null,
   isLoad: null,
+  create_item: null,
   groups: null,
 }
 
@@ -15,7 +16,8 @@ const getters = {
   getFormType: (state) => state.formType,
   getFormData: (state) => state.form_Data,
   getStatus: (state) => state.status,
-  getGroups: (state) => state.groups
+  getGroups: (state) => state.groups,
+  create_item: state => state.create_item,
 }
 
 const mutations = {
@@ -23,13 +25,16 @@ const mutations = {
     let {status} = payload;
     state.status = status
   },
+  crateItemSuccess(state, payload){
+    state.create_item = payload;
+  },
   SET_FormData(state, payload) {
     let {item} = payload
     state.form_Data = item
   },
   SET_FromType(state, payload) {
   },
-  getCustomizationGroups(state, payload) {
+  get_customizationGroups(state, payload) {
     state.groups = payload
   }
 }
@@ -104,7 +109,7 @@ const actions = {
         })
     /*})*/
   },
-  createItem: async ({commit, dispatch}, payload) => {
+  createItem({commit, dispatch}, payload) {
       const formData = new FormData();
       console.log(payload);
       Object.entries(payload.langs).forEach(([key, value]) => {
@@ -114,71 +119,32 @@ const actions = {
           formData.append(`${lang}[${type}]`, value);
         }
       });
-      formData.append(`type`, 0);
+      formData.append(`type`, 1);
+      formData.append(`image`, payload.image);
+      formData.append(`is_published`, payload.additional.published ? 1 : 0);
+      formData.append(`active`, payload.additional.active ? 1 : 0);
       formData.append(`notes`, payload.additional.notes);
       formData.append(`itemCategory[category_id]`, payload.additional.category);
       formData.append(`record_order`, payload.additional.record_order);
-       formData.append(`customization_groups`, payload.additional.customization_groups);
-      console.log(formData);
-      // payload.langs.forEach(el => {
-      //   console.log(el);
-      //   // formData.append(`${el._name}[title]`, el.title);
-        // if (el.description) {
-        //   formData.append(`${el._name}[description]`, el.description);
-        //   if (el.brochure) {
-        //     formData.append(`${el._name}[brochure]`, el.brochure);
-        //   }
-        //   if (el.terms_conditions) {
-        //     formData.append(`${el._name}[terms_conditions]`, el.terms_conditions);
-        //   }
-        // }
-      // });
-      // Object.entries(payload.info).forEach(entry => {
-      //   const [key, value] = entry;
-      //   if (value != null) {
-      //     formData.append(key, value);
-      //   }
-      // });
-      // Object.entries(payload.location).forEach(entry => {
-      //   const [key, value] = entry;
-      //   if (value != null) {
-      //     formData.append(key, value);
-      //   }
-      // });
-      // Object.entries(payload.biding).forEach(entry => {
-      //   const [key, value] = entry;
-      //   if (value != null) {
-      //     formData.append(key, value);
-      //   }
-      // });
-      // if (payload.image != null) {
-      //   formData.append("image", payload.image);
-      // }
-      // if(payload.parent_id){
-      //   formData.append("parent_id", payload.parent_id);
-      // }
-  
-      // commit("setProcessing", false);
-      // const createAuction = create_auction(formData);
-      // // axios
-      // //   .post(`${apiUrl}/auctions`, formData, {})
-      // createAuction.then(res => {
-      //     if (res.status === 201) {
-      //       commit("createAuctionSuccessfuly", res);
-      //       dispatch("getCustomFieldList", { id: res.data.data.category_id });
-      //     } else {
-      //     }
-      //   })
-      //   .catch(error => {
-      //     commit("dateError");
-      //   });
+      const customization_groups = payload.customization_groups
+      formData.append(`customization_groups`, JSON.stringify({customization_groups}));
+      axios
+      .post(`https://foodapi.lilacdev.com/public/api/items`, formData)
+      .then(res => {
+        if (res.status === 200) {
+         commit('crateItemSuccess', res.data.data)     
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
     },
-  getCustomizationGroups: async () => {
+  getCustomizationGroups() {
       axios
       .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)
     .then(res => {
       if (res.status === 200) {
-        commit("getCustomizationGroups", res.data.data);
+        commit("get_customizationGroups", res.data.data);
       }
     })
     .catch(error => {

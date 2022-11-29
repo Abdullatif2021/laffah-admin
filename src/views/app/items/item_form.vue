@@ -6,9 +6,9 @@
           <div class="separator mb-5"></div>
         </b-colxx>
       </b-row>
-      <b-row>
+      <b-row >
         <template v-if="isLoad">
-          <b-card v-if="!itemId" class="mb-4">
+          <b-card v-if="!itemId" style="width: 100%;" class="mb-4">
             <b-card-body class="wizard wizard-default">
               <form-wizard
                 :with-validate="true"
@@ -124,16 +124,26 @@
                   <div class="wizard-basic-step">
                     <b-form>
                       <b-row>
-                        <b-colxx sm="12">
-                          <div class="status_container">
-                            <b-form-group label="Online Status">
-                              <b-form-checkbox-group v-model="gridForm.status">
-                                  <b-form-checkbox value="published">Published</b-form-checkbox>
-                                  <b-form-checkbox value="active">Active</b-form-checkbox>
-                              </b-form-checkbox-group>
-                            </b-form-group>
-                          </div>
-                        </b-colxx>
+                             <b-colxx xxs="6">
+                            <b-row>
+                              <b-colxx xxs="12">
+                                <label>Published</label>
+                              </b-colxx>
+                              <b-colxx xxs="12">
+                                <switches v-model="gridForm.published" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                              </b-colxx>
+                            </b-row>
+                          </b-colxx>
+                          <b-colxx xxs="6">
+                            <b-row>
+                              <b-colxx xxs="12">
+                                <label>Activate</label>
+                              </b-colxx>
+                              <b-colxx xxs="12">
+                                <switches v-model="gridForm.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                              </b-colxx>
+                            </b-row>
+                          </b-colxx>  
                         <b-colxx sm="6">
                           <b-form-group>
                             <label class="form-group-label" for="side">Category</label>
@@ -159,9 +169,12 @@
                       <b-colxx sm="12">
                           <b-form-group label="Customizations Group">
                             <v-select
-                              v-model="gridForm.customizations"
-                              multiple
-                              :options="customizationOptions"
+                            v-model="gridForm.customizations"
+                            :options="customizationOptions"
+                            item-text="name"
+                            item-value="id"
+                            multiple
+                             
                             />
                           </b-form-group>
                         </b-colxx>
@@ -181,47 +194,55 @@
                   </div>
               
                 </tab>
-                <!-- <tab name="Customizations" :validate="validateStep3">
+                <tab name="Batches" :validate="validateStep3">
                  <div class="wizard-basic-step">
                     <b-form>
                       <b-row>
+                        <b-colxx xxs="12">
+                          <div class="top-right-button-container">
+                            <b-button
+                            variant="primary"
+                            class="top-right-button"
+                            @click="itemActions('reset')">
+                            {{ $t('pages.add-new') }}
+                            </b-button>
+                          </div>
+                          
                         
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="Name">{{ $t(`forms.ar_name`) }}</label>
-                            <b-form-input
-                              id="Name"
-                              type="text"
-                              v-model="$v.lang_form.ar_name.$model"
-                              :state="!$v.lang_form.ar_name.$error"
-                            />
-                            <b-form-invalid-feedback
-                              v-if="!$v.lang_form.ar_name.required"
-                              >{{
-                                $t(`forms.ar_massege`)
-                              }}</b-form-invalid-feedback
+                          </b-colxx>
+                        <b-colxx xxs="12">
+                          
+                            <vuetable
+                              ref="vuetable"
+                              class="table-divided order-with-arrow"
+                              :api-mode="false"
+                              :reactive-api-url="true"
+                              :fields="batchBranchFields"
+                              pagination-path
+                              @vuetable:pagination-data="onPaginationData"
                             >
-                          </b-form-group>
+                              <template slot="actions" slot-scope="props">
+                               
+                                <b-button
+                                  variant="outline-theme-3"
+                                  class="icon-button"
+                                  @click="modify(props.rowData.id)"
+                                >
+                                <i  class="simple-icon-arrow-right"></i>
+                                </b-button>
+                              </template>
+                            </vuetable>
+                            <vuetable-pagination-bootstrap
+                              class="mt-4"
+                              ref="pagination"
+                              @vuetable-pagination:change-page="onChangePage"
+                            />
+                          
                         </b-colxx>
-                       
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="desc">{{
-                              $t(`forms.en_desc`)
-                            }}</label>
-                            <b-form-textarea
-                              id="textarea"
-                              rows="3"
-                              max-rows="6"
-                              v-model="$v.lang_form.en_description.$model"
-                            ></b-form-textarea>
-                          </b-form-group>
-                        </b-colxx>
-                       
                       </b-row>
                     </b-form>
                   </div>
-                </tab> -->
+                </tab>
                 <tab type="done">
                   <div class="wizard-basic-step text-center pt-3">
                     <div v-if="isProcessing">
@@ -1462,9 +1483,111 @@
         <div class="loading"></div>
       </template>
       </b-row>
+       <b-modal
+    id="modalright"
+    ref="modalright"
+    :title="$t('pages.add-new-title')"
+    modal-class="modal-right"
+  >
+  <b-form
+      @submit.prevent="onValidateCategoryFormFormSubmit"
+      class="av-tooltip tooltip-label-bottom">
+      <b-form-group
+        :label="$t('forms.batch')"
+        :class="`has-float-label mb-4 ${toggleShadow}`">
+        <b-form-input
+          :disabled="toggleState"
+          type="text"
+          pat
+          v-model.trim="$v.batch.batch.$model"
+          :state="!$v.batch.batch.$error" />
+        <b-form-invalid-feedback v-if="!$v.batch.batch.required">{{`${$t('forms.title_ar')}
+          ${$t('validations.required')}`}}!
+        </b-form-invalid-feedback>
+      </b-form-group>
+      <b-input-group
+        v-if="false"
+        :prepend="$t('forms.image')"
+        :class="`has-float-label mb-4 ${toggleShadow}`">
+        <b-form-file
+          :disabled="toggleState"
+          type="image"
+          @change="selectFile"
+          :placeholder="$t('input-groups.choose-file')"
+          accept="image/png, image/jpeg, image/svg" />
+      </b-input-group>
+      <b-form-group :class="`has-float-label mb-4 ${toggleShadow}`">
+
+        <v-select
+          :disabled="toggleState"
+          label="subTitle"
+          multiple
+          :options="options"
+          :reduce="attribute => ({attribute_id:attribute.attribute_id, value:attribute.value})"
+          :selectable="option => !(batch.attributes.map(a=>a.attribute_id).includes(option.attribute_id) && option.type==='List')"
+          v-model="batch.attributes"
+          @search="onSearch"
+          @change="selecting($event)">
+          <template #option="{ title, subTitle}">
+            <small>{{ title }}</small>
+            <br />
+            {{ subTitle }}
+          </template>
+          <template #header>
+            <div style="opacity: .8">{{$t('forms.search-attribute-massage')}}!</div>
+          </template>
+        </v-select>
+      </b-form-group>
+      <b-form-group
+        :label="$t('forms.cities-prices')"
+        :class="`has-float-label mb-4 ${toggleShadow}`">
+        <b-form-row
+          v-for="(cityPrice,index) in {...batch.prices,...cities}"
+          :key="cityPrice.id">
+          <colxx xxs="8">
+            <b-input-group
+              :prepend="cityPrice.locales[$i18n.locale].name"
+              class="mb-3">
+              <b-form-input
+                :disabled="toggleState"
+                type="text"
+                @input="setCityId(cityPrice.id,index)"
+                v-model.trim="$v.batch.prices.$each[index].price.$model" />
+            </b-input-group>
+          </colxx>
+          <colxx xxs="4">
+            <b-from-group>
+              <switches
+                :disabled="toggleState"
+                type="number"
+                :label="$t('forms.active')"
+                value="0"
+                theme="custom"
+                color="primary"
+                class="mr-4"></switches>
+            </b-from-group>
+          </colxx>
+        </b-form-row>
+      </b-form-group>
+
+    </b-form>
+    <template slot="modal-footer">
+      <b-button variant="outline-secondary" @click="hideModal('modalright')">{{
+        $t("survey.cancel")
+      }}</b-button>
+      <b-button
+        :disabled="enable"
+        variant="primary"
+        @click="formSubmit()"
+        class="mr-1"
+        >{{ $t("survey.submit") }}</b-button
+      >
+    </template>
+  </b-modal>
     </div>
 </template>
 <script>
+import Axios from "axios";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import { validationMixin } from "vuelidate";
@@ -1476,12 +1599,20 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { mapGetters, mapActions } from "vuex";
+import Switches from "vue-switches";
+import DividedTable from "./DividedTable";
+import Vuetable from "vuetable-2/src/components/Vuetable";
+import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
 
 export default {
   components: {
     "form-wizard": FormWizard,
     "tab": Tab,
+    vuetable: Vuetable,
+    "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
+    switches: Switches,
     'v-select' :vSelect,
+    "item-divided-table": DividedTable,
     "quill-editor": quillEditor
   },
   data(){
@@ -1500,22 +1631,51 @@ export default {
           ar_description: null,
           en_description: null,
         },
+        batchBranchFields: [
+          {
+            name: `batch`,
+            sortField: `batch`,
+            title: `${this.$t('tables.title')}`,
+            titleClass: "",
+            dataClass: "list-item-heading",
+            width: "10%",
+          },
+          {
+            name: `batchDetails`,
+            sortField: "batchDetails.0.value",
+            title: `${this.$t('tables.attributes')}`,
+            titleClass: "",
+            dataClass: "text-muted",
+            width: "25%",
+            callback: this.viewAttribute
+          },
+          {
+            name: "prices",
+            sortField: "city_id",
+            title: `${this.$t('tables.city-price')}`,
+            titleClass: "",
+            dataClass: "text-muted",
+            width: "20%",
+            callback: this.viewCity
+          },
+          {
+            name: "__slot:actions",
+            title: "",
+            titleClass: "center aligned text-right",
+            dataClass: "center aligned text-right",
+            width: "20%"
+          }
+        ],
         saveBtn: "Next",
         gridForm: {
           category: null,
-          status: [],
+          published: false,
+          active: false,
           notes: null,
           record_order: null,
           customizations: [],
         },
-        customizationOptions: [
-          "Chocolate",
-        "Vanilla",
-        "Strawberry",
-        "Caramel",
-        "Cookies and Cream",
-        "Peppermint"
-        ],
+        customizationOptions: [],
         categoryOptions: [],
         editorOption: {
         placeholder: '',
@@ -1561,15 +1721,107 @@ export default {
     this.getCustomizationGroups();
   },  
   methods: {
-    ...mapActions(['createItem', 'loadCategoriesList', 'getCustomizationGroups']),
-    onGridFormSubmit(){
+    ...mapActions(['createItem']),
+    viewAttribute(value) {
+      let itm = value.map(x => JSON.parse(x.attribute.locales[this.$i18n.locale].list_values).find(y => y.id === parseInt(x.value)).value)
+      return itm.toString()
+    },
+    viewCity(value) {
+      let cityPriceArray = value.map(x => `${this.cities.find(city => city.id === parseInt(x.city_id)).locales[this.$i18n.locale].name}/ ${x.price}`)
+      return cityPriceArray.toString().replace(',', '\n')
+    },
+    getCustomizationGroups() {
+      return Axios
+      .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)
+    .then(res => {
+      if (res.status === 200) {
+        this.createCustomGroup(res.data.data);
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
+  loadCategoriesList() {
+    return Axios
+      .get(`https://foodapi.lilacdev.com/public/api/categories`)
+      .then(res =>{
+        if (res.status === 200) {
+        this.createcategoryList(res.data.data);
+          }
+        }
+      )
+      .catch(error => {
+      console.log(error);
+    });
+  },
+  loadAttributesList() {
+    return Axios
+      .get(`https://foodapi.lilacdev.com/public/api/attributes`)
+      .then(res =>{
+        if (res.status === 200) {
+        this.createAttributesList(res.data.data);
+          }
+        }
+      )
+      .catch(error => {
+      console.log(error);
+    });
+  },
+  createAttributesList(val){
+    val.forEach(el => {
+      console.log(el);
+    })
+  },
+  itemActions(id){
+    console.log(id);
+  },
+  loadBatchesList(id) {
+    if(id){
+      return Axios
+        .get(`https://foodapi.lilacdev.com/public/api/items/batches/${id}`)
+        .then(res =>{
+          if (res.status === 200) {
+            this.$refs.vuetable.setData(res.data.data);
+            }
+          }
+        )
+        .catch(error => {
+        console.log(error);
+      });
+    }
+  },
+createCustomGroup(data) {
+  data.forEach(el => {
+        this.customizationOptions.push(
+          new Object({ 
+            label: el.locales.en.title,
+            value: el.id
+          }) 
+        )
+      });
+       console.log('optionsssssssss', this.customizationOptions)
+},
+createcategoryList(list){
+    console.log('categoriessss', list);
+    list.forEach(el => {
+        this.categoryOptions.push(
+          new Object({ 
+            text: el.locales.en.title,
+            value: el.id
+          }) 
+        )
+      });
+     
+        },    
+      onGridFormSubmit(){
       this.createItem({
           langs: this.lang_form,
           image: this.main_img,
           additional: this.gridForm,
           is_published: '',
           active: '',
-          //  selectCG.customization_groups = this.selectedItems.map(x => ({id: x}))
+          customization_groups: this.gridForm.customizations.map(x => ({id: x.value}))
       })
     },
     image_selected(){
@@ -1602,36 +1854,42 @@ export default {
     editor() {
       return this.$refs.myTextEditor.quill
     },
-    ...mapGetters(['getCategoriesList', 'getGroups'])
+  ...mapGetters(['create_item'])
   },
   watch: {
+
     main_img: function(main_img) {
       if (main_img) {
           this.imgUrl = URL.createObjectURL(main_img)
           this.files_form.main_img = URL.createObjectURL(main_img)
       }
     },
-    getGroups: function(val){
-      console.log('groupsssss', val);
-    },
+    // getGroups: function(val){
+    //   console.log('groupsssss', val);
+    // },
     gridForm: function(val) {
       if (val.customizations) {
         console.log(val.customizations);
         this.saveBtn = "Save";
       }
     },
-    getCategoriesList: function(val) {
-      console.log(val);
-      val.forEach(el => {
-        this.categoryOptions.push(
-          new Object({ 
-            text: el.locales.en.title,
-            value: el.id
-          }) 
-        )
-      });
-      
+    create_item: function(val) {
+      console.log('create_______item', val);
+      this.loadBatchesList(val.id)
+      this.loadAttributesList();
     }
+    // getCategoriesList: function(val) {
+    //   console.log(val);
+    //   val.forEach(el => {
+    //     this.categoryOptions.push(
+    //       new Object({ 
+    //         text: el.locales.en.title,
+    //         value: el.id
+    //       }) 
+    //     )
+    //   });
+      
+    // }
   }
 }
 </script>

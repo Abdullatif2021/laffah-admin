@@ -81,7 +81,7 @@
                         </b-colxx>
                         <b-colxx sm="12">
                           <b-form-group>
-                            <label class="form-group-label" for="desc">English Title</label>
+                            <label class="form-group-label" for="desc">English details</label>
                             <b-form-textarea
                               id="textarea"
                               rows="3"
@@ -97,22 +97,21 @@
                               <b-form-input
                                 style="display: none;"
                                 v-model="$v.files_form.img.$model"
+                                :state="!$v.files_form.img.$error"
                               />
                               <b-input-group class="mb-3">
                                 <b-form-file
                                   accept="image/*"
-                                  :placeholder="$t('forms.choose-image')"
+                                  placeholder="Please choose an image"
                                   v-model="main_img"
                                   @change="image_selected()"
                                 ></b-form-file>
                               </b-input-group>
 
-                              <!-- <b-form-invalid-feedback
-                                v-if="!$v.files_form.image.required"
-                                >{{
-                                  $t("forms.choose-image-message")
-                                }}</b-form-invalid-feedback
-                              > -->
+                              <b-form-invalid-feedback
+                                v-if="!$v.files_form.img.required"
+                                >Please choose an image</b-form-invalid-feedback
+                              >
                             </b-form-group>
                           </b-colxx>
                         </b-colxx>
@@ -149,11 +148,12 @@
                             <label class="form-group-label" for="side">Category</label>
                             <b-form-select
                               id="side"
-                              v-model="gridForm.category"
+                              v-model="$v.gridForm.category.$model"
+                              :state="!$v.gridForm.category.$error"
                               :options="categoryOptions"
                               plain
                             />
-                          
+                            <b-form-invalid-feedback v-if="!$v.gridForm.category.required" >Please select category</b-form-invalid-feedback>
                           </b-form-group>
                        </b-colxx>            
                       <b-colxx sm="6">
@@ -161,15 +161,17 @@
                           <label class="form-group-label" for="desc">Recoder Order</label>
                           <b-form-input
                             type="number"
-                            v-model="gridForm.record_order"
+                            :state="!$v.gridForm.record_order.$error"
+                            v-model="$v.gridForm.record_order.$model"
                           />
-                        
+                          <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
                         </b-form-group>
                       </b-colxx>
                       <b-colxx sm="12">
                           <b-form-group label="Customizations Group">
                             <v-select
                             v-model="gridForm.customizations"
+                            
                             :options="customizationOptions"
                             item-text="name"
                             item-value="id"
@@ -202,6 +204,7 @@
                           <div class="top-right-button-container">
                             <b-button
                             variant="primary"
+                            v-b-modal.modalright
                             class="top-right-button"
                             @click="itemActions('reset')">
                             {{ $t('pages.add-new') }}
@@ -212,7 +215,7 @@
                           </b-colxx>
                         <b-colxx xxs="12">
                           
-                            <vuetable
+                            <!-- <vuetable
                               ref="vuetable"
                               class="table-divided order-with-arrow"
                               :api-mode="false"
@@ -231,12 +234,12 @@
                                 <i  class="simple-icon-arrow-right"></i>
                                 </b-button>
                               </template>
-                            </vuetable>
-                            <vuetable-pagination-bootstrap
-                              class="mt-4"
-                              ref="pagination"
-                              @vuetable-pagination:change-page="onChangePage"
-                            />
+                            </vuetable> -->
+                              <!-- <vuetable-pagination-bootstrap
+                                class="mt-4"
+                                ref="pagination"
+                                @vuetable-pagination:change-page="onChangePage"
+                              /> -->
                           
                         </b-colxx>
                       </b-row>
@@ -1483,107 +1486,105 @@
         <div class="loading"></div>
       </template>
       </b-row>
-       <b-modal
-    id="modalright"
-    ref="modalright"
-    :title="$t('pages.add-new-title')"
-    modal-class="modal-right"
-  >
-  <b-form
-      @submit.prevent="onValidateCategoryFormFormSubmit"
-      class="av-tooltip tooltip-label-bottom">
-      <b-form-group
-        :label="$t('forms.batch')"
-        :class="`has-float-label mb-4 ${toggleShadow}`">
-        <b-form-input
-          :disabled="toggleState"
-          type="text"
-          pat
-          v-model.trim="$v.batch.batch.$model"
-          :state="!$v.batch.batch.$error" />
-        <b-form-invalid-feedback v-if="!$v.batch.batch.required">{{`${$t('forms.title_ar')}
-          ${$t('validations.required')}`}}!
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <b-input-group
-        v-if="false"
-        :prepend="$t('forms.image')"
-        :class="`has-float-label mb-4 ${toggleShadow}`">
-        <b-form-file
-          :disabled="toggleState"
-          type="image"
-          @change="selectFile"
-          :placeholder="$t('input-groups.choose-file')"
-          accept="image/png, image/jpeg, image/svg" />
-      </b-input-group>
-      <b-form-group :class="`has-float-label mb-4 ${toggleShadow}`">
-
-        <v-select
-          :disabled="toggleState"
-          label="subTitle"
-          multiple
-          :options="options"
-          :reduce="attribute => ({attribute_id:attribute.attribute_id, value:attribute.value})"
-          :selectable="option => !(batch.attributes.map(a=>a.attribute_id).includes(option.attribute_id) && option.type==='List')"
-          v-model="batch.attributes"
-          @search="onSearch"
-          @change="selecting($event)">
-          <template #option="{ title, subTitle}">
-            <small>{{ title }}</small>
-            <br />
-            {{ subTitle }}
-          </template>
-          <template #header>
-            <div style="opacity: .8">{{$t('forms.search-attribute-massage')}}!</div>
-          </template>
-        </v-select>
-      </b-form-group>
-      <b-form-group
-        :label="$t('forms.cities-prices')"
-        :class="`has-float-label mb-4 ${toggleShadow}`">
-        <b-form-row
-          v-for="(cityPrice,index) in {...batch.prices,...cities}"
-          :key="cityPrice.id">
-          <colxx xxs="8">
-            <b-input-group
-              :prepend="cityPrice.locales[$i18n.locale].name"
-              class="mb-3">
+      <b-modal
+        id="modalright"
+        ref="modalright"
+        :title="$t('pages.add-new-title')"
+        modal-class="modal-right"
+      >
+        <b-form class="av-tooltip tooltip-label-bottom">
+            <b-form-group
+              :label="$t('forms.batch')"
+              class="has-float-label mb-4">
               <b-form-input
-                :disabled="toggleState"
                 type="text"
-                @input="setCityId(cityPrice.id,index)"
-                v-model.trim="$v.batch.prices.$each[index].price.$model" />
-            </b-input-group>
+                v-model.trim="$v.batch_form.name.$model"
+                :state="!$v.batch_form.name.$error" />
+              <b-form-invalid-feedback v-if="!$v.batch_form.name.required">{{`${$t('forms.title_ar')}
+                ${$t('validations.required')}`}}!
+              </b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group class="has-float-label mb-4">
+              <label class="form-group-label" for="cate">Attributes</label>
+              <b-form-input
+              style="display: none;"
+              :state="!$v.batch_form.attributes.$error"
+              v-model="$v.batch_form.attributes.$model"
+            />
+              <b-form-select
+                id="cate"
+                v-model="selected_value"
+                @change="get_SubCat"
+                multiple
+                plain
+              >
+              <b-form-select-option-group v-for="(attribute,index) in attributeOptions"  :key="index"   :label="attribute.text">
+                <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values"  :key="index" :value="_val">{{_val.value}}</b-form-select-option>
+              </b-form-select-option-group>
+              </b-form-select>
+              <b-form-invalid-feedback
+                v-if="!$v.batch_form.attributes.required"
+                >Please slelect attributes</b-form-invalid-feedback
+              >          
+            </b-form-group>
+            <div class="wizard-basic-step">
+                <b-row class="add_container">
+                  <b-colxx sm="12">
+                    <b-form-group  label="Branches" class="form-group-label">
+                      <b-form-input
+                        style="display: none;"
+                        :state="!$v.batch_form.branch.$error"
+                        v-model="$v.batch_form.branch.$model"
+                      />
+                      <b-form-select
+                        v-model="selectedBranch"
+                        :options="branchOptions"
+                        @change="selectBrach"
+                        plain
+                      />
+                      <b-form-invalid-feedback
+                        v-if="!$v.batch_form.branch.required"
+                        >Please slelect a branch</b-form-invalid-feedback
+                      >      
+                    </b-form-group>
+                  </b-colxx>
+          
+                   </b-row>
+                   
+        <div class="branch_container" v-if="selectedBranch">
+        <b-form-row>
+          <colxx xxs="8">
+              <b-form-input
+                type="number"
+                placeholder="Please enter the price ..."
+                v-model.trim="selectedBranch.price" />
           </colxx>
           <colxx xxs="4">
             <b-from-group>
-              <switches
-                :disabled="toggleState"
-                type="number"
-                :label="$t('forms.active')"
-                value="0"
-                theme="custom"
-                color="primary"
-                class="mr-4"></switches>
+              <switches v-model="selectedBranch.active" theme="custom" color="primary" class="vue-switcher-small switcher"></switches>
             </b-from-group>
           </colxx>
         </b-form-row>
-      </b-form-group>
+        </div>
+        
+      
 
-    </b-form>
-    <template slot="modal-footer">
-      <b-button variant="outline-secondary" @click="hideModal('modalright')">{{
-        $t("survey.cancel")
-      }}</b-button>
-      <b-button
-        :disabled="enable"
-        variant="primary"
-        @click="formSubmit()"
-        class="mr-1"
-        >{{ $t("survey.submit") }}</b-button
-      >
-    </template>
-  </b-modal>
+                  
+                </div>
+          
+        </b-form>
+        <template slot="modal-footer">
+          <b-button variant="outline-secondary" @click="hideModal('modalright')">{{
+            $t("survey.cancel")
+          }}</b-button>
+          <b-button
+            variant="primary"
+            @click="formSubmit()"
+            class="mr-1"
+            >{{ $t("survey.submit") }}</b-button
+          >
+        </template>
+      </b-modal>
     </div>
 </template>
 <script>
@@ -1618,13 +1619,23 @@ export default {
   data(){
       return {
         isLoad: true,
+        selected_value: [],
         isProcessing: true,
         itemId: null,
+        selectedBranch: null,
+        attributeOptions: [],
+        selected_Branch: null,
+        branchOptions: [],
         imgUrl: null,
         main_img: null,
         files_form: {
           img: null,
         },
+        batch_form: {
+          name: null,
+          attributes: null,
+          branch: null,
+        }, 
         lang_form: {
           ar_name: null,
           en_name: null,
@@ -1703,14 +1714,19 @@ export default {
       en_name: { required },
       en_description: {},
     },
-    // gridForm: {
-    //   category: { },
-    //   status: { },
-    //   notes: { },
-    //   record_order: { },
-    // },
+    gridForm: {
+      category: { required },
+      status: { },
+      notes: { },
+      record_order: { required },
+    },
     files_form: {
-      img: {  },
+      img: { required },
+    },
+    batch_form: {
+      name: { required },
+      attributes: { required },
+      branch: { required },
     }
   },
   
@@ -1742,6 +1758,12 @@ export default {
       console.log(error);
     });
   },
+  get_SubCat(){
+    console.log(this.selected_value)
+    if (this.selected_value) {
+      this.batch_form.attributes = 'selected';
+    }
+  },
   loadCategoriesList() {
     return Axios
       .get(`https://foodapi.lilacdev.com/public/api/categories`)
@@ -1769,12 +1791,29 @@ export default {
     });
   },
   createAttributesList(val){
-    val.forEach(el => {
-      console.log(el);
-    })
+    val.forEach(option => {
+        this.attributeOptions.push(
+          new Object({
+            value: option,
+            text: option.locales.en.title
+          })
+
+        );
+           })
+           console.log(this.attributeOptions)
   },
   itemActions(id){
     console.log(id);
+  },
+  selectBrach(val){
+    if (this.selectedBranch){
+      this.batch_form.branch = 'selected'
+    }else {
+      this.batch_form.branch = null
+
+    }
+    console.log(this.selectedBranch);
+    
   },
   loadBatchesList(id) {
     if(id){
@@ -1802,6 +1841,34 @@ createCustomGroup(data) {
       });
        console.log('optionsssssssss', this.customizationOptions)
 },
+getBranches(){
+  return Axios
+        .get(`https://foodapi.lilacdev.com/public/api/branches`)
+        .then(res =>{
+          if (res.status === 200) {
+            res.data.data.forEach(el => {
+              this.branchOptions.push(
+                new Object({ 
+                  text: el.locales.en.name,
+                  value: {
+                    text: el.locales.en.name,
+                    price: '',
+                  active: true,
+                  id: el.id
+                  },
+                  
+                }) 
+              )
+            });
+            console.log(this.branchOptions)
+
+            }
+          }
+        )
+        .catch(error => {
+        console.log(error);
+      });
+},  
 createcategoryList(list){
     console.log('categoriessss', list);
     list.forEach(el => {
@@ -1837,14 +1904,19 @@ createcategoryList(list){
     validateStep1(){
       this.$v.$touch();
       this.$v.lang_form.$touch();
-      if ( !this.$v.lang_form.$invalid ){
+      this.$v.files_form.$touch();
+      if ( !this.$v.lang_form.$invalid && !this.$v.files_form.$invalid ){
         this.$v.$reset();
         return true;
       }
     },
     validateStep2(){
-      // this.saveBtn = "skip";
-      return true;
+      this.$v.$touch();
+      this.$v.gridForm.$touch();
+      if ( !this.$v.gridForm.$invalid ){
+        this.$v.$reset();
+        return true;
+      }
     },
     validateStep3(){
       return true;
@@ -1861,7 +1933,9 @@ createcategoryList(list){
     main_img: function(main_img) {
       if (main_img) {
           this.imgUrl = URL.createObjectURL(main_img)
-          this.files_form.main_img = URL.createObjectURL(main_img)
+          this.files_form.img = URL.createObjectURL(main_img)
+      }else {
+        this.files_form.img = null;
       }
     },
     // getGroups: function(val){
@@ -1877,6 +1951,7 @@ createcategoryList(list){
       console.log('create_______item', val);
       this.loadBatchesList(val.id)
       this.loadAttributesList();
+      this.getBranches();
     }
     // getCategoriesList: function(val) {
     //   console.log(val);
@@ -1898,5 +1973,17 @@ createcategoryList(list){
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.add_container {
+          width: 100%;
+}
+.switcher {
+  margin: 7px;
+  position: unset !important;
+  display: inline-block;
+}
+.branch_container{
+  display: flex;
+    justify-content: center;
 }
 </style>

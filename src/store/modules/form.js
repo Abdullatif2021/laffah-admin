@@ -131,7 +131,7 @@ const actions = {
       axios
       .post(`https://foodapi.lilacdev.com/public/api/items`, formData)
       .then(res => {
-        if (res.status === 200) {
+        if (res.status === 201) {
          commit('crateItemSuccess', res.data.data)     
         }
       })

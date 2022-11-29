@@ -1579,7 +1579,7 @@
           }}</b-button>
           <b-button
             variant="primary"
-            @click="formSubmit()"
+            @click="submitBatchForm()"
             class="mr-1"
             >{{ $t("survey.submit") }}</b-button
           >
@@ -1625,6 +1625,7 @@ export default {
         selectedBranch: null,
         attributeOptions: [],
         selected_Branch: null,
+        selected_Branch_array: [],
         branchOptions: [],
         imgUrl: null,
         main_img: null,
@@ -1790,6 +1791,16 @@ export default {
       console.log(error);
     });
   },
+  submitBatchForm(){
+    this.createBatch({
+          attributes: this.lang_form,
+          prices: this..map(x => ({id: x.value})),
+          additional: this.gridForm,
+          is_published: '',
+          active: '',
+          customization_groups: this.gridForm.customizations.map(x => ({id: x.value}))
+      })
+  },
   createAttributesList(val){
     val.forEach(option => {
         this.attributeOptions.push(
@@ -1926,10 +1937,12 @@ createcategoryList(list){
     editor() {
       return this.$refs.myTextEditor.quill
     },
-  ...mapGetters(['create_item'])
+  ...mapGetters(['create_item', 'createBatch'])
   },
   watch: {
-
+    createBatch: function(val){
+      console.log('createBatch', val);
+    },
     main_img: function(main_img) {
       if (main_img) {
           this.imgUrl = URL.createObjectURL(main_img)

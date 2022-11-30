@@ -200,7 +200,8 @@
                  <div class="wizard-basic-step">
                     <b-form>
                       <b-row>
-                        <b-colxx xxs="12">
+                        <template v-if="isStillCreated">
+                          <b-colxx xxs="12">
                           <div class="top-right-button-container">
                             <b-button
                             variant="primary"
@@ -210,38 +211,101 @@
                             {{ $t('pages.add-new') }}
                             </b-button>
                           </div>
-                          
-                        
                           </b-colxx>
                         <b-colxx xxs="12">
+                          <template v-if="load_batches">
                           
-                            <!-- <vuetable
-                              ref="vuetable"
+                            <vuetable
+                              ref="batch_vuetable"
                               class="table-divided order-with-arrow"
                               :api-mode="false"
                               :reactive-api-url="true"
                               :fields="batchBranchFields"
                               pagination-path
-                              @vuetable:pagination-data="onPaginationData"
                             >
                               <template slot="actions" slot-scope="props">
                                
-                                <b-button
-                                  variant="outline-theme-3"
-                                  class="icon-button"
-                                  @click="modify(props.rowData.id)"
-                                >
-                                <i  class="simple-icon-arrow-right"></i>
-                                </b-button>
+                                <b-dropdown
+       id="ddown2"
+       size="xs"
+       html=" "
+       split
+       split-class="p-0"
+       class=""
+       variant="secondary">
+       <template #button-content>
+        <div class="py-0">
+        
+        
+        
+        
+         <b-link
+          id="edit"
+          class="d-flex align-items-center  text-white px-2">
+          <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+         </b-link>
+        </div>
+       </template>
+           
+            <b-dropdown-item
+              v-b-modal="`modalright_related`"
+              @click="setItem(props.rowData,'related')">
+              <b-icon-link45deg
+              class="h5 m-0"
+              variant="primary"
+              scale="1" />
+              <span class="mx-1">{{ $t('forms.related-items') }}</span>
+            </b-dropdown-item>
+            <b-dropdown-item
+              v-b-modal="`modalright_branches`"
+              @click="setItem(props.rowData)">
+              <i class="iconsminds-arrow-inside-gap-45 color-theme-1"></i><span class="mx-1">{{ $t('forms.branches-availability') }}</span>
+            </b-dropdown-item>
+            <b-dropdown-divider></b-dropdown-divider>
+            <b-dropdown-item
+              title="Delete Item"
+              class=""
+              v-b-modal="`delete${props.rowData.id}`"
+              scale="1.1">
+              <i class="simple-icon-trash" /> <span class="mx-1">{{ $t('delete') }}</span>
+            </b-dropdown-item>
+            </b-dropdown>
+            <b-modal
+              :id="`delete${props.rowData.id}`"
+              ref="modallg"
+              size="sm"
+              hide-header>
+              <h3>{{ $t("are-you-sure-delete") }}</h3>
+              <template slot="modal-footer">
+                <b-button
+                size="xs"
+                variant="danger"
+                @click="deleteItem(props.rowData.id)"
+                class="mr-1">{{ $t("delete") }}
+                </b-button>
+                <b-button
+                size="xs"
+                variant="light"
+                @click="hideModal('modallg')">{{ $t("cancel") }}
+                </b-button>
+              </template>
+            </b-modal>
                               </template>
-                            </vuetable> -->
+                            </vuetable> 
                               <!-- <vuetable-pagination-bootstrap
                                 class="mt-4"
                                 ref="pagination"
                                 @vuetable-pagination:change-page="onChangePage"
-                              /> -->
-                          
+                              />-->
+                            </template>
+                      <template v-else>
+                        <div class="loading"></div>
+                      </template>
                         </b-colxx>
+                      </template>
+                      <template v-else>
+                        <div class="loading"></div>
+                      </template>
                       </b-row>
                     </b-form>
                   </div>
@@ -1518,8 +1582,8 @@
                 multiple
                 plain
               >
-              <b-form-select-option-group v-for="(attribute,index) in attributeOptions"  :key="index"   :label="attribute.text">
-                <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values"  :key="index" :value="_val">{{_val.value}}</b-form-select-option>
+              <b-form-select-option-group class="attributeOptions" v-for="(attribute,index) in attributeOptions"  :key="index" :label="attribute.text">
+                <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values" ref="attributid" :key="index" :value="`${attribute.value.id}_${_val.id}`">{{_val.value}}</b-form-select-option>
               </b-form-select-option-group>
               </b-form-select>
               <b-form-invalid-feedback
@@ -1621,12 +1685,15 @@ export default {
         isLoad: true,
         selected_value: [],
         isProcessing: true,
-        itemId: null,
+        item_id: null,
         selectedBranch: null,
+        itemId: null,
         attributeOptions: [],
+        selected_attrib_array: [],
         selected_Branch: null,
         selected_Branch_array: [],
         branchOptions: [],
+        isStillCreated: false,
         imgUrl: null,
         main_img: null,
         files_form: {
@@ -1652,24 +1719,24 @@ export default {
             dataClass: "list-item-heading",
             width: "10%",
           },
-          {
-            name: `batchDetails`,
-            sortField: "batchDetails.0.value",
-            title: `${this.$t('tables.attributes')}`,
-            titleClass: "",
-            dataClass: "text-muted",
-            width: "25%",
-            callback: this.viewAttribute
-          },
-          {
-            name: "prices",
-            sortField: "city_id",
-            title: `${this.$t('tables.city-price')}`,
-            titleClass: "",
-            dataClass: "text-muted",
-            width: "20%",
-            callback: this.viewCity
-          },
+          // {
+          //   name: `batchDetails`,
+          //   sortField: "batchDetails.0.value",
+          //   title: `${this.$t('tables.attributes')}`,
+          //   titleClass: "",
+          //   dataClass: "text-muted",
+          //   width: "25%",
+          //   callback: this.viewAttribute
+          // },
+          // {
+          //   name: "prices",
+          //   sortField: "branch_id",
+          //   title: `Branch price`,
+          //   titleClass: "",
+          //   dataClass: "text-muted",
+          //   width: "20%",
+          //   callback: this.viewBranch
+          // },
           {
             name: "__slot:actions",
             title: "",
@@ -1738,20 +1805,22 @@ export default {
     this.getCustomizationGroups();
   },  
   methods: {
-    ...mapActions(['createItem']),
+    ...mapActions(['createItem', 'getBatches', 'createBatch']),
     viewAttribute(value) {
-      let itm = value.map(x => JSON.parse(x.attribute.locales[this.$i18n.locale].list_values).find(y => y.id === parseInt(x.value)).value)
-      return itm.toString()
+      // let itm = value.map(x => JSON.parse(x.attribute.locales.en.list_values).find(y => y.id === parseInt(x.value)).value)
+      return value.toString()
     },
-    viewCity(value) {
-      let cityPriceArray = value.map(x => `${this.cities.find(city => city.id === parseInt(x.city_id)).locales[this.$i18n.locale].name}/ ${x.price}`)
-      return cityPriceArray.toString().replace(',', '\n')
+    viewBranch(value) {
+      return value
+      // let cityPriceArray = value.map(x => `${this.branchOptions.find(branch => branch.value.id === parseInt(x.batch_id))}/ ${x.price}`)
+      // console.log(value.map(x => this.branchOptions.find(branch => branch.value.id === parseInt(x.batch_id))))
+      
     },
     getCustomizationGroups() {
       return Axios
       .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)
     .then(res => {
-      if (res.status === 200) {
+      if (res.status === 200) { 
         this.createCustomGroup(res.data.data);
       }
     })
@@ -1762,6 +1831,7 @@ export default {
   get_SubCat(){
     console.log(this.selected_value)
     if (this.selected_value) {
+
       this.batch_form.attributes = 'selected';
     }
   },
@@ -1791,15 +1861,19 @@ export default {
       console.log(error);
     });
   },
+  hideModal(refname) {
+    this.$refs[refname].hide();
+  },  
   submitBatchForm(){
+    console.log(this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})), this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})))
     this.createBatch({
-          attributes: this.lang_form,
-          prices: this..map(x => ({id: x.value})),
-          additional: this.gridForm,
-          is_published: '',
-          active: '',
-          customization_groups: this.gridForm.customizations.map(x => ({id: x.value}))
+          item_id: this.item_id,
+          batch: this.batch_form.name,
+          prices: this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})),
+          attributes: this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})),
+         
       })
+     
   },
   createAttributesList(val){
     val.forEach(option => {
@@ -1811,7 +1885,7 @@ export default {
 
         );
            })
-           console.log(this.attributeOptions)
+           console.log('this.attributeOptions', this.attributeOptions)
   },
   itemActions(id){
     console.log(id);
@@ -1819,12 +1893,16 @@ export default {
   selectBrach(val){
     if (this.selectedBranch){
       this.batch_form.branch = 'selected'
+      this.selected_Branch_array.push(this.selectedBranch)
     }else {
       this.batch_form.branch = null
 
     }
     console.log(this.selectedBranch);
     
+  },
+  deleteItem(id){
+    console.log(id)
   },
   loadBatchesList(id) {
     if(id){
@@ -1841,6 +1919,7 @@ export default {
       });
     }
   },
+  
 createCustomGroup(data) {
   data.forEach(el => {
         this.customizationOptions.push(
@@ -1864,8 +1943,8 @@ getBranches(){
                   value: {
                     text: el.locales.en.name,
                     price: '',
-                  active: true,
-                  id: el.id
+                    active: true,
+                    id: el.id
                   },
                   
                 }) 
@@ -1937,11 +2016,16 @@ createcategoryList(list){
     editor() {
       return this.$refs.myTextEditor.quill
     },
-  ...mapGetters(['create_item', 'createBatch'])
+  ...mapGetters(['create_item', '_batches', 'create_Batch', 'load_batches'])
   },
   watch: {
-    createBatch: function(val){
-      console.log('createBatch', val);
+    _batches: function(val){
+      console.log('_branches', val)
+      this.$refs.batch_vuetable.setData(val);
+    },
+    create_Batch: function(val){
+      console.log('createBatch', val);  
+      this.getBatches({item_id: this.item_id});
     },
     main_img: function(main_img) {
       if (main_img) {
@@ -1961,23 +2045,15 @@ createcategoryList(list){
       }
     },
     create_item: function(val) {
+      this.item_id = val.id;
       console.log('create_______item', val);
-      this.loadBatchesList(val.id)
+      this.isStillCreated = true;
       this.loadAttributesList();
       this.getBranches();
+    },
+    load_batches: function(val) {
+      this.$refs['modalright'].hide();
     }
-    // getCategoriesList: function(val) {
-    //   console.log(val);
-    //   val.forEach(el => {
-    //     this.categoryOptions.push(
-    //       new Object({ 
-    //         text: el.locales.en.title,
-    //         value: el.id
-    //       }) 
-    //     )
-    //   });
-      
-    // }
   }
 }
 </script>
@@ -1998,5 +2074,13 @@ createcategoryList(list){
 .branch_container{
   display: flex;
     justify-content: center;
+}
+.icon-button {
+  padding: 0;
+  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
 }
 </style>

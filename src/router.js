@@ -148,13 +148,13 @@ const routes = [{
         children: [{
           path: "item-form/:id",
           component: () =>
-            import ( /* webpackChunkName: "dashboards" */ "./views/app/items/item-form"),
+            import ( /* webpackChunkName: "dashboards" */ "./views/app/items/item_form"),
           meta: {loginRequired: true, roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin]},
         },
           {
             path: "item-form",
             component: () =>
-              import ( /* webpackChunkName: "dashboards" */ "./views/app/items/item-form"),
+              import ( /* webpackChunkName: "dashboards" */ "./views/app/items/item_form"),
             meta: {loginRequired: true, roles: [UserRole.superadmin]},
           },
           // {

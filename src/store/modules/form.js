@@ -10,7 +10,9 @@ const state = {
   isLoad: null,
   create_item: null,
   groups: null,
-  createBatch: null,
+  create_Batch: null,
+  batches: null,
+  load_batches: false,
 }
 
 const getters = {
@@ -19,7 +21,9 @@ const getters = {
   getStatus: (state) => state.status,
   getGroups: (state) => state.groups,
   create_item: state => state.create_item,
-  createBatch: state => state.createBatch
+  create_Batch: state => state.create_Batch,
+  _batches: state => state.batches,
+  load_batches: state => state.load_batches
 }
 
 const mutations = {
@@ -31,11 +35,17 @@ const mutations = {
     state.create_item = payload;
   },
   crateBatchSuccess(state, payload){
-    state.createBatch = payload;
+    state.create_Batch = payload;
+  },
+  is_load_batches(state, payload){
+    state.load_batches = payload;
   },
   SET_FormData(state, payload) {
     let {item} = payload
     state.form_Data = item
+  },
+  getBatchSuccess(state, payload){
+    state.batches = payload;
   },
   SET_FromType(state, payload) {
   },
@@ -144,26 +154,46 @@ const actions = {
         console.log(error);
       });
     },
-    createBatch({commit, dispatch}, payload){
-      const formData = new FormData();
-      const item_id = payload.item_id;
-      console.log(payload);
-      const attributes = payload.attributes
-      formData.append(`attributes`, JSON.stringify({attributes}));
-      const prices = payload.prices
-      formData.append(`prices`, JSON.stringify({prices}));
-      formData.append(`batch`, 1);
-      axios
-      .post(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}`, formData)
-      .then(res => {
-        if (res.status === 201) {
-         commit('crateBatchSuccess', res.data.data)     
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    },
+  getBatches({commit, dispatch}, payload){
+    const item_id = payload.item_id;
+    commit('is_load_batches', false)
+    axios
+    .get(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}`)
+    .then(res => {
+      if (res.status === 200) {
+        commit('is_load_batches', true)
+        return res
+      }
+    })
+    .then(res => {
+      if (res.status === 200) {
+        commit('getBatchSuccess', res.data.data)     
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
+  createBatch({commit, dispatch}, payload){
+    const formData = new FormData();
+    const item_id = payload.item_id;
+    console.log(payload);
+    const attributes = payload.attributes
+    formData.append(`attributes`, JSON.stringify({attributes}));
+    const prices = payload.prices
+    formData.append(`prices`, JSON.stringify({prices}));
+    formData.append(`batch`, payload.batch);
+    axios
+    .post(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}`, formData)
+    .then(res => {
+      if (res.status === 201) {
+        commit('crateBatchSuccess', res.data.data)     
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
   getCustomizationGroups() {
       axios
       .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)

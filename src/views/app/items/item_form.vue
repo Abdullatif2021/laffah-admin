@@ -219,10 +219,16 @@
                               ref="batch_vuetable"
                               class="table-divided order-with-arrow"
                               :api-mode="false"
+                              childRow="true"
                               :reactive-api-url="true"
                               :fields="batchBranchFields"
                               pagination-path
+                              @vuetable:row-clicked="rowClicked"
                             >
+                            <template v-slot:child_row="props">
+  <div><b>First name:</b> eerrereer</div>
+  <div><b>Last name:</b> {{props}}</div>
+</template>
                               <template slot="actions" slot-scope="props">
                                
                                 <b-dropdown
@@ -249,18 +255,18 @@
            
             <b-dropdown-item
               v-b-modal="`modalright_related`"
-              @click="setItem(props.rowData,'related')">
+              @click="getAssighedBranch(props.rowData,'related')">
               <b-icon-link45deg
               class="h5 m-0"
               variant="primary"
               scale="1" />
-              <span class="mx-1">{{ $t('forms.related-items') }}</span>
+              <span class="mx-1">Apply other branches</span>
             </b-dropdown-item>
-            <b-dropdown-item
+            <!-- <b-dropdown-item
               v-b-modal="`modalright_branches`"
               @click="setItem(props.rowData)">
               <i class="iconsminds-arrow-inside-gap-45 color-theme-1"></i><span class="mx-1">{{ $t('forms.branches-availability') }}</span>
-            </b-dropdown-item>
+            </b-dropdown-item> -->
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item
               title="Delete Item"
@@ -280,7 +286,7 @@
                 <b-button
                 size="xs"
                 variant="danger"
-                @click="deleteItem(props.rowData.id)"
+                @click="deleteBatch(props.rowData.id)"
                 class="mr-1">{{ $t("delete") }}
                 </b-button>
                 <b-button
@@ -1564,9 +1570,7 @@
                 type="text"
                 v-model.trim="$v.batch_form.name.$model"
                 :state="!$v.batch_form.name.$error" />
-              <b-form-invalid-feedback v-if="!$v.batch_form.name.required">{{`${$t('forms.title_ar')}
-                ${$t('validations.required')}`}}!
-              </b-form-invalid-feedback>
+              <b-form-invalid-feedback v-if="!$v.batch_form.name.required">Please enter batch name</b-form-invalid-feedback>
             </b-form-group>
             <b-form-group class="has-float-label mb-4">
               <label class="form-group-label" for="cate">Attributes</label>
@@ -1618,10 +1622,19 @@
         <div class="branch_container" v-if="selectedBranch">
         <b-form-row>
           <colxx xxs="8">
+            <b-form-input
+                style="display: none;"
+                :state="!$v.batch_form.price.$error"
+                v-model="$v.batch_form.price.$model"
+              />
               <b-form-input
                 type="number"
                 placeholder="Please enter the price ..."
                 v-model.trim="selectedBranch.price" />
+                <b-form-invalid-feedback
+                  v-if="!$v.batch_form.price.required"
+                  >Please enter the price</b-form-invalid-feedback
+                >      
           </colxx>
           <colxx xxs="4">
             <b-from-group>
@@ -1649,6 +1662,43 @@
           >
         </template>
       </b-modal>
+      <b-modal
+        id="modalright_related"
+        ref="modalright_related"
+        title="Apply other branches"
+        modal-class="modal-right"
+      >
+        <b-form class="av-tooltip tooltip-label-bottom">
+        
+        <b-form-group label="Branches">
+          <b-form-checkbox-group 
+            v-model="selected_branches"
+            :options="checkboxOptions"
+            class="mb-3"
+            value-field="item"
+            text-field="name"
+            disabled-field="selected"
+            stacked
+          >
+          </b-form-checkbox-group>
+        </b-form-group>
+      
+   
+     
+        </b-form>
+        <template slot="modal-footer">
+          <b-button variant="outline-secondary" @click="hideModal('modalright_related')">{{
+            $t("survey.cancel")
+          }}</b-button>
+          <b-button
+            variant="primary"
+            @click="submitBatchList()"
+            class="mr-1"
+            >{{ $t("survey.submit") }}</b-button
+          >
+        </template>
+      </b-modal>
+      
     </div>
 </template>
 <script>
@@ -1685,16 +1735,20 @@ export default {
         isLoad: true,
         selected_value: [],
         isProcessing: true,
+        checkboxOptions: [],
+        selected_branches: [],
         item_id: null,
         selectedBranch: null,
         itemId: null,
         attributeOptions: [],
         selected_attrib_array: [],
         selected_Branch: null,
+        batch_id: null,
         selected_Branch_array: [],
         branchOptions: [],
         isStillCreated: false,
         imgUrl: null,
+        main_price: null,
         main_img: null,
         files_form: {
           img: null,
@@ -1703,6 +1757,7 @@ export default {
           name: null,
           attributes: null,
           branch: null,
+          price: null,
         }, 
         lang_form: {
           ar_name: null,
@@ -1795,6 +1850,7 @@ export default {
       name: { required },
       attributes: { required },
       branch: { required },
+      price: { required },
     }
   },
   
@@ -1805,7 +1861,7 @@ export default {
     this.getCustomizationGroups();
   },  
   methods: {
-    ...mapActions(['createItem', 'getBatches', 'createBatch']),
+    ...mapActions(['createItem', 'getBatches', 'createBatch', 'updateBatch']),
     viewAttribute(value) {
       // let itm = value.map(x => JSON.parse(x.attribute.locales.en.list_values).find(y => y.id === parseInt(x.value)).value)
       return value.toString()
@@ -1835,6 +1891,9 @@ export default {
       this.batch_form.attributes = 'selected';
     }
   },
+  getAssighedBranch(val){
+    console.log(val)
+  },
   loadCategoriesList() {
     return Axios
       .get(`https://foodapi.lilacdev.com/public/api/categories`)
@@ -1861,18 +1920,40 @@ export default {
       console.log(error);
     });
   },
+  submitBatchList(){
+    console.log(this.selected_branches);
+    this.updateBatch({
+      item_id: this.item_id,  
+      batch_id: this.batch_id,
+      prices: this.selected_branches.map(x => ({branch_id: x, price: this.main_price, active: true})),
+    })
+  },
+  deleteBatch(val){
+    console.log(val)
+  },
+  rowClicked(dataItem, event) {
+      const itemId = dataItem.id;
+      console.log(itemId)
+      this.$refs.batch_vuetable.toggleChildRow(dataItem.id);
+  },
   hideModal(refname) {
     this.$refs[refname].hide();
   },  
   submitBatchForm(){
-    console.log(this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})), this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})))
-    this.createBatch({
-          item_id: this.item_id,
-          batch: this.batch_form.name,
-          prices: this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})),
-          attributes: this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})),
-         
-      })
+    this.$v.$touch();
+    this.$v.batch_form.$touch();
+    if (this.selectedBranch.price) {
+      this.batch_form.price = 'selected'
+    }
+    if ( !this.$v.batch_form.$invalid){
+      this.createBatch({
+            item_id: this.item_id,
+            batch: this.batch_form.name,
+            prices: this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})),
+            attributes: this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})),
+            
+        })
+    }
      
   },
   createAttributesList(val){
@@ -1893,10 +1974,16 @@ export default {
   selectBrach(val){
     if (this.selectedBranch){
       this.batch_form.branch = 'selected'
+      // if(this.selectedBranch.price != ''){
+      //   this.batch_form.price = 'selected'
+      // }else {
+      //   this.batch_form.price = null
+      // }
+      
       this.selected_Branch_array.push(this.selectedBranch)
     }else {
       this.batch_form.branch = null
-
+      this.batch_form.price = null
     }
     console.log(this.selectedBranch);
     
@@ -1942,7 +2029,7 @@ getBranches(){
                   text: el.locales.en.name,
                   value: {
                     text: el.locales.en.name,
-                    price: '',
+                    price: null,
                     active: true,
                     id: el.id
                   },
@@ -2009,6 +2096,7 @@ createcategoryList(list){
       }
     },
     validateStep3(){
+      this.$router.push('../items')
       return true;
     }
   },
@@ -2016,16 +2104,49 @@ createcategoryList(list){
     editor() {
       return this.$refs.myTextEditor.quill
     },
-  ...mapGetters(['create_item', '_batches', 'create_Batch', 'load_batches'])
+  ...mapGetters(['create_item', '_batches', 'create_Batch', 'load_batches', '_updateBatch', '_deleteBatch'])
   },
   watch: {
+    _updateBatch: function(val){
+      this.getBatches({item_id: this.item_id});
+      this.$refs['modalright_related'].hide();
+      this.checkboxOptions = [];
+      branch_ids = val.prices.map(el=> (el.branch_id))
+      this.checkboxOptions = this.branchOptions.map( item => {
+        return {
+          name: item.text,
+          item: item.value.id,
+          selected: branch_ids.includes(item.value.id)
+        }
+      })
+    },
+    _deleteBatch: function(val){
+      this.getBatches({item_id: this.item_id});
+      this.checkboxOptions = [];
+    },  
     _batches: function(val){
       console.log('_branches', val)
       this.$refs.batch_vuetable.setData(val);
     },
     create_Batch: function(val){
-      console.log('createBatch', val);  
       this.getBatches({item_id: this.item_id});
+      this.checkboxOptions = [];
+      this.batch_id = val.id
+      this.main_price = val.prices[0].price;
+      let branch_ids = [];
+      
+      this.batch_form.name = null;
+      this.selected_Branch_array = null;
+      this.selected_value = null;
+      this.$v.$reset();
+      branch_ids = val.prices.map(el=> (el.branch_id))
+      this.checkboxOptions = this.branchOptions.map( item => {
+        return {
+          name: item.text,
+          item: item.value.id,
+          selected: branch_ids.includes(item.value.id)
+        }
+      })
     },
     main_img: function(main_img) {
       if (main_img) {

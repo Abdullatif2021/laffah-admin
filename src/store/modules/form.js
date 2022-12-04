@@ -13,6 +13,8 @@ const state = {
   create_Batch: null,
   batches: null,
   load_batches: false,
+  deleteBatch: null,
+  updateBatch: null,
 }
 
 const getters = {
@@ -22,6 +24,8 @@ const getters = {
   getGroups: (state) => state.groups,
   create_item: state => state.create_item,
   create_Batch: state => state.create_Batch,
+  _updateBatch: state => state.updateBatch, 
+  _deleteBatch: state => state.deleteBatch,
   _batches: state => state.batches,
   load_batches: state => state.load_batches
 }
@@ -33,6 +37,9 @@ const mutations = {
   },
   crateItemSuccess(state, payload){
     state.create_item = payload;
+  },
+  updateBatchSuccess(state, payload){
+    state.updateBatch = payload;
   },
   crateBatchSuccess(state, payload){
     state.create_Batch = payload;
@@ -46,6 +53,9 @@ const mutations = {
   },
   getBatchSuccess(state, payload){
     state.batches = payload;
+  },
+  deleteBatchSuccess(state, payload){
+    state.deleteBatch = payload;
   },
   SET_FromType(state, payload) {
   },
@@ -194,6 +204,39 @@ const actions = {
       console.log(error);
     });
   },
+  updateBatch({commit, dispatch}, payload){
+  const formData = new FormData();
+  const item_id = payload.item_id;
+  const batch_id = payload.batch_id;
+  console.log(payload)
+  const prices = payload.prices
+  formData.append(`prices`, JSON.stringify({prices}));
+  formData.append("_method", "PUT");
+  axios
+  .put(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`, formData)
+  .then(res => {
+    if (res.status === 200) {
+      commit('updateBatchSuccess', res.data.data)     
+    }
+  })
+  .catch(error => {
+    console.log(error);
+  });
+  },
+  updateBatch({commit, dispatch}, payload){
+    const item_id = payload.item_id;
+    const batch_id = payload.batch_id;
+    axios
+    .delete(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`)
+    .then(res => {
+      if (res.status === 200) {
+        commit('deleteBatchSuccess', res.data.data)     
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+    },
   getCustomizationGroups() {
       axios
       .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)

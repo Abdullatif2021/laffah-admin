@@ -10,11 +10,16 @@ const state = {
   isLoad: null,
   create_item: null,
   groups: null,
+  item: null,
   create_Batch: null,
+  updateItem: null,
   batches: null,
   load_batches: false,
   deleteBatch: null,
+  loadItem: false,
+  updatedItemMainImageSuccessfuly: null,
   updateBatch: null,
+  deleteItem: null,
 }
 
 const getters = {
@@ -22,7 +27,12 @@ const getters = {
   getFormData: (state) => state.form_Data,
   getStatus: (state) => state.status,
   getGroups: (state) => state.groups,
+  _loadItem: (state) => state.loadItem,
+  _item: state => state.item,
+  _updatedItemMainImageSuccessfuly: state => state.updatedItemMainImageSuccessfuly,
   create_item: state => state.create_item,
+  _updateItem: state => state.updateItem,
+  _deleteItem: state => state.deleteItem,
   create_Batch: state => state.create_Batch,
   _updateBatch: state => state.updateBatch, 
   _deleteBatch: state => state.deleteBatch,
@@ -59,8 +69,23 @@ const mutations = {
   },
   SET_FromType(state, payload) {
   },
+  deleteItemSuccess(state, payload){
+    state.deleteItem = payload;
+  },
+  updateItemSuccess(state, payload){
+    state.updateItem = payload;
+  },
   get_customizationGroups(state, payload) {
     state.groups = payload
+  },
+  is_load_item(state, payload){
+    state.loadItem = payload;
+  },
+  getItemSuccess(state, payload){
+    state.item = payload;
+  },
+  updateItemImage(state, payload){
+    state.updatedItemMainImageSuccessfuly = payload;
   }
 }
 
@@ -164,6 +189,66 @@ const actions = {
         console.log(error);
       });
     },
+  updateItem({commit, dispatch}, payload) {
+    const formData = new FormData();
+    const item_id = payload.id
+    console.log('updateItem payload', payload);
+   
+    if(payload.additional){
+      formData.append(`is_published`, payload.additional.published ? 1 : 0);
+      formData.append(`active`, payload.additional.active ? 1 : 0);
+      formData.append(`itemCategory[category_id]`, payload.additional.category);
+      formData.append(`record_order`, payload.additional.record_order);
+    }
+    if(payload.notes){
+      formData.append(`notes`, payload.notes);
+    }
+    if(payload.langs){
+      Object.entries(payload.langs).forEach(([key, value]) => {
+        if (value){
+          const lang = key.toString().split("_")[0];
+          const type = key.toString().split("_")[1];
+          formData.append(`${lang}[${type}]`, value);
+        }
+      });
+    }
+    if (payload.image != null) {
+      formData.append("image", payload.image);
+    }
+    if (payload.customization_groups != null) {
+      const customization_groups = payload.customization_groups
+      formData.append(`customization_groups`, JSON.stringify({customization_groups}));
+    }
+    formData.append("_method", "PUT");
+    axios
+    .post(`https://foodapi.lilacdev.com/public/api/items/${item_id}`, formData)
+    .then(res => {
+      if (res.status === 200) {
+        if(payload.image){
+          commit('updateItemImage', res.data.data)
+        }else {
+          console.log('here from else', res.data.data)
+        commit('updateItemSuccess', res.data.data)
+        }
+      }     
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
+  item_delete({commit}, payload){
+    const item_id = payload.item_id;
+    axios
+    .delete(`https://foodapi.lilacdev.com/public/api/items/${item_id}`)
+    .then(res => {
+      if (res.status === 200) {
+        commit('deleteItemSuccess', res.data.data)     
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
   getBatches({commit, dispatch}, payload){
     const item_id = payload.item_id;
     commit('is_load_batches', false)
@@ -178,6 +263,26 @@ const actions = {
     .then(res => {
       if (res.status === 200) {
         commit('getBatchSuccess', res.data.data)     
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  },
+  getItem({commit, dispatch}, payload){
+    const item_id = payload.id;
+    commit('is_load_item', false)
+    axios
+    .get(`https://foodapi.lilacdev.com/public/api/items/${item_id}`)
+    .then(res => {
+      if (res.status === 200) {
+        commit('is_load_item', true)
+        return res
+      }
+    })
+    .then(res => {
+      if (res.status === 200) {
+        commit('getItemSuccess', res.data.data)     
       }
     })
     .catch(error => {

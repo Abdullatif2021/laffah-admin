@@ -1303,6 +1303,7 @@ createcategoryList(list){
       this.gridForm.notes = val.notes;
       this.gridForm.customizations = val.customizationGroups.map(x => (x.id))
       console.log(this.gridForm.customizations)
+      
     }, 
     _updateItem: function(val){
       this.$notify(

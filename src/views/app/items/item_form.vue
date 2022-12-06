@@ -1,128 +1,68 @@
 <template>
-    <div>
-      <b-row v-if="!itemId">
-        <b-colxx xxs="12">
-          <piaf-breadcrumb :heading="itemId ? 'Edit item': 'Create item'"/>
-          <div class="separator mb-5"></div>
-        </b-colxx>
-      </b-row>
-      <b-row>
-        <template v-if="isLoad">
-          <b-card v-if="!itemId" style="width: 100%;" class="mb-4">
-            <b-card-body class="wizard wizard-default">
-              <form-wizard
-                :with-validate="true"
-                :saveBtn="saveBtn"
-                :top-nav-disabled="true"
-                :last-step-end="true"
-                nav-class="justify-content-between"
-              >
-                <tab name="Main Info" :selected="true" :validate="validateStep1" >
-                  <div class="wizard-basic-step">
-                    <b-form>
-                      <b-row>
-                        <b-colxx style="display: block;padding: 0px;" sm="12">
-                          <label
-                            v-if="main_img"
-                            style="display: flex;justify-content: center;"
-                            class="form-group has-float-label"
-                          >
+ <div>
+  <b-row v-if="item_id">
+    <template v-if="_loadItem">
+      <b-colxx xxs="12">
+          <h1>{{lang_form.en_name}}</h1>
+          <div v-if="addNewBtn" class="top-right-button-container">
+            <b-button
+            variant="primary"
+            size="lg"
+            class="top-right-button"
+            v-b-modal.modalright
+            >Add new Batch</b-button>
+          </div>
+          <piaf-breadcrumb />
+          <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
+            <b-tab @click="addNewBtn = false" title="Basic details">
+              <b-row>
+                  <b-colxx style="margin-top: 60px;" xxs="12">
+                    <b-card class="mb-4 auction_card">
+                      <b-form>
+                        <b-row style="margin: 42px;">
+                          <b-colxx style="position: absolute;top: -104px;left: 1px;padding: 0px;" sm="12">
+                            <label
+                              style="display: flex;justify-content: center;"
+                              class="form-group has-float-label"
+                            >
                             <div class="position-absolute card-top-buttons-1">
-                              <b-button variant="outline-white" class="icon-button">
-                                <i @click="delete_img" class="simple-icon-trash" />
+                              <b-button  variant="outline-white" class="icon-button">
+                                <i v-b-modal.main_image class="simple-icon-pencil" />
                               </b-button>
                             </div>
-                            <img
-                              :src="imgUrl"
-                              style="border-radius: 50%;"
-                              alt="Image"
-                              width="160"
-                              height="160"
-                            />
-                          </label>
-                        </b-colxx>
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="Name">Arabic Title</label>
-                            <b-form-input
-                              id="Name"
-                              type="text"
-                              v-model="$v.lang_form.ar_name.$model"
-                              :state="!$v.lang_form.ar_name.$error"
-                            />
-                            <b-form-invalid-feedback
-                              v-if="!$v.lang_form.ar_name.required"
-                              >Please enter Arabic Title</b-form-invalid-feedback
-                            >
-                          </b-form-group>
-                        </b-colxx>
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="desc">Arabic details</label>
-                            <b-form-textarea
-                              id="textarea"
-                              rows="3"
-                              max-rows="6"
-                              v-model="$v.lang_form.ar_description.$model"
-                            ></b-form-textarea>
-                          </b-form-group>
-                        </b-colxx>
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="Name">English Title</label>
-                            <b-form-input
-                              id="Name"
-                              type="text"
-                              v-model="$v.lang_form.en_name.$model"
-                              :state="!$v.lang_form.en_name.$error"
-                            />
-                            <b-form-invalid-feedback v-if="!$v.lang_form.en_name.required">Please enter english title</b-form-invalid-feedback>
-                          </b-form-group>
-                        </b-colxx>
-                        <b-colxx sm="12">
-                          <b-form-group>
-                            <label class="form-group-label" for="desc">English details</label>
-                            <b-form-textarea
-                              id="textarea"
-                              rows="3"
-                              max-rows="6"
-                              v-model="$v.lang_form.en_description.$model"
-                            ></b-form-textarea>
-                          </b-form-group>
-                        </b-colxx>
-                        <b-colxx class="main_image_uploader" sm="12">
-                          <b-colxx sm="12">
-                            <b-form-group>
-                              <label class="form-group-label" for="bro">Image</label>
-                              <b-form-input
-                                style="display: none;"
-                                v-model="$v.files_form.img.$model"
-                                :state="!$v.files_form.img.$error"
+                              <img
+                                :src="mainImage ? imgUrl : $v.files_form.image.$model"
+                                style="border-radius: 50%;"
+                                alt="Image"
+                                width="160"
+                                height="160"
                               />
-                              <b-input-group class="mb-3">
-                                <b-form-file
-                                  accept="image/*"
-                                  placeholder="Please choose an image"
-                                  v-model="main_img"
-                                  @change="image_selected()"
-                                ></b-form-file>
-                              </b-input-group>
-
-                              <b-form-invalid-feedback
-                                v-if="!$v.files_form.img.required"
-                                >Please choose an image</b-form-invalid-feedback
-                              >
+                            </label>
+                          </b-colxx>
+                          <b-colxx sm="6">
+                            <b-form-group>
+                              <label class="form-group-label" for="side">Category</label>
+                              <b-form-select
+                                id="side"
+                                v-model="$v.gridForm.category.$model"
+                                :state="!$v.gridForm.category.$error"
+                                :options="categoryOptions"
+                                plain
+                              />
+                              <b-form-invalid-feedback v-if="!$v.gridForm.category.required" >Please select category</b-form-invalid-feedback>
+                            </b-form-group>
+                          </b-colxx>            
+                          <b-colxx sm="6">
+                            <b-form-group>
+                              <label class="form-group-label" for="desc">Recoder Order</label>
+                              <b-form-input
+                                type="number"
+                                :state="!$v.gridForm.record_order.$error"
+                                v-model="$v.gridForm.record_order.$model"
+                              />
+                              <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
                             </b-form-group>
                           </b-colxx>
-                        </b-colxx>
-                      </b-row>
-                    </b-form>
-                  </div>
-                </tab>
-                <tab name="Additional Info" :submit="onGridFormSubmit" :validate="validateStep2">
-                  <div class="wizard-basic-step">
-                    <b-form>
-                      <b-row>
                           <b-colxx xxs="6">
                             <b-row>
                               <b-colxx xxs="12">
@@ -143,63 +83,426 @@
                               </b-colxx>
                             </b-row>
                           </b-colxx>  
-                        <b-colxx sm="6">
-                          <b-form-group>
-                            <label class="form-group-label" for="side">Category</label>
-                            <b-form-select
-                              id="side"
-                              v-model="$v.gridForm.category.$model"
-                              :state="!$v.gridForm.category.$error"
-                              :options="categoryOptions"
-                              plain
-                            />
-                            <b-form-invalid-feedback v-if="!$v.gridForm.category.required" >Please select category</b-form-invalid-feedback>
-                          </b-form-group>
-                       </b-colxx>            
-                      <b-colxx sm="6">
-                        <b-form-group>
-                          <label class="form-group-label" for="desc">Recoder Order</label>
-                          <b-form-input
-                            type="number"
-                            :state="!$v.gridForm.record_order.$error"
-                            v-model="$v.gridForm.record_order.$model"
-                          />
-                          <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
-                        </b-form-group>
-                      </b-colxx>
-                      <b-colxx sm="12">
+                        
+                          
+                        <div style="width: 100%">
+                        <b-button
+                          :disabled="disabledFormStep1"
+                          type="submit"
+                          @click="onForm1Submited()"
+                          :variant="disabledFormStep1 ? 'light' : 'primary'"
+                          class="mt-4"
+                          >Save</b-button
+                        >
+                          <b-button
+                            :disabled="disabledFormStep1"
+                            v-b-modal.deleteItem
+                            style="float: right"
+                            :variant="disabledFormStep1 ? 'light' : 'outline-theme-6'"
+                            class="mt-4"
+                            >Delete</b-button
+                          >
+                        </div>
+                        </b-row>
+                      </b-form>
+                    </b-card>
+                    <b-card class="mb-4 auction_card" title="Localzations">
+                      <div class="border">
+                        <b-button v-b-toggle.collapseAccordion1 variant="link">Arabic Language</b-button>
+                        <b-collapse id="collapseAccordion1" accordion="my-accordion">
+                            <div class="p-4">
+                              <b-row>
+                                <b-colxx sm="12">
+                                  <b-form-group>
+                                    <label class="form-group-label" for="Name">Arabic Title</label>
+                                    <b-form-input
+                                      id="Name"
+                                      type="text"
+                                      v-model="$v.lang_form.ar_name.$model"
+                                      :state="!$v.lang_form.ar_name.$error"
+                                    />
+                                    <b-form-invalid-feedback
+                                      v-if="!$v.lang_form.ar_name.required"
+                                      >Please enter Arabic Title</b-form-invalid-feedback
+                                    >
+                                  </b-form-group>
+                                </b-colxx>
+                                <b-colxx sm="12">
+                                  <b-form-group>
+                                    <label class="form-group-label" for="desc">Arabic details</label>
+                                    <b-form-textarea
+                                      id="textarea"
+                                      rows="3"
+                                      max-rows="6"
+                                      v-model="$v.lang_form.ar_description.$model"
+                                    ></b-form-textarea>
+                                  </b-form-group>
+                                </b-colxx>
+                              </b-row>
+                            </div>
+                        </b-collapse>
+                      </div>
+                      <div class="border">
+                          <b-button v-b-toggle.collapseAccordion2 variant="link">English Language</b-button>
+                          <b-collapse id="collapseAccordion2" accordion="my-accordion">
+                              <div class="p-4">
+                                <b-row>
+                                  <b-colxx sm="12">
+                                    <b-form-group>
+                                      <label class="form-group-label" for="Name">English Title</label>
+                                      <b-form-input
+                                        id="Name"
+                                        type="text"
+                                        v-model="$v.lang_form.en_name.$model"
+                                        :state="!$v.lang_form.en_name.$error"
+                                      />
+                                      <b-form-invalid-feedback v-if="!$v.lang_form.en_name.required">Please enter english title</b-form-invalid-feedback>
+                                    </b-form-group>
+                                  </b-colxx>
+                                  <b-colxx sm="12">
+                                    <b-form-group>
+                                      <label class="form-group-label" for="desc">English details</label>
+                                      <b-form-textarea
+                                        id="textarea"
+                                        rows="3"
+                                        max-rows="6"
+                                        v-model="$v.lang_form.en_description.$model"
+                                      ></b-form-textarea>
+                                    </b-form-group>
+                                  </b-colxx>
+                                </b-row>
+                              </div>
+                          </b-collapse>
+                      </div>
+                      <b-button
+                        :disabled="disabledFormStep2"
+                        type="submit"
+                        @click="onForm2Submited()"
+                        :variant="disabledFormStep2 ? 'light' : 'primary'"
+                        class="mt-4"
+                        >Save</b-button>
+                    </b-card>
+                    <b-card class="mb-4 auction_card" title="Additional Info">
+                      <b-row>
+                        <b-colxx sm="12">
                           <b-form-group label="Customizations Group">
                             <v-select
                               v-model="gridForm.customizations"
                               :options="customizationOptions"
                               item-text="name"
+                              :reduce="(option) => option.name"
                               item-value="id"
                               multiple
                             />
                           </b-form-group>
                         </b-colxx>
+                        <b-colxx sm="12">
+                          <b-form-group>
+                            <label class="form-group-label" for="desc">Notes</label>
+                            <quill-editor ref="myTextEditor"
+                                v-model="gridForm.notes"
+                                :options="editorOption"
+                                >
+                            </quill-editor>
+                          </b-form-group>
+                        </b-colxx>
+                          <b-button
+                          type="submit"
+                          :disabled="disabledFormStep3"
+                          @click="onForm3Submited()"
+                          variant="primary"
+                          class="mt-4"
+                          >Save</b-button
+                        >
+                      </b-row>
+                    </b-card>
+                  </b-colxx>
+                
+              </b-row>
+            </b-tab>
+            <b-tab @click="getItemBatches()" title="Batches">
+              <b-row>
+                <b-colxx>
+                    <!-- <batch_list :data="_batches" :branches="" @deleteBatch="deleteBatch" /> -->
+                    <template v-if="load_batches">
+                          
+                          <vuetable
+                            ref="batch_vuetable"
+                            class="table-divided order-with-arrow"
+                            :api-mode="false"
+                            childRow="true"
+                            :reactive-api-url="true"
+                            :fields="batchBranchFields"
+                            pagination-path
+                            @vuetable:row-clicked="rowClicked"
+                          >
+                          <template v-slot:child_row="props">
+                    <div><b>First name:</b> eerrereer</div>
+                    <div><b>Last name:</b> {{props}}</div>
+                  </template>
+                                                <template slot="actions" slot-scope="props">
+                              
+                              <b-dropdown
+                    id="ddown2"
+                    size="xs"
+                    html=" "
+                    split
+                    split-class="p-0"
+                    class=""
+                    variant="secondary">
+                    <template #button-content>
+                      <div class="py-0">
+                      
+                      
+                      
+                      
+                      <b-link
+                        id="edit"
+                        class="d-flex align-items-center  text-white px-2">
+                        <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                      </b-link>
+                      </div>
+                    </template>
+                        
+                          <b-dropdown-item
+                            v-b-modal="`modalright_related`"
+                            @click="getAssighedBranch(props.rowData,'related')">
+                            <b-icon-link45deg
+                            class="h5 m-0"
+                            variant="primary"
+                            scale="1" />
+                            <span class="mx-1">Apply other branches</span>
+                          </b-dropdown-item>
+                          <b-dropdown-divider></b-dropdown-divider>
+                          <b-dropdown-item
+                            title="Delete Item"
+                            class=""
+                            @click="setBatchId(props.rowData.id)"
+                            v-b-modal="`delete_batch`"
+                            scale="1.1">
+                            <i class="simple-icon-trash" /> <span class="mx-1">{{ $t('delete') }}</span>
+                          </b-dropdown-item>
+                          </b-dropdown>
+                         
+                          </template>
+                          </vuetable> 
+                            
+                    </template>
+                    <template v-else>
+                      <div class="loading"></div>
+                    </template>
+              
+                </b-colxx>
+              </b-row>
+            </b-tab>
+          </b-tabs>
+      </b-colxx>
+    </template>
+    <template v-else>
+      <div class="loading"></div>
+    </template>
+  </b-row>
+  <b-row v-else>
+    <b-row style="width: 100%;">
+      <b-colxx xxs="12">
+        <piaf-breadcrumb heading="Create Item" />
+        <div class="separator mb-5"></div>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12" class="mb-5">
+        <b-card no-body>
+          <b-card-body class="wizard wizard-default">
+            <form-wizard
+              :with-validate="true"
+              :saveBtn="saveBtn"
+              :top-nav-disabled="true"
+              :last-step-end="true"
+              nav-class="justify-content-between"
+            >
+              <tab name="Main Info" :selected="true" :validate="validateStep1" >
+                <div class="wizard-basic-step">
+                  <b-form>
+                    <b-row>
+                      <b-colxx style="display: block;padding: 0px;" sm="12">
+                        <label
+                          v-if="main_img"
+                          style="display: flex;justify-content: center;"
+                          class="form-group has-float-label"
+                        >
+                          <div class="position-absolute card-top-buttons-1">
+                            <b-button variant="outline-white" class="icon-button">
+                              <i @click="delete_img" class="simple-icon-trash" />
+                            </b-button>
+                          </div>
+                          <img
+                            :src="imgUrl"
+                            style="border-radius: 50%;"
+                            alt="Image"
+                            width="160"
+                            height="160"
+                          />
+                        </label>
+                      </b-colxx>
                       <b-colxx sm="12">
                         <b-form-group>
-                          <label class="form-group-label" for="desc">Notes</label>
-                          <quill-editor ref="myTextEditor"
-                              v-model="gridForm.notes"
-                              :options="editorOption"
-                              >
-                          </quill-editor>
+                          <label class="form-group-label" for="Name">Arabic Title</label>
+                          <b-form-input
+                            id="Name"
+                            type="text"
+                            v-model="$v.lang_form.ar_name.$model"
+                            :state="!$v.lang_form.ar_name.$error"
+                          />
+                          <b-form-invalid-feedback
+                            v-if="!$v.lang_form.ar_name.required"
+                            >Please enter Arabic Title</b-form-invalid-feedback
+                          >
                         </b-form-group>
                       </b-colxx>
-                  
-                      </b-row>
-                    </b-form>
-                  </div>
-              
-                </tab>
-                <tab name="Batches" :validate="validateStep3">
-                 <div class="wizard-basic-step">
-                    <b-form>
-                      <b-row>
-                        <template v-if="isStillCreated">
-                          <b-colxx xxs="12">
+                      <b-colxx sm="12">
+                        <b-form-group>
+                          <label class="form-group-label" for="desc">Arabic details</label>
+                          <b-form-textarea
+                            id="textarea"
+                            rows="3"
+                            max-rows="6"
+                            v-model="$v.lang_form.ar_description.$model"
+                          ></b-form-textarea>
+                        </b-form-group>
+                      </b-colxx>
+                      <b-colxx sm="12">
+                        <b-form-group>
+                          <label class="form-group-label" for="Name">English Title</label>
+                          <b-form-input
+                            id="Name"
+                            type="text"
+                            v-model="$v.lang_form.en_name.$model"
+                            :state="!$v.lang_form.en_name.$error"
+                          />
+                          <b-form-invalid-feedback v-if="!$v.lang_form.en_name.required">Please enter english title</b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-colxx>
+                      <b-colxx sm="12">
+                        <b-form-group>
+                          <label class="form-group-label" for="desc">English details</label>
+                          <b-form-textarea
+                            id="textarea"
+                            rows="3"
+                            max-rows="6"
+                            v-model="$v.lang_form.en_description.$model"
+                          ></b-form-textarea>
+                        </b-form-group>
+                      </b-colxx>
+                      <b-colxx class="main_image_uploader" sm="12">
+                        <b-colxx sm="12">
+                          <b-form-group>
+                            <label class="form-group-label" for="bro">Image</label>
+                            <b-form-input
+                              style="display: none;"
+                              v-model="$v.files_form.img.$model"
+                              :state="!$v.files_form.img.$error"
+                            />
+                            <b-input-group class="mb-3">
+                              <b-form-file
+                                accept="image/*"
+                                placeholder="Please choose an image"
+                                v-model="main_img"
+                                @change="image_selected()"
+                              ></b-form-file>
+                            </b-input-group>
+
+                            <b-form-invalid-feedback
+                              v-if="!$v.files_form.img.required"
+                              >Please choose an image</b-form-invalid-feedback
+                            >
+                          </b-form-group>
+                        </b-colxx>
+                      </b-colxx>
+                    </b-row>
+                  </b-form>
+                </div>
+              </tab>
+              <tab name="Additional Info" :submit="onGridFormSubmit" :validate="validateStep2">
+                <div class="wizard-basic-step">
+                  <b-form>
+                    <b-row>
+                        <b-colxx xxs="6">
+                          <b-row>
+                            <b-colxx xxs="12">
+                              <label>Published</label>
+                            </b-colxx>
+                            <b-colxx xxs="12">
+                              <switches v-model="gridForm.published" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                            </b-colxx>
+                          </b-row>
+                        </b-colxx>
+                        <b-colxx xxs="6">
+                          <b-row>
+                            <b-colxx xxs="12">
+                              <label>Activate</label>
+                            </b-colxx>
+                            <b-colxx xxs="12">
+                              <switches v-model="gridForm.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                            </b-colxx>
+                          </b-row>
+                        </b-colxx>  
+                      <b-colxx sm="6">
+                        <b-form-group>
+                          <label class="form-group-label" for="side">Category</label>
+                          <b-form-select
+                            id="side"
+                            v-model="$v.gridForm.category.$model"
+                            :state="!$v.gridForm.category.$error"
+                            :options="categoryOptions"
+                            plain
+                          />
+                          <b-form-invalid-feedback v-if="!$v.gridForm.category.required" >Please select category</b-form-invalid-feedback>
+                        </b-form-group>
+                      </b-colxx>            
+                    <b-colxx sm="6">
+                      <b-form-group>
+                        <label class="form-group-label" for="desc">Recoder Order</label>
+                        <b-form-input
+                          type="number"
+                          :state="!$v.gridForm.record_order.$error"
+                          v-model="$v.gridForm.record_order.$model"
+                        />
+                        <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx sm="12">
+                        <b-form-group label="Customizations Group">
+                          <v-select
+                            v-model="gridForm.customizations"
+                            :options="customizationOptions"
+                            item-text="name"
+                            item-value="id"
+                            multiple
+                          />
+                        </b-form-group>
+                      </b-colxx>
+                    <b-colxx sm="12">
+                      <b-form-group>
+                        <label class="form-group-label" for="desc">Notes</label>
+                        <quill-editor ref="myTextEditor"
+                            v-model="gridForm.notes"
+                            :options="editorOption"
+                            >
+                        </quill-editor>
+                      </b-form-group>
+                    </b-colxx>
+                
+                    </b-row>
+                  </b-form>
+                </div>
+            
+              </tab>
+              <tab name="Batches" :validate="validateStep3">
+                <div class="wizard-basic-step">
+                  <b-form>
+                    <b-row>
+                      <template v-if="isStillCreated">
+                        <b-colxx xxs="12">
                           <div class="top-right-button-container">
                             <b-button
                             variant="primary"
@@ -209,10 +512,9 @@
                             {{ $t('pages.add-new') }}
                             </b-button>
                           </div>
-                          </b-colxx>
+                        </b-colxx>
                         <b-colxx xxs="12">
                           <template v-if="load_batches">
-                          
                             <vuetable
                               ref="batch_vuetable"
                               class="table-divided order-with-arrow"
@@ -224,537 +526,264 @@
                               @vuetable:row-clicked="rowClicked"
                             >
                             <template v-slot:child_row="props">
-                      <div><b>First name:</b> eerrereer</div>
-                      <div><b>Last name:</b> {{props}}</div>
-                    </template>
-                                                  <template slot="actions" slot-scope="props">
-                               
-                                <b-dropdown
-                      id="ddown2"
-                      size="xs"
-                      html=" "
-                      split
-                      split-class="p-0"
-                      class=""
-                      variant="secondary">
-                      <template #button-content>
-                        <div class="py-0">
-                        
-                        
-                        
-                        
-                        <b-link
-                          id="edit"
-                          class="d-flex align-items-center  text-white px-2">
-                          <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
-                        </b-link>
-                        </div>
-                      </template>
-                          
-                            <b-dropdown-item
-                              v-b-modal="`modalright_related`"
-                              @click="getAssighedBranch(props.rowData,'related')">
-                              <b-icon-link45deg
-                              class="h5 m-0"
-                              variant="primary"
-                              scale="1" />
-                              <span class="mx-1">Apply other branches</span>
-                            </b-dropdown-item>
-                            <!-- <b-dropdown-item
-                              v-b-modal="`modalright_branches`"
-                              @click="setItem(props.rowData)">
-                              <i class="iconsminds-arrow-inside-gap-45 color-theme-1"></i><span class="mx-1">{{ $t('forms.branches-availability') }}</span>
-                            </b-dropdown-item> -->
-                            <b-dropdown-divider></b-dropdown-divider>
-                            <b-dropdown-item
-                              title="Delete Item"
-                              class=""
-                              v-b-modal="`delete${props.rowData.id}`"
-                              scale="1.1">
-                              <i class="simple-icon-trash" /> <span class="mx-1">{{ $t('delete') }}</span>
-                            </b-dropdown-item>
-                            </b-dropdown>
-                            <b-modal
-                              :id="`delete${props.rowData.id}`"
-                              ref="modallg"
-                              size="sm"
-                              hide-header>
-                              <h3>{{ $t("are-you-sure-delete") }}</h3>
-                              <template slot="modal-footer">
-                                <b-button
-                                size="xs"
-                                variant="danger"
-                                @click="deleteBatch(props.rowData.id)"
-                                class="mr-1">{{ $t("delete") }}
-                                </b-button>
-                                <b-button
-                                size="xs"
-                                variant="light"
-                                @click="hideModal('modallg')">{{ $t("cancel") }}
-                                </b-button>
-                              </template>
-                            </b-modal>
-                                              </template>
-                            </vuetable> 
-                              <!-- <vuetable-pagination-bootstrap
-                                class="mt-4"
-                                ref="pagination"
-                                @vuetable-pagination:change-page="onChangePage"
-                              />-->
+                              <div><b>First name:</b> eerrereer</div>
+                              <div><b>Last name:</b> {{props}}</div>
                             </template>
-                      <template v-else>
-                        <div class="loading"></div>
-                      </template>
+                            <template slot="actions" slot-scope="props">
+                              <b-dropdown
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                                <template #button-content>
+                                  <div class="py-0">
+                                    <b-link id="edit" class="d-flex align-items-center  text-white px-2">
+                                      <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                                    </b-link>
+                                  </div>
+                                </template>
+                                <b-dropdown-item v-b-modal="`modalright_related`" @click="getAssighedBranch(props.rowData,'related')">
+                                  <b-icon-link45deg class="h5 m-0" variant="primary" scale="1" />
+                                  <span class="mx-1">Apply other branches</span>
+                                </b-dropdown-item>
+                                <b-dropdown-divider></b-dropdown-divider>
+                                <b-dropdown-item title="Delete Item" @click="setBatchId(props.rowData.id)" v-b-modal="`delete_batch`" scale="1.1">
+                                  <i class="simple-icon-trash" /><span class="mx-1">{{ $t('delete') }}</span>
+                                </b-dropdown-item>
+                                </b-dropdown>
+                              </template>
+                            </vuetable> 
+                          </template>
+                          <template v-else>
+                            <div class="loading"></div>
+                          </template>
                         </b-colxx>
                       </template>
-                      <template v-else>
-                        <div class="loading"></div>
-                      </template>
-                      </b-row>
-                    </b-form>
-                  </div>
-                </tab>
-                <tab type="done">
-                  <div class="wizard-basic-step text-center pt-3">
-                    <div v-if="isProcessing">
-                      <b-spinner
-                        variant="primary"
-                        label="Spinning"
-                        class="mb-1"
-                      ></b-spinner>
-                    </div>
-                    <div v-else>
-                      <h2 class="mb-2">{{ $t("wizard.content-thanks") }}</h2>
-                      <p>{{ $t("wizard.registered") }}</p>
-                    </div>
-                  </div>
-                </tab>
-              </form-wizard>
-            </b-card-body>
-          </b-card>
-          <b-card v-if="itemId" class="mb-4 auctionDetailsContainer">
-            <b-row>
-              <b-tabs
-                nav-class="separator-tabs ml-0 mb-5"
-                content-class="tab-content"
-                :no-fade="true"
-              >
-                <b-tab title="Basic details">
-                  <b-row>
-                    <template v-if="_loadItem">
-                      <b-colxx style="margin-top: 26px;" xxs="12">
-                        <b-card class="mb-4 auction_card">
-                          <b-form>
-                            <b-row style="margin: 42px;">
-                              <b-colxx style="position: absolute;top: -104px;left: 1px;padding: 0px;" sm="12">
-                                <label
-                                  style="display: flex;justify-content: center;"
-                                  class="form-group has-float-label"
-                                >
-                                <div class="position-absolute card-top-buttons-1">
-                                  <b-button  variant="outline-white" class="icon-button">
-                                    <i v-b-modal.main_image class="simple-icon-pencil" />
-                                  </b-button>
-                                </div>
-                                  <img
-                                    :src="mainImage ? imgUrl : $v.files_form.image.$model"
-                                    style="border-radius: 50%;"
-                                    alt="Image"
-                                    width="160"
-                                    height="160"
-                                  />
-                                </label>
-                              </b-colxx>
-                              <b-colxx sm="6">
-                                <b-form-group>
-                                  <label class="form-group-label" for="side">Category</label>
-                                  <b-form-select
-                                    id="side"
-                                    v-model="$v.gridForm.category.$model"
-                                    :state="!$v.gridForm.category.$error"
-                                    :options="categoryOptions"
-                                    plain
-                                  />
-                                  <b-form-invalid-feedback v-if="!$v.gridForm.category.required" >Please select category</b-form-invalid-feedback>
-                                </b-form-group>
-                              </b-colxx>            
-                              <b-colxx sm="6">
-                                <b-form-group>
-                                  <label class="form-group-label" for="desc">Recoder Order</label>
-                                  <b-form-input
-                                    type="number"
-                                    :state="!$v.gridForm.record_order.$error"
-                                    v-model="$v.gridForm.record_order.$model"
-                                  />
-                                  <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
-                                </b-form-group>
-                              </b-colxx>
-                              <b-colxx xxs="6">
-                                <b-row>
-                                  <b-colxx xxs="12">
-                                    <label>Published</label>
-                                  </b-colxx>
-                                  <b-colxx xxs="12">
-                                    <switches v-model="gridForm.published" theme="custom" color="primary" class="vue-switcher-small"></switches>
-                                  </b-colxx>
-                                </b-row>
-                              </b-colxx>
-                              <b-colxx xxs="6">
-                                <b-row>
-                                  <b-colxx xxs="12">
-                                    <label>Activate</label>
-                                  </b-colxx>
-                                  <b-colxx xxs="12">
-                                    <switches v-model="gridForm.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
-                                  </b-colxx>
-                                </b-row>
-                              </b-colxx>  
-                            
-                              
-                            <div style="width: 100%">
-                            <b-button
-                              :disabled="disabledFormStep1"
-                              type="submit"
-                              @click="onForm1Submited()"
-                              :variant="disabledFormStep1 ? 'light' : 'primary'"
-                              class="mt-4"
-                              >Save</b-button
-                            >
-                              <b-button
-                                :disabled="disabledFormStep1"
-                                v-b-modal.deleteItem
-                                style="float: right"
-                                :variant="disabledFormStep1 ? 'light' : 'outline-theme-6'"
-                                class="mt-4"
-                                >Delete</b-button
-                              >
-                            </div>
-                            </b-row>
-                          </b-form>
-                        </b-card>
-                        <b-card class="mb-4 auction_card" title="Localzations">
-                          <div class="border">
-                            <b-button v-b-toggle.collapseAccordion1 variant="link">Arabic Language</b-button>
-                            <b-collapse id="collapseAccordion1" accordion="my-accordion">
-                                <div class="p-4">
-                                  <b-row>
-                                    <b-colxx sm="12">
-                                      <b-form-group>
-                                        <label class="form-group-label" for="Name">Arabic Title</label>
-                                        <b-form-input
-                                          id="Name"
-                                          type="text"
-                                          v-model="$v.lang_form.ar_name.$model"
-                                          :state="!$v.lang_form.ar_name.$error"
-                                        />
-                                        <b-form-invalid-feedback
-                                          v-if="!$v.lang_form.ar_name.required"
-                                          >Please enter Arabic Title</b-form-invalid-feedback
-                                        >
-                                      </b-form-group>
-                                    </b-colxx>
-                                    <b-colxx sm="12">
-                                      <b-form-group>
-                                        <label class="form-group-label" for="desc">Arabic details</label>
-                                        <b-form-textarea
-                                          id="textarea"
-                                          rows="3"
-                                          max-rows="6"
-                                          v-model="$v.lang_form.ar_description.$model"
-                                        ></b-form-textarea>
-                                      </b-form-group>
-                                    </b-colxx>
-                                  </b-row>
-                                </div>
-                            </b-collapse>
-                          </div>
-                          <div class="border">
-                              <b-button v-b-toggle.collapseAccordion2 variant="link">English Language</b-button>
-                              <b-collapse id="collapseAccordion2" accordion="my-accordion">
-                                  <div class="p-4">
-                                    <b-row>
-                                      <b-colxx sm="12">
-                                        <b-form-group>
-                                          <label class="form-group-label" for="Name">English Title</label>
-                                          <b-form-input
-                                            id="Name"
-                                            type="text"
-                                            v-model="$v.lang_form.en_name.$model"
-                                            :state="!$v.lang_form.en_name.$error"
-                                          />
-                                          <b-form-invalid-feedback v-if="!$v.lang_form.en_name.required">Please enter english title</b-form-invalid-feedback>
-                                        </b-form-group>
-                                      </b-colxx>
-                                      <b-colxx sm="12">
-                                        <b-form-group>
-                                          <label class="form-group-label" for="desc">English details</label>
-                                          <b-form-textarea
-                                            id="textarea"
-                                            rows="3"
-                                            max-rows="6"
-                                            v-model="$v.lang_form.en_description.$model"
-                                          ></b-form-textarea>
-                                        </b-form-group>
-                                      </b-colxx>
-                                    </b-row>
-                                  </div>
-                              </b-collapse>
-                          </div>
-                          <b-button
-                            :disabled="disabledFormStep2"
-                            type="submit"
-                            @click="onForm2Submited()"
-                            :variant="disabledFormStep2 ? 'light' : 'primary'"
-                            class="mt-4"
-                            >Save</b-button>
-                        </b-card>
-                        <b-card class="mb-4 auction_card" title="Additional Info">
-                          <b-row>
-                            <b-colxx sm="12">
-                              <b-form-group label="Customizations Group">
-                                <v-select
-                                  v-model="gridForm.customizations"
-                                  :options="customizationOptions"
-                                  item-text="name"
-                                  :reduce="(option) => option.name"
-                                  item-value="id"
-                                  multiple
-                                />
-                              </b-form-group>
-                            </b-colxx>
-                            <b-colxx sm="12">
-                              <b-form-group>
-                                <label class="form-group-label" for="desc">Notes</label>
-                                <quill-editor ref="myTextEditor"
-                                    v-model="gridForm.notes"
-                                    :options="editorOption"
-                                    >
-                                </quill-editor>
-                              </b-form-group>
-                            </b-colxx>
-                              <b-button
-                              type="submit"
-                              :disabled="disabledFormStep3"
-                              @click="onForm3Submited()"
-                              variant="primary"
-                              class="mt-4"
-                              >Save</b-button
-                            >
-                          </b-row>
-                        </b-card>
-                      </b-colxx>
-                    </template>
                     <template v-else>
                       <div class="loading"></div>
                     </template>
-                  </b-row>
-                </b-tab>
-                <b-tab @click="getItemBatches()" title="Batches">
-                  <b-row>
-                    <b-colxx>
-                      <template v-if="load_batches">
-                        <!-- <batch_list :data="_batches" @deleteBatch="deleteBatch" /> -->
-                      </template>
-                      <template v-else>
-                        <div class="loading"></div>
-                      </template>
-                    </b-colxx>
-                  </b-row>
-                </b-tab>
-              </b-tabs>
-            </b-row>
-          </b-card>
-        </template>
-        <template v-else>
-          <div class="loading"></div>
-        </template>
-      </b-row>
-      <b-modal
-        id="modalright"
-        ref="modalright"
-        :title="$t('pages.add-new-title')"
-        modal-class="modal-right"
-      >
-        <b-form class="av-tooltip tooltip-label-bottom">
-            <b-form-group
-              :label="$t('forms.batch')"
-              class="has-float-label mb-4">
-              <b-form-input
-                type="text"
-                v-model.trim="$v.batch_form.name.$model"
-                :state="!$v.batch_form.name.$error" />
-              <b-form-invalid-feedback v-if="!$v.batch_form.name.required">Please enter batch name</b-form-invalid-feedback>
-            </b-form-group>
-            <b-form-group class="has-float-label mb-4">
-              <label class="form-group-label" for="cate">Attributes</label>
-              <b-form-input
-              style="display: none;"
-              :state="!$v.batch_form.attributes.$error"
-              v-model="$v.batch_form.attributes.$model"
-            />
-              <b-form-select
-                id="cate"
-                v-model="selected_value"
-                @change="get_SubCat"
-                multiple
-                plain
-              >
-              <b-form-select-option-group class="attributeOptions" v-for="(attribute,index) in attributeOptions"  :key="index" :label="attribute.text">
-                <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values" ref="attributid" :key="index" :value="`${attribute.value.id}_${_val.id}`">{{_val.value}}</b-form-select-option>
-              </b-form-select-option-group>
-              </b-form-select>
-              <b-form-invalid-feedback
-                v-if="!$v.batch_form.attributes.required"
-                >Please slelect attributes</b-form-invalid-feedback
-              >          
-            </b-form-group>
-            <div class="wizard-basic-step">
-                <b-row class="add_container">
-                  <b-colxx sm="12">
-                    <b-form-group  label="Branches" class="form-group-label">
-                      <b-form-input
-                        style="display: none;"
-                        :state="!$v.batch_form.branch.$error"
-                        v-model="$v.batch_form.branch.$model"
-                      />
-                      <b-form-select
-                        v-model="selectedBranch"
-                        :options="branchOptions"
-                        @change="selectBrach"
-                        plain
-                      />
-                      <b-form-invalid-feedback
-                        v-if="!$v.batch_form.branch.required"
-                        >Please slelect a branch</b-form-invalid-feedback
-                      >      
-                    </b-form-group>
-                  </b-colxx>
-          
-                   </b-row>
-                   
-        <div class="branch_container" v-if="selectedBranch">
-        <b-form-row>
-          <colxx xxs="8">
-            <b-form-input
-                style="display: none;"
-                :state="!$v.batch_form.price.$error"
-                v-model="$v.batch_form.price.$model"
-              />
-              <b-form-input
-                type="number"
-                placeholder="Please enter the price ..."
-                v-model.trim="selectedBranch.price" />
-                <b-form-invalid-feedback
-                  v-if="!$v.batch_form.price.required"
-                  >Please enter the price</b-form-invalid-feedback
-                >      
-          </colxx>
-          <colxx xxs="4">
-            <b-from-group>
-              <switches v-model="selectedBranch.active" theme="custom" color="primary" class="vue-switcher-small switcher"></switches>
-            </b-from-group>
-          </colxx>
-        </b-form-row>
-        </div>
-        
-      
-
-                  
+                    </b-row>
+                  </b-form>
                 </div>
-          
-        </b-form>
-        <template slot="modal-footer">
-          <b-button variant="outline-secondary" @click="hideModal('modalright')">{{
-            $t("survey.cancel")
-          }}</b-button>
-          <b-button
-            variant="primary"
-            @click="submitBatchForm()"
-            class="mr-1"
-            >{{ $t("survey.submit") }}</b-button
-          >
-        </template>
-      </b-modal>
-      <b-modal
-        id="modalright_related"
-        ref="modalright_related"
-        title="Apply other branches"
-        modal-class="modal-right"
-      >
-        <b-form class="av-tooltip tooltip-label-bottom">
-        
-        <b-form-group label="Branches">
-          <b-form-checkbox-group 
-            v-model="selected_branches"
-            :options="checkboxOptions"
-            class="mb-3"
-            value-field="item"
-            text-field="name"
-            disabled-field="selected"
-            stacked
-          >
-          </b-form-checkbox-group>
+              </tab>
+              <tab type="done">
+                <div class="wizard-basic-step text-center pt-3">
+                  <div v-if="isProcessing">
+                    <b-spinner
+                      variant="primary"
+                      label="Spinning"
+                      class="mb-1"
+                    ></b-spinner>
+                  </div>
+                  <div v-else>
+                    <h2 class="mb-2">{{ $t("wizard.content-thanks") }}</h2>
+                    <p>{{ $t("wizard.registered") }}</p>
+                  </div>
+                </div>
+              </tab>
+            </form-wizard>
+          </b-card-body>
+        </b-card>
+      </b-colxx>
+    </b-row>
+  </b-row>
+  <b-modal
+    id="modalright"
+    ref="modalright"
+    title="Add New Batch"
+    modal-class="modal-right"
+  >
+    <b-form class="av-tooltip tooltip-label-bottom">
+        <b-form-group :label="$t('forms.batch')" class="has-float-label mb-4">
+          <b-form-input type="text" v-model.trim="$v.batch_form.name.$model" :state="!$v.batch_form.name.$error" />
+          <b-form-invalid-feedback v-if="!$v.batch_form.name.required">Please enter batch name</b-form-invalid-feedback>
         </b-form-group>
-      
-   
-     
-        </b-form>
-        <template slot="modal-footer">
-          <b-button variant="outline-secondary" @click="hideModal('modalright_related')">{{
-            $t("survey.cancel")
-          }}</b-button>
-          <b-button
-            variant="primary"
-            @click="submitBatchList()"
-            class="mr-1"
-            >{{ $t("survey.submit") }}</b-button
-          >
-        </template>
-      </b-modal>
-      <b-modal
-        id="main_image"
-        ref="main_image"
-        title="Image"
-        :no-close-on-backdrop="true"
+        <b-form-group class="has-float-label mb-4">
+          <label class="form-group-label" for="cate">Attributes</label>
+          <b-form-input style="display: none;" :state="!$v.batch_form.attributes.$error" v-model="$v.batch_form.attributes.$model" />
+            <b-form-select
+              id="cate"
+              v-model="selected_value"
+              @change="get_SubCat"
+              multiple
+              plain
+            >
+          <b-form-select-option-group class="attributeOptions" v-for="(attribute,index) in attributeOptions"  :key="index" :label="attribute.text">
+            <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values" ref="attributid" :key="index" :value="`${attribute.value.id}_${_val.id}`">{{_val.value}}</b-form-select-option>
+          </b-form-select-option-group>
+          </b-form-select>
+          <b-form-invalid-feedback
+            v-if="!$v.batch_form.attributes.required"
+            >Please slelect attributes</b-form-invalid-feedback
+          >          
+        </b-form-group>
+        <div class="wizard-basic-step">
+          <b-row class="add_container">
+            <b-colxx sm="12">
+              <b-form-group  label="Branches" class="form-group-label">
+                <b-form-input
+                  style="display: none;"
+                  :state="!$v.batch_form.branch.$error"
+                  v-model="$v.batch_form.branch.$model"
+                />
+                <b-form-select
+                  v-model="selectedBranch"
+                  :options="branchOptions"
+                  @change="selectBrach"
+                  plain
+                />
+                <b-form-invalid-feedback
+                  v-if="!$v.batch_form.branch.required"
+                  >Please slelect a branch</b-form-invalid-feedback
+                >      
+              </b-form-group>
+            </b-colxx>
+          </b-row>   
+          <div class="branch_container" v-if="selectedBranch">
+          <b-form-row>
+            <colxx xxs="8">
+              <b-form-input
+                  style="display: none;"
+                  :state="!$v.batch_form.price.$error"
+                  v-model="$v.batch_form.price.$model"
+                />
+                <b-form-input
+                  type="number"
+                  placeholder="Please enter the price ..."
+                  v-model.trim="selectedBranch.price" />
+                  <b-form-invalid-feedback
+                    v-if="!$v.batch_form.price.required"
+                    >Please enter the price</b-form-invalid-feedback
+                  >      
+            </colxx>
+            <colxx xxs="4">
+              <b-from-group>
+                <switches v-model="selectedBranch.active" theme="custom" color="primary" class="vue-switcher-small switcher"></switches>
+              </b-from-group>
+            </colxx>
+          </b-form-row>
+          </div>     
+        </div>
+    </b-form>
+    <template slot="modal-footer">
+      <b-button variant="outline-secondary" @click="hideModal('modalright')">{{
+        $t("survey.cancel")
+      }}</b-button>
+      <b-button
+        variant="primary"
+        @click="submitBatchForm()"
+        class="mr-1"
+        >{{ $t("survey.submit") }}</b-button
       >
-      <b-form-group :label="$t('forms.image')">
-        <vue-dropzone
-          ref="myVueDropzone"
-          id="dropzone"
-          :options="imageDropzoneOptions"
-          @vdropzone-files-added="imageAdded"
-          @vdropzone-removed-file="imageRemoved"
-        ></vue-dropzone>
-      </b-form-group>
-      <template slot="modal-footer">
-        <b-button
-          variant="primary"
-          @click="updateImage()"
-          class="mr-1"
-          :disabled="image_added || model_button"
-          >{{ $t("forms.submit") }}</b-button
-        >
-        <b-button variant="secondary" @click="hideModal('main_image')">{{
-          $t("survey.cancel")
-        }}</b-button>
-      </template>
-      </b-modal>
-      <b-modal
-        id="deleteItem"
-        ref="deleteItem"
-        :title="$t('modal.modal-active-auction-title')"
-        >Are you sure you want to delete this Item
-        <template slot="modal-footer">
-          <b-button
-            :disabled="enableModalBtn"
-            variant="primary"
-            @click="delete_Item()"
-            class="mr-1"
-            >Yes</b-button>
-          <b-button variant="secondary" @click="hideModal('deleteItem')">No</b-button>
-      </template>
-      </b-modal>
-    </div>
+    </template>
+  </b-modal>
+  <b-modal
+    id="modalright_related"
+    ref="modalright_related"
+    title="Apply other branches"
+    modal-class="modal-right"
+  >
+    <b-form class="av-tooltip tooltip-label-bottom">
+    
+    <b-form-group label="Branches">
+      <b-form-checkbox-group 
+        v-model="selected_branches"
+        :options="checkboxOptions"
+        class="mb-3"
+        value-field="item"
+        text-field="name"
+        disabled-field="selected"
+        stacked
+      >
+        <div class="branch_message" v-if="(checkboxOptions.length < 1)">
+          <h4>There are no more branches
+              All have been added</h4>
+        </div>
+      </b-form-checkbox-group>
+    </b-form-group>
+  
+
+  
+    </b-form>
+    <template slot="modal-footer">
+      <b-button variant="outline-secondary" @click="hideModal('modalright_related')">{{
+        $t("survey.cancel")
+      }}</b-button>
+      <b-button
+        variant="primary"
+        @click="submitBatchList()"
+        class="mr-1"
+        >{{ $t("survey.submit") }}</b-button
+      >
+    </template>
+  </b-modal>
+  <b-modal
+    id="main_image"
+    ref="main_image"
+    title="Image"
+    :no-close-on-backdrop="true"
+  >
+  <b-form-group :label="$t('forms.image')">
+    <vue-dropzone
+      ref="myVueDropzone"
+      id="dropzone"
+      :options="imageDropzoneOptions"
+      @vdropzone-files-added="imageAdded"
+      @vdropzone-removed-file="imageRemoved"
+    ></vue-dropzone>
+  </b-form-group>
+  <template slot="modal-footer">
+    <b-button
+      variant="primary"
+      @click="updateImage()"
+      class="mr-1"
+      :disabled="image_added || model_button"
+      >{{ $t("forms.submit") }}</b-button
+    >
+    <b-button variant="secondary" @click="hideModal('main_image')">{{
+      $t("survey.cancel")
+    }}</b-button>
+  </template>
+  </b-modal>
+  <b-modal
+    id="deleteItem"
+    ref="deleteItem"
+    :title="$t('modal.modal-active-auction-title')"
+    >Are you sure you want to delete this Item
+    <template slot="modal-footer">
+      <b-button
+        :disabled="enableModalBtn"
+        variant="primary"
+        @click="delete_Item()"
+        class="mr-1"
+        >Yes</b-button>
+      <b-button variant="secondary" @click="hideModal('deleteItem')">No</b-button>
+  </template>
+  </b-modal>
+  <b-modal
+    :id="`delete_batch`"
+    ref="delete_batch"
+    size="sm"
+    hide-header>
+    <h3>{{ $t("are-you-sure-delete") }}</h3>
+    <template slot="modal-footer">
+      <b-button
+      size="xs"
+      variant="danger"
+      @click="delete1_batch()"
+      class="mr-1">{{ $t("delete") }}
+      </b-button>
+      <b-button
+      size="xs"
+      variant="light"
+      @click="hideModal('delete_batch')">{{ $t("cancel") }}
+      </b-button>
+    </template>
+  </b-modal>
+ </div>
 </template>
 <script>
 import Axios from "axios";
@@ -768,6 +797,7 @@ const { required, requiredIf } = require("vuelidate/lib/validators");
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import { BIconEye, BIconFileEarmarkSpreadsheetFill, BIconLink45deg, BIconPencil, BIconShop } from 'bootstrap-vue';
 import { mapGetters, mapActions } from "vuex";
 import Switches from "vue-switches";
 import DividedTable from "./DividedTable";
@@ -783,6 +813,7 @@ export default {
     vuetable: Vuetable,
     "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
     switches: Switches,
+    "b-icon-link45deg": BIconLink45deg,
     'v-select' :vSelect,
     "item-divided-table": DividedTable,
     "quill-editor": quillEditor
@@ -816,18 +847,22 @@ export default {
         model_button: false,
         isProcessing: true,
         disabledFormStep1: false,
+        is_load_batch: false,
         enableModalBtn: false,
+        delete_id: null,
         checkboxOptions: [],
         selected_branches: [],
         item_id: null,
         mainImage: null,
         selectedBranch: null,
         image_added: true,
-        itemId: null,
+        item_id: null,
         attributeOptions: [],
         selected_attrib_array: [],
+        addNewBtn: false,
         selected_Branch: null,
         batch_id: null,
+        oldBranches: [],
         selected_Branch_array: [],
         disabledFormStep3: false,
         branchOptions: [],
@@ -943,14 +978,14 @@ export default {
   
 
   created(){
-    console.log(' this.$route.query ' ,this.$route.params.id)
-    this.itemId = this.$route.params.id
+    
+    this.item_id = this.$route.params.id
     this.loadCategoriesList();
     this.getCustomizationGroups();
-    this.itemId ? this.getItem({id: this.itemId}) : console.log('create state')
+    this.item_id ? this.getItem({id: this.item_id}) : console.log('create state')
   },  
   methods: {
-    ...mapActions(['getItem', 'createItem', 'updateItem', 'item_delete', 'getBatches', 'createBatch', 'updateBatch']),
+    ...mapActions(['getItem', 'createItem', 'updateItem', 'item_delete', 'getBatches', 'createBatch', 'updateBatch', 'deleteBatch1']),
     viewAttribute(value) {
       // let itm = value.map(x => JSON.parse(x.attribute.locales.en.list_values).find(y => y.id === parseInt(x.value)).value)
       return value.toString()
@@ -965,7 +1000,7 @@ export default {
       this.mainImage = file;
       this.image_added = false;
     },
-
+    
     imageRemoved(){
       this.mainImage = null;
       this.image_added = true;
@@ -983,7 +1018,7 @@ export default {
     });
   },
   get_SubCat(){
-    console.log(this.selected_value)
+   
     if (this.selected_value) {
 
       this.batch_form.attributes = 'selected';
@@ -991,7 +1026,7 @@ export default {
   },
   delete_Item(){
     this.enableModalBtn= true;
-    this.item_delete({item_id: this.itemId})
+    this.item_delete({item_id: this.item_id})
   },
   onForm1Submited(){
        this.$v.$touch();
@@ -1003,7 +1038,7 @@ export default {
         this.disabledFormStep1 = true;
           this.updateItem({
             additional: this.gridForm,
-            id: this.itemId,
+            id: this.item_id,
             notes: null,
             image: null,
             langs: null,
@@ -1021,7 +1056,7 @@ export default {
         this.disabledFormStep2 = true;
           this.updateItem({
             info: null,
-            id: this.itemId,
+            id: this.item_id,
             notes: null,
             image: null,
             langs: this.lang_form,
@@ -1035,16 +1070,36 @@ export default {
             info: null,
             customization_groups: this.gridForm.customizations.map(x => ({id: x.value})),
             notes: this.gridForm.notes,
-            id: this.itemId,
+            id: this.item_id,
             image: null,
             langs: null,
           });
   },
   getAssighedBranch(val){
     console.log(val)
+    this.oldBranches = val.prices.map(x => ({branch_id: x, price: this.main_price, active: true}))
+    this.batch_id = val.id
+    this.main_price = val.prices[0].price;
+    this.checkboxOptions = [];
+    let branch_ids = []
+    branch_ids = val.prices.map(el=> (el.branch_id))
+    this.branchOptions.map( item => {
+      if(!branch_ids.includes(item.value.id)){
+        this.checkboxOptions.push(
+          new Object({
+            name: item.text,
+            item: item.value.id,
+            selected: false,
+          })
+        )
+      }
+     
+    })
   },
-  getItemBatches(){
-    this.getBatches({item_id: this.itemId});
+  async getItemBatches(){
+    await this.getBranches()
+    await this.getBatches({item_id: this.item_id});
+    this.addNewBtn = true;
   },
   loadCategoriesList() {
     return Axios
@@ -1073,29 +1128,44 @@ export default {
     });
   },
   submitBatchList(){
-    console.log(this.selected_branches);
     this.updateBatch({
-      item_id: this.item_id,  
+      item_id: this.item_id,
       batch_id: this.batch_id,
       prices: this.selected_branches.map(x => ({branch_id: x, price: this.main_price, active: true})),
     })
   },
-  deleteBatch(val){
+/**
+ * Set id of batch in order to delete it.
+ *
+ * @async
+ * @function setBatchId
+ * @param {string}  - The ID.
+ * @return {Promise<string>}.
+*/
+  setBatchId(val){
     console.log(val)
+    this.delete_id = val
+  },
+  delete1_batch(){
+    console.log(this.item_id, this.delete_id)
+    this.deleteBatch1({
+      item_id: this.item_id,  
+      batch_id: this.delete_id,
+    })
   },
   updateImage(){
       this.model_button = true;
       this.updateItem({
             info: null,
-            id: this.itemId,
+            id: this.item_id,
             image: this.mainImage ? this.mainImage[0] : null,
             langs: null,
           });
   },
   rowClicked(dataItem, event) {
-      const itemId = dataItem.id;
-      console.log(itemId)
-      this.$refs.batch_vuetable.toggleChildRow(dataItem.id);
+      const item_id = dataItem.id;
+      console.log(item_id)
+      // this.$refs.batch_vuetable.toggleChildRow(dataItem.id);
   },
   hideModal(refname) {
     this.$refs[refname].hide();
@@ -1103,7 +1173,7 @@ export default {
   submitBatchForm(){
     this.$v.$touch();
     this.$v.batch_form.$touch();
-    if (this.selectedBranch.price) {
+    if (this.selectedBranch?.price) {
       this.batch_form.price = 'selected'
     }
     if ( !this.$v.batch_form.$invalid){
@@ -1180,8 +1250,9 @@ createCustomGroup(data) {
        console.log('optionsssssssss', this.customizationOptions)
 },
 getBranches(){
+  this.branchOptions = [];
   return Axios
-        .get(`https://foodapi.lilacdev.com/public/api/branches`)
+        .get(`https://foodapi.lilacdev.com/public/api/branches?type=dashboard`)
         .then(res =>{
           if (res.status === 200) {
             res.data.data.forEach(el => {
@@ -1331,15 +1402,18 @@ createcategoryList(list){
     _updateBatch: function(val){
       this.getBatches({item_id: this.item_id});
       this.$refs['modalright_related'].hide();
+      this.selected_branches = [];
+      let branch_ids = [];
+      this.oldBranches = [];
       this.checkboxOptions = [];
-      branch_ids = val.prices.map(el=> (el.branch_id))
-      this.checkboxOptions = this.branchOptions.map( item => {
-        return {
-          name: item.text,
-          item: item.value.id,
-          selected: branch_ids.includes(item.value.id)
-        }
-      })
+      // branch_ids = val.prices.map(el=> (el.branch_id))
+      // this.checkboxOptions = this.branchOptions.map( item => {
+      //   return {
+      //     name: item.text,
+      //     item: item.value.id,
+      //     selected: branch_ids.includes(item.value.id)
+      //   }
+      // })
     },
     _deleteItem(newVal, old) {
       this.enableModalBtn= false;
@@ -1353,12 +1427,13 @@ createcategoryList(list){
       this.$router.push('../items')
     },
     _deleteBatch: function(val){
+      this.$refs['delete_batch'].hide();
       this.getBatches({item_id: this.item_id});
       this.checkboxOptions = [];
     },  
     _batches: function(val){
-      console.log('_branches', val)
       this.$refs.batch_vuetable.setData(val);
+      this.loadAttributesList();
     },
     create_Batch: function(val){
       this.getBatches({item_id: this.item_id});
@@ -1368,8 +1443,10 @@ createcategoryList(list){
       let branch_ids = [];
       
       this.batch_form.name = null;
-      this.selected_Branch_array = null;
-      this.selected_value = null;
+      this.selected_Branch_array = [];
+      this.selectedBranch.price = null;
+      this.selectedBranch = null;
+      this.selected_value = [];
       this.$v.$reset();
       branch_ids = val.prices.map(el=> (el.branch_id))
       this.checkboxOptions = this.branchOptions.map( item => {
@@ -1407,7 +1484,6 @@ createcategoryList(list){
       this.item_id = val.id;
       console.log('create_______item', val);
       this.isStillCreated = true;
-      this.loadAttributesList();
       this.getBranches();
     },
     load_batches: function(val) {
@@ -1465,5 +1541,12 @@ createcategoryList(list){
   font-size: 1rem;
   font-weight: 700;
   margin-left: -20px;
+}
+.branch_message{
+  margin: 14px;
+  padding: 14px;
+  border: 1px solid #ed0000;
+  border-radius: 12px;
+  text-align-last: center;
 }
 </style>

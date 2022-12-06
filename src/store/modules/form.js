@@ -318,7 +318,7 @@ const actions = {
   formData.append(`prices`, JSON.stringify({prices}));
   formData.append("_method", "PUT");
   axios
-  .put(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`, formData)
+  .post(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`, formData)
   .then(res => {
     if (res.status === 200) {
       commit('updateBatchSuccess', res.data.data)     
@@ -328,7 +328,8 @@ const actions = {
     console.log(error);
   });
   },
-  updateBatch({commit, dispatch}, payload){
+  deleteBatch1({commit, dispatch}, payload){
+    console.log(payload);
     const item_id = payload.item_id;
     const batch_id = payload.batch_id;
     axios

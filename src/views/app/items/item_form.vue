@@ -1,6 +1,6 @@
 <template>
  <div>
-  <b-row v-if="item_id">
+  <b-row v-if="enable_edit">
     <template v-if="_loadItem">
       <b-colxx xxs="12">
           <h1>{{lang_form.en_name}}</h1>
@@ -190,7 +190,6 @@
                               v-model="gridForm.customizations"
                               :options="customizationOptions"
                               item-text="name"
-                              :reduce="(option) => option.name"
                               item-value="id"
                               multiple
                             />
@@ -223,48 +222,45 @@
             <b-tab @click="getItemBatches()" title="Batches">
               <b-row>
                 <b-colxx>
-                    <!-- <batch_list :data="_batches" :branches="" @deleteBatch="deleteBatch" /> -->
-                    <template v-if="load_batches">
-                          
-                          <vuetable
-                            ref="batch_vuetable"
-                            class="table-divided order-with-arrow"
-                            :api-mode="false"
-                            childRow="true"
-                            :reactive-api-url="true"
-                            :fields="batchBranchFields"
-                            pagination-path
-                            @vuetable:row-clicked="rowClicked"
-                          >
-                          <template v-slot:child_row="props">
-                    <div><b>First name:</b> eerrereer</div>
-                    <div><b>Last name:</b> {{props}}</div>
-                  </template>
-                                                <template slot="actions" slot-scope="props">
-                              
-                              <b-dropdown
-                    id="ddown2"
-                    size="xs"
-                    html=" "
-                    split
-                    split-class="p-0"
-                    class=""
-                    variant="secondary">
-                    <template #button-content>
-                      <div class="py-0">
-                      
-                      
-                      
-                      
-                      <b-link
-                        id="edit"
-                        class="d-flex align-items-center  text-white px-2">
-                        <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
-                      </b-link>
-                      </div>
-                    </template>
-                        
-                          <b-dropdown-item
+                    <template v-if="(load_batches || loadBatchTab)">
+                      <b-table
+                        :items="records"
+                        :fields="column"
+                        striped
+                        hover
+                        :per-page="perPage"
+                        @row-clicked="handleRowClicked"
+                      >
+                        <template #cell(batchDetails)="data">
+                          <b class="text-info">{{ getAttrib(data.value)}}</b>
+                        </template>
+                        <template #cell(prices)="data">
+                          <b class="text-info">{{ getBranch(data.value)}}</b>
+                        </template>
+                        <template slot="row-details"> >> Expanded details </template>
+                        <template slot="actions" slot-scope="props">
+                          <b-dropdown
+                          id="ddown2"
+                          size="xs"
+                          html=" "
+                          split
+                          split-class="p-0"
+                          class=""
+                          variant="secondary">
+                            <template #button-content>
+                            <div class="py-0">
+                            
+                            
+                            
+                            
+                            <b-link
+                              id="edit"
+                              class="d-flex align-items-center  text-white px-2">
+                              <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                            </b-link>
+                            </div>
+                            </template>
+                            <b-dropdown-item
                             v-b-modal="`modalright_related`"
                             @click="getAssighedBranch(props.rowData,'related')">
                             <b-icon-link45deg
@@ -284,9 +280,8 @@
                           </b-dropdown-item>
                           </b-dropdown>
                          
-                          </template>
-                          </vuetable> 
-                            
+                        </template>
+                      </b-table>
                     </template>
                     <template v-else>
                       <div class="loading"></div>
@@ -495,76 +490,71 @@
                     </b-row>
                   </b-form>
                 </div>
-            
               </tab>
               <tab name="Batches" :validate="validateStep3">
                 <div class="wizard-basic-step">
                   <b-form>
                     <b-row>
-                      <template v-if="isStillCreated">
-                        <b-colxx xxs="12">
-                          <div class="top-right-button-container">
-                            <b-button
-                            variant="primary"
-                            v-b-modal.modalright
-                            class="top-right-button"
-                            @click="itemActions('reset')">
-                            {{ $t('pages.add-new') }}
-                            </b-button>
-                          </div>
-                        </b-colxx>
-                        <b-colxx xxs="12">
-                          <template v-if="load_batches">
-                            <vuetable
-                              ref="batch_vuetable"
-                              class="table-divided order-with-arrow"
-                              :api-mode="false"
-                              childRow="true"
-                              :reactive-api-url="true"
-                              :fields="batchBranchFields"
-                              pagination-path
-                              @vuetable:row-clicked="rowClicked"
-                            >
-                            <template v-slot:child_row="props">
-                              <div><b>First name:</b> eerrereer</div>
-                              <div><b>Last name:</b> {{props}}</div>
-                            </template>
-                            <template slot="actions" slot-scope="props">
-                              <b-dropdown
-                              id="ddown2"
-                              size="xs"
-                              html=" "
-                              split
-                              split-class="p-0"
-                              class=""
-                              variant="secondary">
-                                <template #button-content>
-                                  <div class="py-0">
-                                    <b-link id="edit" class="d-flex align-items-center  text-white px-2">
-                                      <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
-                                    </b-link>
-                                  </div>
+                        <template v-if="isStillCreated">
+                          <b-colxx sm="12">
+                            <div class="top-right-button-container">
+                              <b-button
+                              variant="primary"
+                              v-b-modal.modalright
+                              class="top-right-button"
+                              @click="itemActions('reset')">
+                              {{ $t('pages.add-new') }}
+                              </b-button>
+                            </div>
+                          </b-colxx>
+                          <b-colxx sm="12">
+                            <template v-if="(load_batches|| addNewBtn)">
+                             <b-table
+                                :items="batch_vuetable"
+                                :fields="batchBranchFields"
+                                striped
+                                hover
+                                :per-page="perPage"
+                                @row-clicked="handleRowClicked"
+                              >
+                                <template slot="row-details"> >> Expanded details </template>
+     
+                              <template slot="actions" slot-scope="props">
+                                <b-dropdown
+                                id="ddown2"
+                                size="xs"
+                                html=" "
+                                split
+                                split-class="p-0"
+                                class=""
+                                variant="secondary">
+                                  <template #button-content>
+                                    <div class="py-0">
+                                      <b-link id="edit" class="d-flex align-items-center  text-white px-2">
+                                        <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                                      </b-link>
+                                    </div>
+                                  </template>
+                                  <b-dropdown-item v-b-modal="`modalright_related`" @click="getAssighedBranch(props.rowData,'related')">
+                                    <b-icon-link45deg class="h5 m-0" variant="primary" scale="1" />
+                                    <span class="mx-1">Apply other branches</span>
+                                  </b-dropdown-item>
+                                  <b-dropdown-divider></b-dropdown-divider>
+                                  <b-dropdown-item title="Delete Item" @click="setBatchId(props.rowData.id)" v-b-modal="`delete_batch`" scale="1.1">
+                                    <i class="simple-icon-trash" /><span class="mx-1">{{ $t('delete') }}</span>
+                                  </b-dropdown-item>
+                                  </b-dropdown>
                                 </template>
-                                <b-dropdown-item v-b-modal="`modalright_related`" @click="getAssighedBranch(props.rowData,'related')">
-                                  <b-icon-link45deg class="h5 m-0" variant="primary" scale="1" />
-                                  <span class="mx-1">Apply other branches</span>
-                                </b-dropdown-item>
-                                <b-dropdown-divider></b-dropdown-divider>
-                                <b-dropdown-item title="Delete Item" @click="setBatchId(props.rowData.id)" v-b-modal="`delete_batch`" scale="1.1">
-                                  <i class="simple-icon-trash" /><span class="mx-1">{{ $t('delete') }}</span>
-                                </b-dropdown-item>
-                                </b-dropdown>
-                              </template>
-                            </vuetable> 
-                          </template>
-                          <template v-else>
-                            <div class="loading"></div>
-                          </template>
-                        </b-colxx>
-                      </template>
-                    <template v-else>
-                      <div class="loading"></div>
-                    </template>
+                              </b-table>
+                            </template>
+                            <template v-else>
+                              <div class="loading"></div>
+                            </template>
+                          </b-colxx>
+                        </template>
+                        <template v-else>
+                          <div class="loading"></div>
+                        </template>
                     </b-row>
                   </b-form>
                 </div>
@@ -822,6 +812,40 @@ export default {
       return {
         isLoad: true,
         selected_value: [],
+        column: [
+          {
+              key: `batch`,
+              sortable: true,            
+              label: `${this.$t('tables.title')}`,
+              titleClass: "",
+              dataClass: "list-item-heading",
+              width: "10%",
+            },
+            {
+              key: `batchDetails`,
+              sortable: true,
+              label: `${this.$t('tables.attributes')}`,
+              titleClass: "",
+              dataClass: "text-muted",
+              width: "25%",
+            },
+            {
+              key: "prices",
+              sortable: true,
+              label: `Branch price`,
+              titleClass: "",
+              dataClass: "text-muted",
+              width: "20%",
+              callback: this.viewBranch
+            },
+            {
+              key: "__slot:actions",
+              label: "",
+              titleClass: "center aligned text-right",
+              dataClass: "center aligned text-right",
+              width: "20%"
+            }
+        ],
         disabledFormStep2: false,
         imageDropzoneOptions: {
             url: "https://lilacmarketingevents.com",
@@ -847,12 +871,18 @@ export default {
         model_button: false,
         isProcessing: true,
         disabledFormStep1: false,
+        perPage: 10,
+        loadBatchTab: false,
+        
+        batch_vuetable: [],
         is_load_batch: false,
         enableModalBtn: false,
         delete_id: null,
         checkboxOptions: [],
+        records: [],
         selected_branches: [],
         item_id: null,
+        enable_edit: null,
         mainImage: null,
         selectedBranch: null,
         image_added: true,
@@ -864,6 +894,7 @@ export default {
         batch_id: null,
         oldBranches: [],
         selected_Branch_array: [],
+        allOpenRows: [],
         disabledFormStep3: false,
         branchOptions: [],
         isStillCreated: false,
@@ -895,24 +926,24 @@ export default {
             dataClass: "list-item-heading",
             width: "10%",
           },
-          // {
-          //   name: `batchDetails`,
-          //   sortField: "batchDetails.0.value",
-          //   title: `${this.$t('tables.attributes')}`,
-          //   titleClass: "",
-          //   dataClass: "text-muted",
-          //   width: "25%",
-          //   callback: this.viewAttribute
-          // },
-          // {
-          //   name: "prices",
-          //   sortField: "branch_id",
-          //   title: `Branch price`,
-          //   titleClass: "",
-          //   dataClass: "text-muted",
-          //   width: "20%",
-          //   callback: this.viewBranch
-          // },
+          {
+            name: `batchDetails`,
+            sortField: "batchDetails.0.value",
+            title: `${this.$t('tables.attributes')}`,
+            titleClass: "",
+            dataClass: "text-muted",
+            width: "25%",
+            callback: this.viewAttribute
+          },
+          {
+            name: "prices",
+            sortField: "branch_id",
+            title: `Branch price`,
+            titleClass: "",
+            dataClass: "text-muted",
+            width: "20%",
+            callback: this.viewBranch
+          },
           {
             name: "__slot:actions",
             title: "",
@@ -978,7 +1009,7 @@ export default {
   
 
   created(){
-    
+    this.enable_edit = this.$route.params.id
     this.item_id = this.$route.params.id
     this.loadCategoriesList();
     this.getCustomizationGroups();
@@ -987,14 +1018,14 @@ export default {
   methods: {
     ...mapActions(['getItem', 'createItem', 'updateItem', 'item_delete', 'getBatches', 'createBatch', 'updateBatch', 'deleteBatch1']),
     viewAttribute(value) {
-      // let itm = value.map(x => JSON.parse(x.attribute.locales.en.list_values).find(y => y.id === parseInt(x.value)).value)
-      return value.toString()
+      //      let itm = value.map(x => JSON.parse(x.attribute.locales.en.list_values).find(y => y.id === (x.value)).value)
+      // return itm.toString()
+    
     },
     viewBranch(value) {
-      return value
-      // let cityPriceArray = value.map(x => `${this.branchOptions.find(branch => branch.value.id === parseInt(x.batch_id))}/ ${x.price}`)
-      // console.log(value.map(x => this.branchOptions.find(branch => branch.value.id === parseInt(x.batch_id))))
-      
+      console.log('viewBranches', value)
+      // let cityPriceArray = value.map(x => `${this.cities.find(city => city.id === parseInt(x.city_id)).locales[this.$i18n.locale].name}/ ${x.price}`)
+      // return cityPriceArray.toString().replace(',', '\n')
     },
     imageAdded(file){
       this.mainImage = file;
@@ -1016,6 +1047,23 @@ export default {
     .catch(error => {
       console.log(error);
     });
+  },
+  getAttrib(val){
+    console.log('this is attrib val', val)
+    let res = [];
+    val.forEach(item => {
+      let ids = item.attribute.locales.en.list_values.map(x => x.id) 
+      if(ids.includes (item.value)){
+       res.push(item.attribute.locales.en.list_values[item.value].value) 
+        console.log('win')
+      }
+    })
+    return res
+  },
+  
+  getBranch(val){
+    console.log(val)
+    return val[0].price;
   },
   get_SubCat(){
    
@@ -1045,6 +1093,17 @@ export default {
           });
 
       }
+    },
+    handleRowClicked(item, index) {
+      console.log(item)
+      this.allOpenRows.map((ele) => {
+        if (ele.id !== item.id && ele._showDetails) {
+          this.$set(ele, "_showDetails", !ele._showDetails);
+        }
+      });
+      this.allOpenRows = [];
+      this.$set(item, "_showDetails", !item._showDetails);
+      this.allOpenRows.push(item);
     },
     onForm2Submited(){
        this.$v.$touch();
@@ -1188,6 +1247,7 @@ export default {
      
   },
   createAttributesList(val){
+    this.attributeOptions = [];
     val.forEach(option => {
         this.attributeOptions.push(
           new Object({
@@ -1372,9 +1432,8 @@ createcategoryList(list){
       this.lang_form.en_name = val.locales.en.name;
       this.lang_form.en_description = val.locales.en.description;
       this.gridForm.notes = val.notes;
-      this.gridForm.customizations = val.customizationGroups.map(x => (x.id))
+      this.gridForm.customizations = val.customizationGroups.map(el => ({label: el.locales.en.title, value: el.id}))
       console.log(this.gridForm.customizations)
-      
     }, 
     _updateItem: function(val){
       this.$notify(
@@ -1432,7 +1491,9 @@ createcategoryList(list){
       this.checkboxOptions = [];
     },  
     _batches: function(val){
-      this.$refs.batch_vuetable.setData(val);
+      this.records = val;
+      // this.$refs.batch_vuetable.setData(val);
+      this.loadBatchTab = true;
       this.loadAttributesList();
     },
     create_Batch: function(val){
@@ -1482,9 +1543,15 @@ createcategoryList(list){
     },
     create_item: function(val) {
       this.item_id = val.id;
-      console.log('create_______item', val);
       this.isStillCreated = true;
+      this.$notify(
+        "success",
+        "Operation completed successfully",
+        "the Item have been created successfully",
+        { duration: 4000, permanent: false }
+      );
       this.getBranches();
+      this.loadAttributesList();
     },
     load_batches: function(val) {
       this.$refs['modalright'].hide();

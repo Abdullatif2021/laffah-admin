@@ -87,7 +87,78 @@ img {
 .nav-tabs .nav-link {
     font-size: 15px !important;
 }
+.toggle_btn_on_en{
+    background: white;
+    padding-left: 39px;
+    border-radius: 17px;
+    border: 1px solid #23ad00;
+    cursor: pointer;
+    padding-top: -7px;
+    font-size: 12px;
+  }
+  .toggle_btn_off_en{
+    background: white;
+    padding-left: 39px;
+    border-radius: 27px;
+    border: 1px solid #ad0000;
+    cursor: pointer;
+    padding-top: -7px;
+    font-size: 12px;
+  }
+  .toggle_btn_on_ar{
+    background: white;
+    padding-left: 50px;
+    border-radius: 17px;
+    border: 1px solid #23ad00;
+    cursor: pointer;
+    padding-top: -7px;
+    font-size: 12px;
+  }
+  .toggle_btn_off_ar{
+    background: white;
+    padding-left: 50px;
+    border-radius: 17px;
+    border: 1px solid #ad0000;
+    cursor: pointer;
+    padding-top: -7px;
+    font-size: 12px;
+  }
 
+.toggle_span_on_en {
+    height: 16px;
+    width: 16px;
+    background-color: #1ec200;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0px;
+    margin-left: -37px;
+    position: absolute;
+    margin-top: 3px;
+}
+  .toggle_span_off_en{
+    height: 16px;
+    width: 16px;
+    background-color: #c20000;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0px;
+    margin-left: -18px;
+    position: absolute;
+    margin-top: 3px;
+  
+  }
+  .toggle_span_on_ar{
+    height: 16px;
+    width: 16px;
+    background-color: #1ec200;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0px;
+    margin-right: 5px;
+    position: absolute;
+    margin-top: 5px;
+  
+  }
 .vuetable {
     button i:before {
         transform: rotateZ(0deg);

@@ -66,12 +66,16 @@ export default {
           callback: this.viewCategory
         },
         {
-          name: "is_published",
+          name: "",
           title: `${this.$t('tables.online-state')}`,
           titleClass: "",
-          dataClass: "",
+          dataClass: "list-item-heading",
           width: "10%",
-          callback: this.viewStatus
+          callback: value => {
+            return `<b-button class="${value.is_published === "1" ? `toggle_btn_on_en`: `toggle_btn_off_en`}" variant="primary">
+              <span class="${value.is_published === "1" ? `toggle_span_on_en`: `toggle_span_off_en`}"></span>
+              </b-button>`;
+          },
         },
         {
           name: "__slot:price",
@@ -115,7 +119,10 @@ export default {
       return (this.selectData.find(category => category.category_id === value[0]) || {}).title || 'Deleted  '
     },
     viewStatus(value) {
-      return value === 1 ? this.$t('tables.published') : this.$t('tables.published')
+        console.log('puplish', value)
+      return ;
+
+      // return value === 1 ? this.$t('tables.published') : this.$t('tables.published')
     },
 
     searchChange(val) {
@@ -142,3 +149,77 @@ export default {
   },
 };
 </script>
+<style scoped>
+.toggle_btn_on_en{
+  background: white;
+  padding-left: 50px;
+  border-radius: 17px;
+  border: 1px solid #23ad00;
+  cursor: pointer;
+  padding-top: -7px;
+  font-size: 12px;
+}
+.toggle_btn_off_en{
+  background: white;
+  padding-left: 50px;
+  border-radius: 17px;
+  border: 1px solid #ad0000;
+  cursor: pointer;
+  padding-top: -7px;
+  font-size: 12px;
+}
+.toggle_btn_on_ar{
+  background: white;
+  padding-left: 50px;
+  border-radius: 17px;
+  border: 1px solid #23ad00;
+  cursor: pointer;
+  padding-top: -7px;
+  font-size: 12px;
+}
+.toggle_btn_off_ar{
+  background: white;
+  padding-left: 50px;
+  border-radius: 17px;
+  border: 1px solid #ad0000;
+  cursor: pointer;
+  padding-top: -7px;
+  font-size: 12px;
+}
+.toggle_span_on_en{
+  height: 16px;
+  width: 16px;
+  background-color: #1ec200;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0px;
+  margin-left: -43px;
+  position: absolute;
+  margin-top: 5px;
+
+}
+.toggle_span_off_en{
+  height: 16px;
+  width: 16px;
+  background-color: #c20000;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0px;
+  margin-left: -21px;
+  position: absolute;
+  margin-top: 5px;
+
+}
+.toggle_span_on_ar{
+  height: 16px;
+  width: 16px;
+  background-color: #1ec200;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0px;
+  margin-right: 5px;
+  position: absolute;
+  margin-top: 5px;
+
+}
+</style>

@@ -1073,6 +1073,7 @@ export default {
     this.enable_edit = this.$route.params.id
     this.item_id = this.$route.params.id
     this.loadCategoriesList();
+    this.loadAttributesList();
     this.getCustomizationGroups();
     this.item_id ? this.getItem({id: this.item_id}) : console.log('create state')
   },  
@@ -1602,6 +1603,7 @@ createcategoryList(list){
           this.imgUrl = URL.createObjectURL(val[0])
           this.files_form.image = URL.createObjectURL(val[0])
       }
+      console.log(this.mainImage, this.imgUrl)
     },
     main_img: function(main_img) {
       if (main_img) {

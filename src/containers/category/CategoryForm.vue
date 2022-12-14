@@ -345,6 +345,7 @@ export default {
       this.$v.categoryFrom.title_ar.$model = this.dataresult.locales.ar.title;
       this.$v.categoryFrom.description_ar.$model = this.dataresult.locales.ar.description;
       this.categoryFrom.parent_id = this.categories.filter(x => x.code == parseInt(this.dataresult.parent_id))
+      console.log('this.categoryFrom.parent_id',this.categoryFrom.parent_id, ' === ', this.dataresult.parent_id, this.categories.filter(x => x.code == parseInt(this.dataresult.parent_id)))
       this.active = this.dataresult.add_to_menu == "1" ? true : false;
       this.fileUrl = this.dataresult.image;
       this.isLoad = true;

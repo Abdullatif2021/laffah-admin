@@ -16,10 +16,30 @@
         class="vue-switcher-small d-flex align-self-center"></Switches>
        <h6 class="font-weight-bold d-flex align-self-center">{{this.$t('forms.enable-form')}}</h6>
       </div>
+    
      </b-card-header>
      <b-form
       @submit.prevent="setData"
       v-if="isLoad">
+      <b-colxx style="position: absolute;top: -104px;left: 1px;padding: 0px;" sm="12">
+       <label
+              style="display: flex;justify-content: center;"
+              class="form-group has-float-label"
+       >
+       <div class="position-absolute card-top-buttons-1">
+              <b-button  variant="outline-white" class="icon-button">
+              <i v-b-modal.main_image class="simple-icon-pencil" />
+              </b-button>
+       </div>
+              <img
+              :src="!image_added ? imgUrl : $v.branchesForm.image.$model"
+              style="border-radius: 50%;"
+              alt="Image"
+              width="160"
+              height="160"
+              />
+       </label>
+       </b-colxx>
       <b-form-group
        :label="$t('forms.name-ar')"
        :class="`has-float-label mb-4 ${toggleShadow}`">
@@ -172,35 +192,25 @@
        </b-form-invalid-feedback>
 
       </b-form-group>
-      <b-form-group
-       :label="$t('forms.latitude')"
-       :class="`has-float-label mb-4 ${toggleShadow}`">
+       <b-form-group class="form-group-label"
+                          label="Location">
+       <googleMaps
+       id="maps"
+       :location="location"
+       @select_location="set_location"
+       />
        <b-form-input
-        :disabled="toggleState"
-        required
-        type="text"
-        v-model.trim="$v.branchesForm.latitude.$model"
-        :state="!$v.branchesForm.latitude.$error"
-        :dir="direction" />
-       <b-form-invalid-feedback v-if="!$v.branchesForm.latitude.required">{{`${$t('forms.latitude')}
-              ${$t('validations.required')}`}}!
-       </b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group
-       :label="$t('forms.longitude')"
-       :class="`has-float-label mb-4 ${toggleShadow}`">
-       <b-form-input
-        :disabled="toggleState"
-        required
-        type="text"
-        v-model.trim="$v.branchesForm.longitude.$model"
-        :state="!$v.branchesForm.longitude.$error"
-        :dir="direction" />
-       <b-form-invalid-feedback v-if="!$v.branchesForm.longitude.required">{{`${$t('forms.longitude')}
-              ${$t('validations.required')}`}}!
-       </b-form-invalid-feedback>
+       style="display: none;"
+       :state="!$v.branchesForm.latitude.$error"
+       v-model="$v.branchesForm.latitude.$model"
+       />
 
-      </b-form-group>
+       <b-form-invalid-feedback
+       v-if="!$v.branchesForm.latitude.required"
+       >The Location is required</b-form-invalid-feedback
+       >
+       </b-form-group>
+     
       <b-form-group
        :label="$t('forms.branch_code')"
        :class="`has-float-label mb-4 ${toggleShadow}`">
@@ -265,6 +275,34 @@
     </b-card-body>
    </b-card>
   </b-colxx>
+  <b-modal
+    id="main_image"
+    ref="main_image"
+    title="Image"
+    :no-close-on-backdrop="true"
+  >
+  <b-form-group :label="$t('forms.image')">
+    <vue-dropzone
+      ref="myVueDropzone"
+      id="dropzone"
+      :options="imageDropzoneOptions"
+      @vdropzone-files-added="imageAdded"
+      @vdropzone-removed-file="imageRemoved"
+    ></vue-dropzone>
+  </b-form-group>
+  <template slot="modal-footer">
+    <b-button
+      variant="primary"
+      @click="updateImage()"
+      class="mr-1"
+      :disabled="image_added || model_button"
+      >{{ $t("forms.submit") }}</b-button
+    >
+    <b-button variant="secondary" @click="hideModal('main_image')">{{
+      $t("survey.cancel")
+    }}</b-button>
+  </template>
+  </b-modal>
  </b-row>
 </template>
 
@@ -275,6 +313,7 @@ import { validationMixin } from "vuelidate";
 import { getDirection } from "../../utils";
 import axios from "axios";
 import Datepicker from "vuejs-datepicker";
+import googleMaps from "../../components/Common/google_maps.vue";
 import { barChartOptions } from '../../components/Charts/config';
 import { defaultDirection } from '../../constants/config';
 import { BIconArrowDownSquareFill } from 'bootstrap-vue';
@@ -285,6 +324,7 @@ import { quillEditor } from 'vue-quill-editor'
 import ThumbnailImage from "../../components/Cards/ThumbnailImage";
 import Switches from "vue-switches";
 import { mapGetters, mapActions } from 'vuex';
+import VueDropzone from "vue2-dropzone";
 
 const {
  required,
@@ -295,6 +335,8 @@ export default {
 
  components: {
   "v-select": vSelect,
+  "vue-dropzone": VueDropzone,
+  googleMaps : googleMaps,
   datepicker: Datepicker,
   'quill-editor': quillEditor,
   ThumbnailImage,
@@ -305,6 +347,9 @@ export default {
  mixins: [validationMixin],
  validations: {
   branchesForm: {
+image: {
+
+},
    name_ar: {
     required,
     maxLength: maxLength(200),
@@ -360,9 +405,35 @@ export default {
    //value: '01:01:00',
    isOpen: false,
    visibleState: 'visible',
+   location: [],
    active: true,
    disableSubmit: false,
    required: null,
+   imageDropzoneOptions: {
+            url: "https://lilacmarketingevents.com",
+            thumbnailHeight: 160,
+            thumbnailWidth: 150,
+            parallelUploads: 3,
+            maxFiles: 1,
+          
+            acceptedFiles:
+            "image/jpeg,image/png,image/gif",
+            uploadMultiple: false,
+            addRemoveLinks: true,
+            removedfile: function(file) {
+              var _ref;
+              return (_ref = file.previewElement) != null
+                ? _ref.parentNode.removeChild(file.previewElement)
+                : void 0;
+        },
+        autoProcessQueue: false,
+        previewTemplate: this.dropzoneTemplate(),
+        headers: {}
+      },
+   mainImage: null,
+   imgUrl: null,
+   image_added: true,
+   model_button: false,
    isfile: false,
    fileUrl: "",
    editable: false,
@@ -373,6 +444,7 @@ export default {
    dataresult: null,
    newCities: [],
    branchesForm: {
+       image: null,
     name_en: '',
     name_ar: '',
     description_en: '',
@@ -418,6 +490,12 @@ export default {
  },
 
  watch: {
+mainImage: function(val) {
+      if (val) {
+          this.imgUrl = URL.createObjectURL(val[0])
+      }
+      console.log(this.imgUrl)
+},
   editable(val) {
    if (val) {
     this.toggleState = false;
@@ -425,7 +503,6 @@ export default {
    } else {
     this.toggleState = true;
     this.toggleShadow = "";
-
    }
   },
  },
@@ -459,7 +536,15 @@ export default {
 
  },
  methods: {
-
+       imageAdded(file){
+      this.mainImage = file;
+      this.image_added = false;
+    },
+    
+    imageRemoved(){
+      this.mainImage = null;
+      this.image_added = true;
+    },
   changeFile(event) {
    this.isfile = true;
    // Reference to the DOM input element
@@ -509,7 +594,9 @@ export default {
       this.$v.branchesForm.description_en.$model = this.dataresult.locales.en.description;
       this.$v.branchesForm.telephone.$model = this.dataresult.telephone;
       this.$v.branchesForm.mobile.$model = this.dataresult.mobile;
+      this.location.push( +this.dataresult.latitude,  +this.dataresult.longitude);
       this.$v.branchesForm.latitude.$model = this.dataresult.latitude;
+      this.$v.branchesForm.image.$model = this.dataresult.image;
       this.$v.branchesForm.longitude.$model = this.dataresult.longitude;
       this.$v.branchesForm.branch_code.$model = this.dataresult.branch_code;
       this.$v.branchesForm.address_ar.$model = this.dataresult.locales.ar.address;
@@ -529,6 +616,62 @@ export default {
     this.isLoad = true;
    }
   },
+  hideModal(refname) {
+    this.$refs[refname].hide();
+    this.mainImage = null;
+  },  
+  updateImage(){
+    this.$v.branchesForm.image.$model = this.mainImage[0];
+    this.formData = new FormData();
+    this.formData.append("image", this.mainImage[0]);
+    this.formData.append("open_from", this.branchesForm.open_from);
+    this.formData.append("open_to", this.branchesForm.open_to);
+    this.formData.append("_method", 'PUT');
+    this.model_button = true;
+    axios //PUT method
+     .post(this.apiBase + '/' + this.itemid, this.formData, {
+      headers: {
+       'Content-Type': 'multipart/form-data'
+      }       
+     })
+     .then(
+      res => {
+       this.dataresult = res
+       if (this.dataresult.data.success == true) {
+        this.model_button = false;
+        this.$v.branchesForm.image.$model = this.dataresult.data.data.image
+        this.$refs['main_image'].hide();
+        this.$notify("success", "Image has been Updated Successfully", null, { duration: 5000, permanent: false });
+       } 
+      })
+     .catch(error => {
+      this.$notify("error", "Image was not Updated", "Network Error", null, { duration: 5000, permanent: false });
+     });
+  },
+  dropzoneTemplate() {
+      return `<div class="dz-preview dz-file-preview mb-3">
+                  <div class="d-flex flex-row "> <div class="p-0 w-30 position-relative">
+                      <div class="dz-error-mark"><span><i></i>  </span></div>
+                      <div class="dz-success-mark"><span><i></i></span></div>
+                      <div class="preview-container">
+                        <img data-dz-thumbnail class="img-thumbnail border-0" />
+                        <i class="simple-icon-doc preview-icon"></i>
+                      </div>
+                  </div>
+                  <div class="pl-3 pt-2 pr-2 pb-1 w-70 dz-details position-relative">
+                    <div> <span data-dz-name /> </div>
+                    <div class="text-primary text-extra-small" data-dz-size /> </div>
+                    <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                    <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                  </div>
+                  <a href="#" class="remove" data-dz-remove> <i class="glyph-icon simple-icon-trash"></i> </a>
+                </div>`;
+    },
+  set_location(data) {
+       console.log(data)
+       this.branchesForm.latitude = data.lat;
+       this.branchesForm.longitude = data.lng;
+  },
   setData() {
    this.disableSubmit = true
    this.isLoad = false;
@@ -545,18 +688,24 @@ export default {
    this.formData.append("en[address]", this.branchesForm.address_en);
    this.formData.append("ar[address]", this.branchesForm.address_ar);
    this.formData.append("branch_code", this.branchesForm.branch_code);
+
    this.formData.append("city_id", this.branchesForm.city);
    this.formData.append("creation_date", this.branchesForm.creation_date.toISOString());
    this.formData.append("open_from", this.branchesForm.open_from);
    this.formData.append("open_to", this.branchesForm.open_to);
    this.formData.append("active", this.active == true ? 1 : 0);
    this.formData.append("is_open", this.isOpen == true ? 1 : 0);
+//    if(this.mainImage){
+//        this.formData.append("image", this.this.mainImage[0]);
+
+//    }
    // if(this.branchesForm.image)
    // if (this.isfile) { //check upload new file
    //     this.formData.append("image", this.branchesForm.image);
    // }
    if (this.itemid != null) {
     this.formData.append("_method", 'PUT');
+    this.model_button = true;
     axios //PUT method
      .post(this.apiBase + '/' + this.itemid, this.formData, {
       headers: {
@@ -629,7 +778,7 @@ export default {
 
  },
  async mounted() {
-  await this.getData()
+  await this.getData();
   await this.fetchCities();
  },
 }
@@ -640,5 +789,18 @@ export default {
   margin:0px !important;
       display: flex;
     align-items: center;
+}
+.card-top-buttons-1 {
+  padding: 1.3rem;
+  top: 0;
+  margin: 100px;
+}
+.icon-button {
+  padding: 0;
+  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
 }
 </style>

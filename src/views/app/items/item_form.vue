@@ -231,34 +231,47 @@
                         :per-page="perPage"
                         @row-clicked="handleRowClicked"
                       >
-                        <template #cell(batchDetails)="data">
-                          <b class="text-info att_list">
-                            <div v-for="(foo, index) in getAttrib(data.value)" :key="index">
-                              <p>{{ foo.value }}</p>
-                            </div>
-                          </b>
-                        </template>
-                        <template #cell(prices)="data">
-                          <b class="text-info">{{ getBranch(data.value)}}</b>
-                        </template>
-                        <template #cell(id)="data">
+                    
+                            <template #cell(branch)="data">
+                              <b class="text-info">{{ getBranchName(data.value)}}</b>
+                            </template>
+                            <!-- <template #cell(batchDetails)="data">
+                              <b class="text-info att_list">
+                                <div v-for="(foo, index) in getAttrib(data.value)" :key="index">
+                                  <p>{{ foo.value }}</p>
+                                </div>
+                              </b>
+                            </template> -->
+                            <template #cell(price)="data">
+                              <b class="text-info">{{ getPrice(data.value)}}</b>
+                            </template>
+                            <template #cell(active)="data">
+                              <div @click="batch_activate(data.item)">
+                                <switches v-model="data.item.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                                <!-- <b class="text-info">{{ get_active_view(data.value)}}</b> -->
+                              </div>
+                            </template>
+                        
+                       
+                        <template #cell(actions)="data">
                           <b class="text-info">
                             <b-dropdown
-                          id="ddown2"
-                          size="xs"
-                          html=" "
-                          split
-                          split-class="p-0"
-                          class=""
-                          variant="secondary">
-                            <template #button-content>
-                            <div class="py-0">
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                                <template #button-content>
+                                <div  class="py-0">
                             
                             
                             
                             
                             <b-link
                               id="edit"
+                              @click="open_edit_model(data.item)"
                               class="d-flex align-items-center  text-white px-2">
                               <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
                             </b-link>
@@ -267,7 +280,7 @@
                           <b-dropdown-item
                             title="Delete Item"
                             class=""
-                            @click="setBatchId(data.value)"
+                            @click="setBatchId(data.item.id)"
                             v-b-modal="`delete_batch`"
                             scale="1.1">
                             <i class="simple-icon-trash" /> <span class="mx-1">{{ $t('delete') }}</span>
@@ -530,38 +543,55 @@
                           </b-colxx>
                           <b-colxx sm="12">
                             <template v-if="(load_batches|| addNewBtn)">
-                            <b-table
-                            :items="records"
-                            :fields="column"
-                            striped
-                            hover
-                            :per-page="perPage"
-                            @row-clicked="handleRowClicked"
-                            >
-                            <template #cell(batchDetails)="data">
+                              <b-table
+                                :items="records"
+                                :fields="column"
+                                striped
+                                hover
+                                :per-page="perPage"
+                                @row-clicked="handleRowClicked"
+                              >
+                    
+                            <template #cell(branch)="data">
+                              <b class="text-info">{{ getBranchName(data.value)}}</b>
+                            </template>
+                            <!-- <template #cell(batchDetails)="data">
                               <b class="text-info att_list">
                                 <div v-for="(foo, index) in getAttrib(data.value)" :key="index">
                                   <p>{{ foo.value }}</p>
                                 </div>
                               </b>
+                            </template> -->
+                            <template #cell(price)="data">
+                              <b class="text-info">{{ getPrice(data.value)}}</b>
                             </template>
-                            <template #cell(prices)="data">
-                              <b class="text-info">{{ getBranch(data.value)}}</b>
+                            <template #cell(active)="data">
+                              <div @click="batch_activate(data.item)">
+                                <switches v-model="data.item.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                                <!-- <b class="text-info">{{ get_active_view(data.value)}}</b> -->
+                              </div>
                             </template>
-                            <template #cell(id)="data">
+                        
+                       
+                        <template #cell(actions)="data">
                           <b class="text-info">
                             <b-dropdown
-                          id="ddown2"
-                          size="xs"
-                          html=" "
-                          split
-                          split-class="p-0"
-                          class=""
-                          variant="secondary">
-                            <template #button-content>
-                            <div class="py-0">
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                                <template #button-content>
+                                <div  class="py-0">
+                            
+                            
+                            
+                            
                             <b-link
                               id="edit"
+                              @click="open_edit_model(data.item)"
                               class="d-flex align-items-center  text-white px-2">
                               <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
                             </b-link>
@@ -570,7 +600,7 @@
                           <b-dropdown-item
                             title="Delete Item"
                             class=""
-                            @click="setBatchId(data.value)"
+                            @click="setBatchId(data.item.id)"
                             v-b-modal="`delete_batch`"
                             scale="1.1">
                             <i class="simple-icon-trash" /> <span class="mx-1">{{ $t('delete') }}</span>
@@ -581,7 +611,7 @@
                         <template slot="row-details"> 
                             <b-form-group>
                               <template v-if="checkboxOptions.length > 0">
-                                <label class="form-group-label cate_class">Branches: </label>
+                              <label class="form-group-label cate_class">Branches: </label>
                                 <b-form-checkbox-group 
                                   v-model="selected_branches"
                                   :options="checkboxOptions"
@@ -605,8 +635,7 @@
                               <b-button size="sm" variant="primary"  @click="submitBatchList()" class="mr-1" >{{ $t("survey.submit") }}</b-button>
                             </div>
                         </template>
-                               
-                              </b-table>
+                      </b-table>
                             </template>
                             <template v-else>
                               <div class="loading"></div>
@@ -644,15 +673,15 @@
   <b-modal
     id="modalright"
     ref="modalright"
-    title="Add New Batch"
+    :title="batch_modify ?  `Edit Price` : 'Add New Batch'"
     modal-class="modal-right"
   >
     <b-form class="av-tooltip tooltip-label-bottom">
-        <b-form-group :label="$t('forms.batch')" class="has-float-label mb-4">
+        <!-- <b-form-group :label="$t('forms.batch')" class="has-float-label mb-4">
           <b-form-input type="text" v-model.trim="$v.batch_form.name.$model" :state="!$v.batch_form.name.$error" />
           <b-form-invalid-feedback v-if="!$v.batch_form.name.required">Please enter batch name</b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group class="has-float-label mb-4">
+        </b-form-group> -->
+        <!-- <b-form-group class="has-float-label mb-4">
           <label class="form-group-label" for="cate">Attributes</label>
           <b-form-input style="display: none;" :state="!$v.batch_form.attributes.$error" v-model="$v.batch_form.attributes.$model" />
             <b-form-select
@@ -670,8 +699,23 @@
             v-if="!$v.batch_form.attributes.required"
             >Please slelect attributes</b-form-invalid-feedback
           >          
-        </b-form-group>
-        <div class="wizard-basic-step">
+        </b-form-group> -->
+        <div v-if="batch_modify" class="wizard-basic-step">
+          <b-row class="add_container">
+            <b-colxx sm="12">
+              <b-form-group  :label="batch_object.name" class="form-group-label">
+                <b-form-input
+                  type="number"
+                  placeholder="Please enter the price ..."
+                  v-model.trim="batch_object.price" />
+                  <b-form-invalid-feedback
+                    >Please enter the price</b-form-invalid-feedback
+                  >     
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+        </div>
+        <div v-else class="wizard-basic-step">
           <b-row class="add_container">
             <b-colxx sm="12">
               <b-form-group  label="Branches" class="form-group-label">
@@ -724,6 +768,15 @@
         $t("survey.cancel")
       }}</b-button>
       <b-button
+        v-if="batch_modify"
+        :disabled="!batch_object.price"
+        variant="primary"
+        @click="submitBatchForm()"
+        class="mr-1"
+        >{{ $t("survey.submit") }}</b-button
+      >
+      <b-button
+        v-else
         variant="primary"
         @click="submitBatchForm()"
         class="mr-1"
@@ -873,39 +926,57 @@ export default {
       return {
         isLoad: true,
         selected_value: [],
+        batch_object: {
+          name: String,
+          price: Number,
+          active: Number,
+          branch_id: Number,
+          item_id: Number
+        },
         column: [
+          
           {
-              key: `batch`,
+              key: `branch`,
               sortable: true,            
-              label: `${this.$t('tables.title')}`,
+              label: `Branch Name`,
               titleClass: "",
               dataClass: "list-item-heading",
-              width: "10%",
+              width: "40%",
             },
+            // {
+            //   key: `batchDetails`,
+            //   sortable: true,
+            //   label: `${this.$t('tables.attributes')}`,
+            //   titleClass: "",
+            //   dataClass: "text-muted",
+            //   width: "25%",
+            // },
+            
             {
-              key: `batchDetails`,
+              key: "price",
               sortable: true,
-              label: `${this.$t('tables.attributes')}`,
-              titleClass: "",
-              dataClass: "text-muted",
-              width: "25%",
-            },
-            {
-              key: "prices",
-              sortable: true,
-              label: `Branch price`,
+              label: `Price`,
               titleClass: "",
               dataClass: "text-muted",
               width: "20%",
-              callback: this.viewBranch
             },
-            {
-              key: "id",
-              label: "Actions",
-              titleClass: "center aligned text-right",
-              dataClass: "center aligned text-right",
-              width: "20%"
-            }
+            // {
+            //   key: "active",
+            //   sortable: true,
+            //   label: `Status`,
+            //   titleClass: "",
+            //   dataClass: "text-muted",
+            //   width: "20%",
+            // },
+            'active',
+            'actions'
+            // {
+            //   key: "id",
+            //   label: "Actions",
+            //   titleClass: "center aligned text-right",
+            //   dataClass: "center aligned text-right",
+            //   width: "20%"
+            // }
         ],
         disabledFormStep2: false,
         imageDropzoneOptions: {
@@ -943,6 +1014,7 @@ export default {
         records: [],
         selected_branches: [],
         item_id: null,
+        batch_modify: false,
         enable_edit: null,
         mainImage: null,
         selectedBranch: null,
@@ -986,6 +1058,7 @@ export default {
             titleClass: "",
             dataClass: "list-item-heading",
             width: "10%",
+            callback: this.getBranchName
           },
           {
             name: `batchDetails`,
@@ -1061,8 +1134,8 @@ export default {
       image : {  }
     },
     batch_form: {
-      name: { required },
-      attributes: { required },
+      name: {  },
+      attributes: {  },
       branch: { required },
       price: { required },
     }
@@ -1116,9 +1189,24 @@ export default {
     console.log('itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', itm)
     return itm
   },
-  
-  getBranch(val){
-    return val[0].price;
+  batch_activate(val){
+    console.log('i am here batch_activate', val)
+    this.updateBatch({
+      item_id: val.item_id,
+      branch_id: val.branch_id,
+      active: val.active, 
+      price: val.price
+    })
+  },
+  getPrice(val){
+    return val;
+  },
+  getBranchName(val){
+    return val.locales.en.name;
+  },
+  get_active_view(val){
+    return `<h1>val</h1>`
+    
   },
   get_SubCat(){
    
@@ -1130,6 +1218,17 @@ export default {
   delete_Item(){
     this.enableModalBtn= true;
     this.item_delete({item_id: this.item_id})
+  },
+  open_edit_model(val){
+    console.log('open_edit_model', val)
+    this.batch_modify = true;
+    this.$refs['modalright'].show();
+    this.batch_object.name = val.branch.locales.en.name;
+    this.batch_object.price = val.price;
+    this.batch_object.active = val.active;
+    this.batch_object.item_id = val.item_id;
+    this.batch_object.branch_id = val.branch_id;
+
   },
   onForm1Submited(){
        this.$v.$touch();
@@ -1150,16 +1249,16 @@ export default {
       }
     },
     handleRowClicked(item, index) {
-      this.getAssighedBranch(item)
-      console.log(item)
-      this.allOpenRows.map((ele) => {
-        if (ele.id !== item.id && ele._showDetails) {
-          this.$set(ele, "_showDetails", !ele._showDetails);
-        }
-      });
-      this.allOpenRows = [];
-      this.$set(item, "_showDetails", !item._showDetails);
-      this.allOpenRows.push(item);  
+      // this.getAssighedBranch(item)
+      // console.log(item)
+      // this.allOpenRows.map((ele) => {
+      //   if (ele.id !== item.id && ele._showDetails) {
+      //     this.$set(ele, "_showDetails", !ele._showDetails);
+      //   }
+      // });
+      // this.allOpenRows = [];
+      // this.$set(item, "_showDetails", !item._showDetails);
+      // this.allOpenRows.push(item);  
     },
     onForm2Submited(){
        this.$v.$touch();
@@ -1267,8 +1366,7 @@ export default {
   delete1_batch(){
     console.log(this.item_id, this.delete_id)
     this.deleteBatch1({
-      item_id: this.item_id,  
-      batch_id: this.delete_id,
+      record_id: this.delete_id,
     })
   },
   updateImage(){
@@ -1289,7 +1387,16 @@ export default {
     this.$refs[refname].hide();
   },  
   submitBatchForm(){
-    this.$v.$touch();
+    if(this.batch_modify){
+      this.updateBatch({
+        item_id: this.batch_object.item_id,
+        branch_id: this.batch_object.branch_id,
+        active: this.batch_object.active, 
+        price: this.batch_object.price,
+        batch_modify: true,
+      })
+    }else{
+      this.$v.$touch();
     this.$v.batch_form.$touch();
     if (this.selectedBranch?.price) {
       this.batch_form.price = 'selected'
@@ -1297,13 +1404,19 @@ export default {
     if ( !this.$v.batch_form.$invalid){
       this.createBatch({
             item_id: this.item_id,
-            batch: this.batch_form.name,
-            prices: this.selected_Branch_array.map(x => ({branch_id: x.id, price: x.price, active: x.active})),
-            attributes: this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})),
+            // batch: this.batch_form.name,{branch_id: x.id, price: x.price, active: x.active}
+            // price: this.selected_Branch_array[0].map(x => ({branch_id: x.id, price: x.price, active: x.active})),
+
+            price: this.selected_Branch_array[0].price,
+            branch_id: this.selected_Branch_array[0].id,
+            active: this.selected_Branch_array[0].active,
+            // attributes: this.selected_value.map(x => ({attribute_id: x.toString().split("_")[0], value: x.toString().split("_")[1]})),
             
         })
     }
      
+    }
+    
   },
   createAttributesList(val){
     this.attributeOptions = [];
@@ -1518,20 +1631,21 @@ createcategoryList(list){
         );
     },
     _updateBatch: function(val){
-      this.getBatches({item_id: this.item_id});
-      this.$refs['modalright_related'].hide();
-      this.selected_branches = [];
-      let branch_ids = [];
-      this.oldBranches = [];
-      this.checkboxOptions = [];
-      // branch_ids = val.prices.map(el=> (el.branch_id))
-      // this.checkboxOptions = this.branchOptions.map( item => {
-      //   return {
-      //     name: item.text,
-      //     item: item.value.id,
-      //     selected: branch_ids.includes(item.value.id)
-      //   }
-      // })
+        this.getBatches({item_id: this.item_id});
+        this.$refs['modalright_related'].hide();
+        this.$refs['modalright'].hide();
+        this.selected_branches = [];
+        let branch_ids = [];
+        this.batch_modify = false;
+        this.oldBranches = [];
+        this.checkboxOptions = [];
+        this.$notify(
+        "success",
+        "Operation completed Successfully",
+        "Batch have been Updated Successfully",
+        { duration: 4000, permanent: false }
+      );
+      
     },
     _deleteItem(newVal, old) {
       this.enableModalBtn= false;
@@ -1546,33 +1660,17 @@ createcategoryList(list){
     },
     _deleteBatch: function(val){
       this.$refs['delete_batch'].hide();
+      this.$notify(
+        "success",
+        "Operation completed successfully",
+        "Batch have been deleted successfully",
+        { duration: 4000, permanent: false }
+      );
       this.getBatches({item_id: this.item_id});
       this.checkboxOptions = [];
     },  
     _batches: function(val){
-      const testArray = []
-      const batchDetails = []
-      val.forEach(el =>{
-        testArray.push(
-          new Object({
-            batch: el.batch,
-            price: el.prices[0].price,
-            id: el.id,
-            item_id: el.item_id,
-            details: el.batchDetails.forEach(item =>{
-              batchDetails.push(
-                new Object({
-                  attribute: item.attribute.locales.en.list_values.find(element => element.id = item.value)
-                })
-              )
-            }),
-            det: batchDetails
-          })
-        ) 
-      })
-      console.log(testArray)
       this.records = val;
-      // this.$refs.batch_vuetable.setData(val);
       this.loadBatchTab = true;
       this.loadAttributesList();
     },
@@ -1714,4 +1812,47 @@ createcategoryList(list){
   display: flex;
   gap: 10px;
 }
+.toggle_btn_on_en{
+  background: white;
+    padding-left: 20px;
+    border-radius: 17px;
+    border: 1px solid #23ad00;
+    cursor: pointer;
+    padding-top: 12px;
+    font-size: 17px;
+  }
+  .toggle_btn_off_en{
+    background: white;
+    padding-left: 20px;
+    border-radius: 27px;
+    border: 1px solid #ad0000;
+    cursor: pointer;
+    padding-top: 12px;
+    font-size: 12px;
+  }
+  
+  .toggle_span_on_en {
+    height: 16px;
+    width: 16px;
+    background-color: #1ec200;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0px;
+    margin-left: -18px;
+    position: absolute;
+    margin-top: -10px;
+}
+  .toggle_span_off_en{
+    height: 16px;
+    width: 16px;
+    background-color: #1ec200;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0px;
+    margin-left: -19px;
+    position: absolute;
+    margin-top: -10px;
+  
+  }
+  
 </style>

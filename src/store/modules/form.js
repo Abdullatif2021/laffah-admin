@@ -253,7 +253,7 @@ const actions = {
     const item_id = payload.item_id;
     commit('is_load_batches', false)
     axios
-    .get(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}`)
+    .get(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('is_load_batches', true)
@@ -293,13 +293,12 @@ const actions = {
     const formData = new FormData();
     const item_id = payload.item_id;
     console.log(payload);
-    const attributes = payload.attributes
-    formData.append(`attributes`, JSON.stringify({attributes}));
-    const prices = payload.prices
-    formData.append(`prices`, JSON.stringify({prices}));
-    formData.append(`batch`, payload.batch);
+
+    formData.append(`active`, payload.active ? 1 : 0);
+    formData.append(`price`, payload.price);
+    formData.append(`branch_id`, payload.branch_id);
     axios
-    .post(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}`, formData)
+    .post(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}`, formData)
     .then(res => {
       if (res.status === 201) {
         commit('crateBatchSuccess', res.data.data)     
@@ -312,28 +311,28 @@ const actions = {
   updateBatch({commit, dispatch}, payload){
   const formData = new FormData();
   const item_id = payload.item_id;
-  const batch_id = payload.batch_id;
-  console.log(payload)
-  const prices = payload.prices
-  formData.append(`prices`, JSON.stringify({prices}));
-  formData.append("_method", "PUT");
+  const branch_id = payload.branch_id;
+  console.log('update Batch payload', payload)
+  const price = payload.price;
+ 
+  const active = payload.batch_modify ? payload.active : payload.active ? 0 : 1;
   axios
-  .post(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`, formData)
+  .put(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}/${branch_id}/${active}/${price}`)
   .then(res => {
-    if (res.status === 200) {
       commit('updateBatchSuccess', res.data.data)     
-    }
   })
   .catch(error => {
     console.log(error);
   });
   },
+  activateBatch(){
+
+  },
   deleteBatch1({commit, dispatch}, payload){
     console.log(payload);
-    const item_id = payload.item_id;
-    const batch_id = payload.batch_id;
+    const record_id = payload.record_id;
     axios
-    .delete(`https://foodapi.lilacdev.com/public/api/items/batches/${item_id}/${batch_id}`)
+    .delete(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${record_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('deleteBatchSuccess', res.data.data)     

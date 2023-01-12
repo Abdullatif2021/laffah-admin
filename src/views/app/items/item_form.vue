@@ -9,7 +9,7 @@
             variant="primary"
             size="lg"
             class="top-right-button"
-            v-b-modal.modalright
+            v-b-modal.modalright     
             >Add new Batch</b-button>
           </div>
           <piaf-breadcrumb />

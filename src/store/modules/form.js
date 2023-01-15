@@ -179,7 +179,7 @@ const actions = {
       const customization_groups = payload.customization_groups
       formData.append(`customization_groups`, JSON.stringify({customization_groups}));
       axios
-      .post(`https://foodapi.lilacdev.com/public/api/items`, formData)
+      .post(`https://api2.laffahrestaurants.com/public/api/items`, formData)
       .then(res => {
         if (res.status === 201) {
          commit('crateItemSuccess', res.data.data)     
@@ -221,7 +221,7 @@ const actions = {
     }
     formData.append("_method", "PUT");
     axios
-    .post(`https://foodapi.lilacdev.com/public/api/items/${item_id}`, formData)
+    .post(`https://api2.laffahrestaurants.com/public/api/items/${item_id}`, formData)
     .then(res => {
       if (res.status === 200) {
         if(payload.image){
@@ -239,7 +239,7 @@ const actions = {
   item_delete({commit}, payload){
     const item_id = payload.item_id;
     axios
-    .delete(`https://foodapi.lilacdev.com/public/api/items/${item_id}`)
+    .delete(`https://api2.laffahrestaurants.com/public/api/items/${item_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('deleteItemSuccess', res.data.data)     
@@ -253,7 +253,7 @@ const actions = {
     const item_id = payload.item_id;
     commit('is_load_batches', false)
     axios
-    .get(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}`)
+    .get(`https://api2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('is_load_batches', true)
@@ -273,7 +273,7 @@ const actions = {
     const item_id = payload.id;
     commit('is_load_item', false)
     axios
-    .get(`https://foodapi.lilacdev.com/public/api/items/${item_id}`)
+    .get(`https://api2.laffahrestaurants.com/public/api/items/${item_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('is_load_item', true)
@@ -298,7 +298,7 @@ const actions = {
     formData.append(`price`, payload.price);
     formData.append(`branch_id`, payload.branch_id);
     axios
-    .post(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}`, formData)
+    .post(`https://api2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}`, formData)
     .then(res => {
       if (res.status === 201) {
         commit('crateBatchSuccess', res.data.data)     
@@ -317,7 +317,7 @@ const actions = {
  
   const active = payload.batch_modify ? payload.active : payload.active ? 0 : 1;
   axios
-  .put(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${item_id}/${branch_id}/${active}/${price}`)
+  .put(`https://api2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}/${branch_id}/${active}/${price}`)
   .then(res => {
       commit('updateBatchSuccess', res.data.data)     
   })
@@ -332,7 +332,7 @@ const actions = {
     console.log(payload);
     const record_id = payload.record_id;
     axios
-    .delete(`https://foodapi.lilacdev.com/public/api/item_batch_branches/${record_id}`)
+    .delete(`https://api2.laffahrestaurants.com/public/api/item_batch_branches/${record_id}`)
     .then(res => {
       if (res.status === 200) {
         commit('deleteBatchSuccess', res.data.data)     
@@ -344,7 +344,7 @@ const actions = {
     },
   getCustomizationGroups() {
       axios
-      .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)
+      .get(`https://api2.laffahrestaurants.com/public/api/customizations/groups`)
     .then(res => {
       if (res.status === 200) {
         commit("get_customizationGroups", res.data.data);

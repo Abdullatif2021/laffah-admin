@@ -1177,7 +1177,7 @@ export default {
     },
     getCustomizationGroups() {
       return Axios
-      .get(`https://foodapi.lilacdev.com/public/api/customizations/groups`)
+      .get(`https://api2.laffahrestaurants.com/public/api/customizations/groups`)
     .then(res => {
       if (res.status === 200) { 
         this.createCustomGroup(res.data.data);
@@ -1324,7 +1324,7 @@ export default {
   },
   loadCategoriesList() {
     return Axios
-      .get(`https://foodapi.lilacdev.com/public/api/categories`)
+      .get(`https://api2.laffahrestaurants.com/public/api/categories`)
       .then(res =>{
         if (res.status === 200) {
         this.createcategoryList(res.data.data);
@@ -1337,7 +1337,7 @@ export default {
   },
   loadAttributesList() {
     return Axios
-      .get(`https://foodapi.lilacdev.com/public/api/attributes`)
+      .get(`https://api2.laffahrestaurants.com/public/api/attributes`)
       .then(res =>{
         if (res.status === 200) {
         this.createAttributesList(res.data.data);
@@ -1461,7 +1461,7 @@ export default {
   loadBatchesList(id) {
     if(id){
       return Axios
-        .get(`https://foodapi.lilacdev.com/public/api/items/batches/${id}`)
+        .get(`https://api2.laffahrestaurants.com/public/api/items/batches/${id}`)
         .then(res =>{
           if (res.status === 200) {
             this.$refs.vuetable.setData(res.data.data);
@@ -1488,7 +1488,7 @@ createCustomGroup(data) {
 getBranches(){
   this.branchOptions = [];
   return Axios
-        .get(`https://foodapi.lilacdev.com/public/api/branches?type=dashboard`)
+        .get(`https://api2.laffahrestaurants.com/public/api/branches?type=dashboard`)
         .then(res =>{
           if (res.status === 200) {
             res.data.data.forEach(el => {

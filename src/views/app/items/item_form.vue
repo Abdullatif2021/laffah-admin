@@ -12,8 +12,16 @@
             v-b-modal.modalright     
             >Add new Batch</b-button>
           </div>
+          <div v-else class="top-right-button-container">
+            <h6 class="font-weight-bold d-flex align-self-center">Enable Editing</h6>
+            <switches
+              v-model="editable"
+              theme="custom"
+              color="primary mx-2 d-inline"
+              class="vue-switcher-small d-flex align-self-center top-right-button"></switches>
+          </div>
           <piaf-breadcrumb />
-          <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
+          <b-tabs nav-class="separator-tabs ml-0 mb-5" style="width: 100%;" content-class="tab-content" :no-fade="true">
             <b-tab @click="addNewBtn = false" title="Basic details">
               <b-row>
                   <b-colxx style="margin-top: 60px;" xxs="12">
@@ -26,8 +34,8 @@
                               class="form-group has-float-label"
                             >
                             <div class="position-absolute card-top-buttons-1">
-                              <b-button  variant="outline-white" class="icon-button">
-                                <i v-b-modal.main_image class="simple-icon-pencil" />
+                              <b-button :disabled="!editable" variant="outline-white" class="icon-button">
+                                <i :disabled="!editable" v-b-modal.main_image class="simple-icon-pencil" />
                               </b-button>
                             </div>
                               <img
@@ -44,6 +52,7 @@
                               <label class="form-group-label" for="side">Category</label>
                               <b-form-select
                                 id="side"
+                                :disabled="!editable"
                                 v-model="$v.gridForm.category.$model"
                                 :state="!$v.gridForm.category.$error"
                                 :options="categoryOptions"
@@ -59,6 +68,7 @@
                                 type="number"
                                 :state="!$v.gridForm.record_order.$error"
                                 v-model="$v.gridForm.record_order.$model"
+                                :disabled="!editable"
                               />
                               <b-form-invalid-feedback v-if="!$v.gridForm.record_order.required" >Please enter a record order</b-form-invalid-feedback>
                             </b-form-group>
@@ -69,7 +79,7 @@
                                 <label>Published</label>
                               </b-colxx>
                               <b-colxx xxs="12">
-                                <switches v-model="gridForm.published" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                                <switches :disabled="!editable" v-model="gridForm.published" theme="custom" color="primary" class="vue-switcher-small"></switches>
                               </b-colxx>
                             </b-row>
                           </b-colxx>
@@ -79,7 +89,7 @@
                                 <label>Activate</label>
                               </b-colxx>
                               <b-colxx xxs="12">
-                                <switches v-model="gridForm.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
+                                <switches :disabled="!editable"  v-model="gridForm.active" theme="custom" color="primary" class="vue-switcher-small"></switches>
                               </b-colxx>
                             </b-row>
                           </b-colxx>  
@@ -87,7 +97,7 @@
                           
                         <div style="width: 100%">
                         <b-button
-                          :disabled="disabledFormStep1"
+                          :disabled="disabledFormStep1 || !editable"
                           type="submit"
                           @click="onForm1Submited()"
                           :variant="disabledFormStep1 ? 'light' : 'primary'"
@@ -95,7 +105,7 @@
                           >Save</b-button
                         >
                           <b-button
-                            :disabled="disabledFormStep1"
+                            :disabled="disabledFormStep1 || !editable"
                             v-b-modal.deleteItem
                             style="float: right"
                             :variant="disabledFormStep1 ? 'light' : 'outline-theme-6'"
@@ -118,6 +128,7 @@
                                     <b-form-input
                                       id="Name"
                                       type="text"
+                                      :disabled="!editable"
                                       v-model="$v.lang_form.ar_name.$model"
                                       :state="!$v.lang_form.ar_name.$error"
                                     />
@@ -133,6 +144,7 @@
                                     <b-form-textarea
                                       id="textarea"
                                       rows="3"
+                                      :disabled="!editable"
                                       max-rows="6"
                                       v-model="$v.lang_form.ar_description.$model"
                                     ></b-form-textarea>
@@ -153,6 +165,7 @@
                                       <b-form-input
                                         id="Name"
                                         type="text"
+                                        :disabled="!editable"
                                         v-model="$v.lang_form.en_name.$model"
                                         :state="!$v.lang_form.en_name.$error"
                                       />
@@ -166,6 +179,7 @@
                                         id="textarea"
                                         rows="3"
                                         max-rows="6"
+                                        :disabled="!editable"
                                         v-model="$v.lang_form.en_description.$model"
                                       ></b-form-textarea>
                                     </b-form-group>
@@ -175,7 +189,7 @@
                           </b-collapse>
                       </div>
                       <b-button
-                        :disabled="disabledFormStep2"
+                        :disabled="disabledFormStep2 || !editable"
                         type="submit"
                         @click="onForm2Submited()"
                         :variant="disabledFormStep2 ? 'light' : 'primary'"
@@ -191,6 +205,7 @@
                               :options="customizationOptions"
                               item-text="name"
                               item-value="id"
+                              :disabled="!editable"
                               multiple
                             />
                           </b-form-group>
@@ -201,13 +216,14 @@
                             <quill-editor ref="myTextEditor"
                                 v-model="gridForm.notes"
                                 :options="editorOption"
+                                :disabled="!editable"
                                 >
                             </quill-editor>
                           </b-form-group>
                         </b-colxx>
                           <b-button
                           type="submit"
-                          :disabled="disabledFormStep3"
+                          :disabled="disabledFormStep3 || !editable"
                           @click="onForm3Submited()"
                           variant="primary"
                           class="mt-4"
@@ -677,35 +693,21 @@
     modal-class="modal-right"
   >
     <b-form class="av-tooltip tooltip-label-bottom">
-        <!-- <b-form-group :label="$t('forms.batch')" class="has-float-label mb-4">
-          <b-form-input type="text" v-model.trim="$v.batch_form.name.$model" :state="!$v.batch_form.name.$error" />
-          <b-form-invalid-feedback v-if="!$v.batch_form.name.required">Please enter batch name</b-form-invalid-feedback>
-        </b-form-group> -->
-        <!-- <b-form-group class="has-float-label mb-4">
-          <label class="form-group-label" for="cate">Attributes</label>
-          <b-form-input style="display: none;" :state="!$v.batch_form.attributes.$error" v-model="$v.batch_form.attributes.$model" />
-            <b-form-select
-              id="cate"
-              v-model="selected_value"
-              @change="get_SubCat"
-              multiple
-              plain
-            >
-          <b-form-select-option-group class="attributeOptions" v-for="(attribute,index) in attributeOptions"  :key="index" :label="attribute.text">
-            <b-form-select-option v-for="(_val,index) in attribute.value.locales.en.list_values" ref="attributid" :key="index" :value="`${attribute.value.id}_${_val.id}`">{{_val.value}}</b-form-select-option>
-          </b-form-select-option-group>
-          </b-form-select>
-          <b-form-invalid-feedback
-            v-if="!$v.batch_form.attributes.required"
-            >Please slelect attributes</b-form-invalid-feedback
-          >          
-        </b-form-group> -->
         <div v-if="batch_modify" class="wizard-basic-step">
           <b-row class="add_container">
+             <b-colxx sm="12" :class="`d-flex justify-content-end my-3`">
+              <h6 class="font-weight-bold d-flex align-self-center">Enable Editing</h6>
+            <switches
+              v-model="editable_batch"
+              theme="custom"
+              color="primary mx-2 d-inline"
+              class="vue-switcher-small d-flex align-self-center top-right-button"></switches>
+            </b-colxx>
             <b-colxx sm="12">
               <b-form-group  :label="batch_object.name" class="form-group-label">
                 <b-form-input
                   type="number"
+                  :disabled="!editable_batch"
                   placeholder="Please enter the price ..."
                   v-model.trim="batch_object.price" />
                   <b-form-invalid-feedback
@@ -769,7 +771,7 @@
       }}</b-button>
       <b-button
         v-if="batch_modify"
-        :disabled="!batch_object.price"
+        :disabled="!batch_object.price || !editable_batch"
         variant="primary"
         @click="submitBatchForm()"
         class="mr-1"
@@ -1019,12 +1021,14 @@ export default {
         mainImage: null,
         selectedBranch: null,
         image_added: true,
+        editable_batch: false,
         item_id: null,
         attributeOptions: [],
         selected_attrib_array: [],
         addNewBtn: false,
         selected_Branch: null,
         batch_id: null,
+        editable: false, 
         oldBranches: [],
         selected_Branch_array: [],
         allOpenRows: [],
@@ -1743,6 +1747,9 @@ createcategoryList(list){
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.nav_class {
+  width: 100%;
 }
 .add_container {
           width: 100%;

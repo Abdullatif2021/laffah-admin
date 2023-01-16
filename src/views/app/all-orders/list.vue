@@ -4,7 +4,7 @@
       <b-row class=" h-100" :class="{'app-row':!isLoad||pendingOrders.length>0}">
         <b-colxx xxs="12" xl="12">
           <h2 class="text-center">Orders in Queue
-            <b-badge pill variant="light">{{ Array.isArray(viewOrdersManageArray) ? viewOrdersManageArray.length : 0 }}
+            <b-badge pill variant="light">{{ viewOrdersManageArray.length }}
             </b-badge>
           </h2>
           <b-card class="mb-4 bg-transparent shadow-none order-steps " no-body v-if="!isLoadStatus">
@@ -120,6 +120,8 @@ export default {
       return []
     },
     viewOrdersManageArray({ordersManageArray}) {
+      console.log('ordersManageArrayordersManageArrayordersManageArrayordersManageArray',ordersManageArray);
+
       if (ordersManageArray.length > 0) {
         let ids = this.orders.map(x => x.id)
         ordersManageArray.map((x, i) => {

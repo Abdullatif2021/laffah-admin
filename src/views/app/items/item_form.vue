@@ -9,7 +9,8 @@
             variant="primary"
             size="lg"
             class="top-right-button"
-            v-b-modal.modalright     
+            v-b-modal.modalright
+            @click="batch_modify = false"     
             >Add new Batch</b-button>
           </div>
           <div v-else class="top-right-button-container">
@@ -40,7 +41,7 @@
                             </div>
                               <img
                                 :src="mainImage ? imgUrl : $v.files_form.image.$model"
-                                style="border-radius: 50%;"
+                                style="border-radius: 50%;object-fit: cover;"
                                 alt="Image"
                                 width="160"
                                 height="160"
@@ -118,7 +119,7 @@
                     </b-card>
                     <b-card class="mb-4 auction_card" title="Localzations">
                       <div class="border">
-                        <b-button v-b-toggle.collapseAccordion1 variant="link">Arabic Language</b-button>
+                        <b-button v-b-toggle.collapseAccordion1 class="lang_btn" variant="link">Arabic Language</b-button>
                         <b-collapse id="collapseAccordion1" accordion="my-accordion">
                             <div class="p-4">
                               <b-row>
@@ -155,7 +156,7 @@
                         </b-collapse>
                       </div>
                       <div class="border">
-                          <b-button v-b-toggle.collapseAccordion2 variant="link">English Language</b-button>
+                          <b-button v-b-toggle.collapseAccordion2 class="lang_btn" variant="link">English Language</b-button>
                           <b-collapse id="collapseAccordion2" accordion="my-accordion">
                               <div class="p-4">
                                 <b-row>
@@ -1774,7 +1775,7 @@ createcategoryList(list){
 .auction_card{
   border-radius: 24px;
 
-  background: linear-gradient(109.6deg, rgb(245, 239, 249) 30.1%, rgb(207, 211, 236) 100.2%);
+  /* background: linear-gradient(109.6deg, rgb(245, 239, 249) 30.1%, rgb(207, 211, 236) 100.2%); */
 }
 .auctionDetailsContainer{
   background: none;
@@ -1810,6 +1811,27 @@ createcategoryList(list){
   font-size: 17px;
     font-weight: 700;
 }
+.lang_btn {
+  width: 100%;
+  text-align: left;
+  position: relative;
+  background: #f8f8f8;
+  border-radius: 0px;
+}
+.lang_btn:after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 7.255em;
+    content: "";
+    position: absolute;
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+    right: 16px;
+    top: 15px;
+}
+
 .btn_cont {
   display: flex;
   align-items: center;

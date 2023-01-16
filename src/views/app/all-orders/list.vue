@@ -4,7 +4,7 @@
       <b-row class=" h-100" :class="{'app-row':!isLoad||pendingOrders.length>0}">
         <b-colxx xxs="12" xl="12">
           <h2 class="text-center">Orders in Queue
-            <b-badge pill variant="light">{{ viewOrdersManageArray.length }}
+            <b-badge pill variant="light">{{viewOrdersManageArray ? viewOrdersManageArray.length : 0 }}
             </b-badge>
           </h2>
           <b-card class="mb-4 bg-transparent shadow-none order-steps " no-body v-if="!isLoadStatus">
@@ -120,23 +120,23 @@ export default {
       return []
     },
     viewOrdersManageArray({ordersManageArray}) {
-      console.log('ordersManageArrayordersManageArrayordersManageArrayordersManageArray',ordersManageArray);
-
-      if (ordersManageArray.length > 0) {
-        let ids = this.orders.map(x => x.id)
-        ordersManageArray.map((x, i) => {
-          console.log('watch ordersManageArray', ids.includes(x.id));
-          if (ids.includes(x.id)) {
-            return x
-          } else {
-            ordersManageArray.splice(i, 1)
-          }
-        })
-        console.log(ordersManageArray);
-        localStorage.setItem('currentOrders', JSON.stringify(ordersManageArray))
-        this.ordersManageArray = ordersManageArray
+      if (ordersManageArray) {
+        if (ordersManageArray.length > 0) {
+          let ids = this.orders.map(x => x.id)
+          ordersManageArray.map((x, i) => {
+            console.log('watch ordersManageArray', ids.includes(x.id));
+            if (ids.includes(x.id)) {
+              return x
+            } else {
+              ordersManageArray.splice(i, 1)
+            }
+          })
+          console.log(ordersManageArray);
+          localStorage.setItem('currentOrders', JSON.stringify(ordersManageArray))
+          this.ordersManageArray = ordersManageArray
+        }
+        return ordersManageArray
       }
-      return ordersManageArray
     }
   },
   methods: {

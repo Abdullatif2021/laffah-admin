@@ -187,6 +187,31 @@
 
       </b-badge>
     </b-row>
+    <b-modal
+        id="delivery_popup"
+        ref="delivery_popup"
+        title="Did you print the Order?"
+        :no-close-on-backdrop="true"
+      >
+      <b-form-group label="Choose Delivery">
+        <v-select
+          v-model="selectedOption"
+          :options="delivery_options"
+          label="fullName"
+          @input="searchOption"
+        ></v-select>
+      </b-form-group>
+      <template slot="modal-footer">
+        <b-button
+          variant="primary"
+          @click="acceptOrder()"
+          class="mr-1"
+          :disabled="!selectedOption"
+          >Yes</b-button
+        >
+        <b-button variant="secondary" @click="hideModal('delivery_popup')">No</b-button>
+      </template>
+    </b-modal>
   </b-card>
 </template>
 
@@ -195,21 +220,29 @@ import _ from "lodash"
 import {printInvoice} from '@/utils';
 import invoice from '@/containers/orders/invoice'
 import Invoice from "@/containers/orders/invoice";
+import { mapGetters, mapActions } from "vuex";
+import vSelect from "vue-select";
+
 
 export default {
   name: "queueItem",
-  components: {Invoice},
+  components: {Invoice, 'v-select' :vSelect,},
   props: ['data', 'changeStatus', 'showRejectionMsgOk', 'allStatus', 'className'],
   data() {
     return {
       rejectOrder: null,
       printOrder: null,
       visible: true,
+      delivery_options: [],
+      selectedOption: null,
       completed: false,
+      delivery_selected: false,
       collapseToggleList: []
     }
   },
   computed: {
+    ...mapGetters(['_deliveries', '_assign']),
+
     order: {
       get: function () {
         return this.data
@@ -224,7 +257,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['getDeliveries', 'assignToDelivery']),
     showMsgOk(order) {
+
       this.completed = false
       let {completed} = this
       const h = this.$createElement
@@ -254,7 +289,7 @@ export default {
         cancelVariant: 'outline-secondary',
         centered: true, size: 'sm',
       }).then(value => {
-        console.log(value);
+        console.log('i am here', value);
         if (value) {
           let result = this.orderNextStep(order, this.allStatus.find(x => parseInt(x.status_id) === 5), event)
           this.completed = value
@@ -264,13 +299,34 @@ export default {
           // An error occurred
         })
     },
-    print(order) {
-      console.log(order.status);
+    acceptOrder(){
       if (parseInt(order.status) < 2) {
         this.changeStatus(order, 2)
       }
-      this.showMsgOk(order)
+      this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
+      this.assignToDelivery({user_id: selectedOption.id, order_id: this.processed_order.id})
+    },
+    hideModal(refname) {
+      this.$refs[refname].hide();
+    },    
+    print(order) {
+      console.log('this is order from print func', order);
+      
+      if (parseInt(order.is_pickup) > 0){
+        if (parseInt(order.status) < 2) {
+        this.changeStatus(order, 2)
+        }
+        this.showMsgOk(order)
+      }else {
+        this.getDeliveries({branch_id: order.branch_id})
+        this.processed_order = null;
+        this.open_delivery_popup(order);
+      }
       printInvoice(order)
+    },
+    open_delivery_popup(order){
+      this.processed_order = order;
+      this.$refs['delivery_popup'].show();
     },
     toggleCollapse: function (detail) {
       if (this.collapseToggleList.includes(detail.id)) {
@@ -279,6 +335,13 @@ export default {
       } else {
         this.collapseToggleList.push(detail.id)
       }
+    },
+    searchOption(search, loading) {
+      loading(true)
+      setTimeout(() => {
+        loading(false)
+        this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
+      }, 1000)
     },
     orderNextStep(order, e) {
       const nextStepID = 6//status to complete
@@ -300,6 +363,23 @@ export default {
       e.target.disabled = true
     },
   },
+  watch: {
+    _deliveries: function(data){
+      console.log('from watcher deliveries', data) 
+      data.forEach(el => {
+        this.delivery_options.push(
+          new Object({ 
+            name: el.first_name,
+            fullName: `${el.first_name} ${el.last_name}`,
+            id: el.id
+          }) 
+        )
+      })
+    },
+    _assigned: function(val){
+      console.log('_assign', val);
+    }
+  }
 }
 </script>
 

@@ -354,6 +354,9 @@ export default {
             case "casher":
               role = this.$t('menu.casher')
               break;
+            case "delivery":
+              role = 'Delivery'
+              break;
             default:
               break;
           }

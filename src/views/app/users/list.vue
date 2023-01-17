@@ -83,6 +83,7 @@ export default {
    superAdmin: "?role=superadmin",
    admin: "?role=admin",
    casher: "?role=casher",
+   delivery: "?role=delivery",
    branchAdmin: "?role=branchAdmin",
    user: "?role=user",
    tabWidth: null,
@@ -149,11 +150,13 @@ export default {
    "getBranchAdmin",
    "getAdmin",
    "getCasher",
+   "getDelivery",
    "getUser",
    "getSuperAdminLoad",
    "getAdminLoad",
    "getBranchAdminLoad",
    "getCasherLoad",
+   "getDeliveryLoad",
    "getUserLoad"
   ]),
   authorSuperadmin() {
@@ -174,7 +177,7 @@ export default {
    let arr;
    if (this.authorSuperadmin) {
     this.selected_tab_name = this.$t('menu.superadmin'),
-     this.tabWidth = 'w-20'
+     this.tabWidth = 'w-16'
     arr = [{
       title: this.$t('menu.superadmin'),
       dataMethod: this.superAdmin,
@@ -202,6 +205,13 @@ export default {
       data: this.getCasher,
       getLoad: this.getCasherLoad,
       role: this.casher
+     },
+     {
+      title: 'Delivery',
+      dataMethod: this.delivery,
+      data: this.getDelivery,
+      getLoad: this.getDeliveryLoad,
+      role: this.delivery
      },
      {
       title: this.$t('menu.user'),

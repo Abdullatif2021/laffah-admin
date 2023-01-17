@@ -19,6 +19,7 @@ import survey from "./modules/survey";
 import todo from "./modules/todo";
 import user from "./modules/user";
 import users from "./modules/users";
+import delivery from "./modules/delivery";
 
 Vue.use(Vuex)
 
@@ -53,6 +54,7 @@ export default new Vuex.Store({
         branches,
         orders,
         roles,
-        users
+        users,
+        delivery
     }
 })

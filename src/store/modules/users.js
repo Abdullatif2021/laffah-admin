@@ -7,12 +7,14 @@ const state = () => ({
     branchAdmin: [],
     user: [],
     casher: [],
+    delivery: [],
     // guest: [],
     loadSuperAdmin: false,
     loadAdmin: false,
     loadUser: false,
     loadBranchAdmin: false,
     loadCasher: false,
+    loadDelivery: false,
     loadGuest: false,
 });
 
@@ -75,6 +77,18 @@ const actions = {
             console.log(err);
         })
     },
+    async fetchDelivery({ commit }, url) {
+        commit('LOAD_Delivery', false)
+
+        await axios.get(`${apiUrl}${url}`).then(res => {
+            let resultData = res.data.data;
+            commit('SET_Delivery', resultData),
+                commit('LOAD_Delivery', true)
+
+        }).catch(err => {
+            console.log(err);
+        })
+    },
     // async fetchGuest({ commit }, url) {
     //     commit('LOAD_GUEST', false)
 
@@ -120,6 +134,12 @@ const getters = {
     getCasherLoad: state => {
         return state.loadCasher
     },
+    getDelivery: state => {
+        return state.delivery
+    },
+    getDeliveryLoad: state => {
+        return state.loadDelivery
+    },
     // getGuest: state => {
     //     return state.guest
     // },
@@ -159,6 +179,12 @@ const mutations = {
     },
     LOAD_CASHER(state, payload) {
         state.loadCasher = payload
+    },
+    SET_Delivery(state, payload) {
+        state.delivery = payload
+    },
+    LOAD_Delivery(state, payload) {
+        state.loadDelivery = payload
     },
     // SET_GUEST(state, payload) {
     //     state.guest = payload

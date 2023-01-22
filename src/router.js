@@ -342,6 +342,38 @@ const routes = [{
         ]
       },
       {
+        path: "delivery",
+        component: () =>
+          import ( /* webpackChunkName: "branches" */ "./views/app/delivery/index"),
+        redirect: `${adminRoot}/delivery/list`,
+        meta: {
+          loginRequired: true,
+          roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher]
+        },
+
+        children: [{
+          path: "list",
+          component: () =>
+            import ( /* webpackChunkName : "product" */ "./views/app/delivery/list"),
+          meta: {
+            loginRequired: true,
+            roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher]
+          },
+
+        },
+          {
+            path: "details/:id",
+            component: () =>
+              import ( /* webpackChunkName: "branches" */ "./views/app/delivery/details"),
+            meta: {
+              loginRequired: true,
+              roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher]
+            },
+          }
+
+        ]
+      },
+      {
         path: "orders",
         component: () =>
           import ( /* webpackChunkName: "branches" */ "./views/app/orders/index"),

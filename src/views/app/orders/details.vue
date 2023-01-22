@@ -213,6 +213,25 @@
               variant="outline-primary">{{ $t('pages.view-map') }}
             </b-button>
           </b-card>
+          <!-- delivery guy -->
+          <b-card
+            header-tag="header"
+            >
+            <template #header>
+              <h6 class="mb-0 text-muted"><span class="simple-icon-user"/> Delivery Guy</h6>
+            </template>
+            <b-card-body
+              class="align-self-center d-flex justify-content-center body_padding" >
+                <b-form-group class="full_width" label="Change Delivery">
+                  <v-select label="fullName" @input="searchOption" v-model="selectedOption" :options="delivery_options" />
+                </b-form-group>
+            </b-card-body>
+            <b-button
+              @click="updateDeliveryGuy(selectedOption, order)"
+              target="_blank"
+              variant="outline-primary">Save
+            </b-button>
+          </b-card>
           <!--          delivery address-->
           <b-card
             v-if="order.promotion && Object.keys(order.promotion).length>0"
@@ -512,6 +531,8 @@ import {
   BootstrapVueIcons
 } from "bootstrap-vue";
 import {printInvoice} from "@/utils";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 // import note from "@/store/modules/note";
 // import VueFormGenerator from "vue-form-generator";
 
@@ -526,6 +547,7 @@ export default {
     'b-icon': BIcon,
     'b-icon-pencil': BIconPencil,
     'b-icon-person': BIconPerson,
+    'v-select' : vSelect,
     'b-icon-check2': BIconCheck2,
     'b-icon-arrow-repeat': BIconArrowRepeat,
     'b-icon-arrow-right-circle-fill': BIconArrowRightCircleFill,
@@ -543,6 +565,9 @@ export default {
       submitting: false,
       orderId: null,
       order: null,
+      assigned_delivery: null,
+      delivery_options: [],
+      selectedOption: null,
       rnEditable: false,
       rnIcon: false,
       dcEditable: false,
@@ -604,7 +629,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["fetchBranches"]),
+    ...mapActions(["fetchBranches", "getDeliveries", "changeDelivery"]),
     ...mapActions({
       loadOrderStatuses: 'orders/loadStatuses',
       // loadNoteStatuses: 'note/loadStatuses',
@@ -645,6 +670,10 @@ export default {
       }
       this.modalData.title = undefined
       this.$bvModal.hide('modalright')
+    },
+    updateDeliveryGuy(val, order){
+      console.log('updateDeliveryGuy', val, order)
+      this.changeDelivery({order_id: order.id, user_id: val.id})
     },
     updateFormModel(rawData) {
       let data = rawData
@@ -689,6 +718,11 @@ export default {
         }
       })
     },
+    searchOption(search, loading) {
+      setTimeout(() => {
+        this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
+      }, 1000)
+    },
     handleStatusRequests(status) {
       let {submitDisabled, order} = this
       let formData = new FormData
@@ -722,7 +756,8 @@ export default {
         .then(res => {
           this.order = res.data.data
           this.initState = this.order.status
-
+          this.getDeliveries({branch_id: res.data.data.branch_id})
+          this.assigned_delivery = res.data.data.delivery
         })
         .catch(error => {
           console.log(error)
@@ -736,6 +771,7 @@ export default {
     }
   },
   computed: {
+    
     showVat() {
       if (parseInt(this.order.vat_value) == 0) {
         this.fields = this.fields.filter(x => x.key != 'vat_value')
@@ -746,7 +782,7 @@ export default {
       statuses: 'orders/getStatuses',
       // noteStatuses: 'note/getStatuses'
     }),
-    ...mapGetters(["getBranches"]),
+    ...mapGetters(["getBranches", '_deliveries', "_change"]),
     modalData: ({
                   schema,
                   initData,
@@ -834,6 +870,31 @@ export default {
       deep: true,
       immediate: true
     },
+    assigned_delivery: function(val){
+      console.log(val);
+      setTimeout(() => {
+        this.selectedOption = this.delivery_options.find(i => {
+        return i.id = val.id;
+      });
+      console.log('this.selectedOption', this.selectedOption)
+      }, 3000);
+      
+    },
+    _deliveries: function(data){
+      console.log('from watcher deliveries', data) 
+      data.forEach(el => {
+        this.delivery_options.push(
+          new Object({ 
+            name: el.first_name,
+            fullName: `${el.first_name} ${el.last_name}`,
+            id: el.id
+          }) 
+        )
+      })
+    },
+    _change: function(val){
+      this.$notify("success", "Delivery Guy has been Updated Successfully", null, { duration: 5000, permanent: false });
+    }
   },
   mounted() {
     this.loadOrderStatuses()
@@ -843,6 +904,9 @@ export default {
 </script>
 
 <style scoped>
+.full_width{
+  width: 100%;
+}
 .card-columns {
   -webkit-column-count: 2;
   -moz-column-count: 2;
@@ -859,5 +923,8 @@ export default {
   margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.03);
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.body_padding {
+  padding: 0.75rem;
 }
 </style>

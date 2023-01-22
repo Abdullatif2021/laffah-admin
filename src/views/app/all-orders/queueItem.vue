@@ -194,12 +194,7 @@
         :no-close-on-backdrop="true"
       >
       <b-form-group label="Choose Delivery">
-        <v-select
-          v-model="selectedOption"
-          :options="delivery_options"
-          label="fullName"
-          @input="searchOption"
-        ></v-select>
+        <v-select label="fullName" @input="searchOption" v-model="selectedOption" :options="delivery_options" />
       </b-form-group>
       <template slot="modal-footer">
         <b-button
@@ -222,11 +217,13 @@ import invoice from '@/containers/orders/invoice'
 import Invoice from "@/containers/orders/invoice";
 import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
 
 
 export default {
   name: "queueItem",
-  components: {Invoice, 'v-select' :vSelect,},
+  components: {Invoice, 'v-select' : vSelect,},
   props: ['data', 'changeStatus', 'showRejectionMsgOk', 'allStatus', 'className'],
   data() {
     return {
@@ -258,6 +255,25 @@ export default {
   },
   methods: {
     ...mapActions(['getDeliveries', 'assignToDelivery']),
+  myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+},
+
+filterFunction() {
+  var input, filter, ul, li, a, i;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  div = document.getElementById("myDropdown");
+  a = div.getElementsByTagName("a");
+  for (i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+},
     showMsgOk(order) {
 
       this.completed = false
@@ -300,11 +316,11 @@ export default {
         })
     },
     acceptOrder(){
-      if (parseInt(order.status) < 2) {
-        this.changeStatus(order, 2)
+      if (parseInt(this.processed_order.status) < 2) {
+        this.changeStatus(this.processed_order, 2)
       }
+      this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id})
       this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
-      this.assignToDelivery({user_id: selectedOption.id, order_id: this.processed_order.id})
     },
     hideModal(refname) {
       this.$refs[refname].hide();
@@ -337,9 +353,7 @@ export default {
       }
     },
     searchOption(search, loading) {
-      loading(true)
       setTimeout(() => {
-        loading(false)
         this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
       }, 1000)
     },
@@ -468,5 +482,10 @@ export default {
   scrollbar-width: thin; /* "auto" or "thin" */
   scrollbar-color: gray lightgray; /* scroll thumb and track */
 }
-
+.custom-search .search-input {
+  background: red;
+}
+.custom-search .menu {
+  list-style-type: none;
+}
 </style>

@@ -25,6 +25,13 @@ const data = [{
 
   },
   {
+    id: "Delivery",
+    icon: "iconsminds-scooter",
+    label: "Delivery",
+    to: `${adminRoot}/delivery`,
+    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher],
+  },
+  {
     id: "items",
     icon: "iconsminds-bag-items",
     label: "menu.items",

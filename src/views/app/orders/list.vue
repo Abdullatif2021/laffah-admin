@@ -237,68 +237,68 @@ export default {
       lastPage: 0,
       selectedItems: [],
       title: this.$t('menu.orders'),
-      fields: [{
-        name: "order_key",
-        title: "Key",
-        titleClass: "px-2",
-        dataClass: "px-2 font-weight-bold",
-        width: "15%"
-      },
-        {
-          name: "entry_date",
-          title: `${this.$t('forms.date')}`,
-          titleClass: "px-1",
-          dataClass: "px-1 text-muted",
-          width: "15%",
-          callback: (value) => this.formatDateTime(value, false)
+        fields: [{
+          name: "order_key",
+          title: "Key",
+          titleClass: "px-2",
+          dataClass: "px-2 font-weight-bold",
+          width: "15%"
         },
-        {
-          name: "contact_name",
-          title: `${this.$t('forms.client')}`,
-          titleClass: "px-1",
-          dataClass: "px-1",
-          width: "12%",
-          callback: this.nameFriendly
-        },
-        {
-          name: "payment_method",
-          title: `${this.$t('forms.payment')}`,
-          titleClass: "px-1",
-          dataClass: "px-1",
-          width: "10%",
-          callback: (value) => parseInt(value) === 1 ? '💰 ' + this.$t("pages.cash-on-delivery") : '💳 ' + this.$t("pages.payment-gateway")
-        },
-        {
-          name: "delivery_time",
-          title: `${this.$t('forms.arrivals')}`,
-          titleClass: "px-1",
-          dataClass: "px-1",
-          width: "15%",
-          callback: (value) => this.formatDateTime(value, true)
-        },
-        {
-          name: "__slot:price",
-          title: `${this.$t('forms.total')}`,
-          titleClass: "px-1",
-          dataClass: "px-1",
-          width: "13%"
-        },
-        {
-          name: "is_pickup",
-          title: `${this.$t('tables.order-type')}`,
-          titleClass: "px-1",
-          dataClass: "px-1 xx-small",
-          width: "10%",
-          callback: this.orderType
-        },
-        {
-          name: "__slot:events",
-          title: "",
-          titleClass: "center aligned text-right px-2",
-          dataClass: "center aligned text-right px-2",
-          width: "30%"
-        },
-      ],
+          {
+            name: "entry_date",
+            title: `${this.$t('forms.date')}`,
+            titleClass: "px-1",
+            dataClass: "px-1 text-muted",
+            width: "15%",
+            callback: (value) => this.formatDateTime(value, false)
+          },
+          {
+            name: "contact_name",
+            title: `${this.$t('forms.client')}`,
+            titleClass: "px-1",
+            dataClass: "px-1",
+            width: "12%",
+            callback: this.nameFriendly
+          },
+          {
+            name: "payment_method",
+            title: `${this.$t('forms.payment')}`,
+            titleClass: "px-1",
+            dataClass: "px-1",
+            width: "10%",
+            callback: (value) => parseInt(value) === 1 ? '💰 ' + this.$t("pages.cash-on-delivery") : '💳 ' + this.$t("pages.payment-gateway")
+          },
+          {
+            name: "delivery_time",
+            title: `${this.$t('forms.arrivals')}`,
+            titleClass: "px-1",
+            dataClass: "px-1",
+            width: "15%",
+            callback: (value) => this.formatDateTime(value, true)
+          },
+          {
+            name: "__slot:price",
+            title: `${this.$t('forms.total')}`,
+            titleClass: "px-1",
+            dataClass: "px-1",
+            width: "13%"
+          },
+          {
+            name: "is_pickup",
+            title: `${this.$t('tables.order-type')}`,
+            titleClass: "px-1",
+            dataClass: "px-1 xx-small",
+            width: "10%",
+            callback: this.orderType
+          },
+          {
+            name: "__slot:events",
+            title: "",
+            titleClass: "center aligned text-right px-2",
+            dataClass: "center aligned text-right px-2",
+            width: "30%"
+          },
+        ],
       selected_tab_name: this.$t('menu.pending')
     };
   },

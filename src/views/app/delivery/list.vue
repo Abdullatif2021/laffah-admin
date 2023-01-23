@@ -40,11 +40,11 @@
                         </b-dropdown>
                     </template>
                 </vuetable>
-                <vuetable-pagination-bootstrap
+                <!-- <vuetable-pagination-bootstrap
                 class="mt-4"
                 ref="pagination"
                 @vuetable-pagination:change-page="onChangePage"
-                />
+                /> -->
             </b-colxx>
         </b-row>
     </div>
@@ -81,7 +81,7 @@
             title: "First Name",
             titleClass: "",
             dataClass: "list-item-heading",
-            width: "50%"
+            width: "20%"
           },
           {
             name: "last_name",
@@ -89,21 +89,21 @@
             title: "Last Name",
             titleClass: "",
             dataClass: "list-item-heading",
-            width: "50%"
+            width: "20%"
           },
           {
             name: "phone_number",
             title: "Telephone",
             titleClass: "",
             dataClass: "text-muted",
-            width: "10%"
+            width: "20%"
           },
           {
             name: "email",
             title: "Email",
             titleClass: "",
             dataClass: "text-muted",
-            width: "10%"
+            width: "20%"
           },
      
           {
@@ -111,7 +111,7 @@
             title: "",
             titleClass: "center aligned text-right",
             dataClass: "center aligned text-right",
-            width: "5%"
+            width: "20%"
           }
         ]
       };

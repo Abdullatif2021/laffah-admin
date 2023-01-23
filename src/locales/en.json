@@ -26,6 +26,7 @@
   "menu": {
     "reports": "Reports",
     "recipes": "Recipes",
+    "delivery":"Delivery",
     "settings": "Settings",
     "site": "Site",
     "rfqs": "RFQs",

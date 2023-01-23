@@ -877,7 +877,7 @@ export default {
         return i.id = val.id;
       });
       console.log('this.selectedOption', this.selectedOption)
-      }, 3000);
+      }, 2000);
       
     },
     _deliveries: function(data){

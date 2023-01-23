@@ -53,7 +53,8 @@
   import Vuetable from "vuetable-2/src/components/Vuetable";
   import { mapActions, mapGetters } from 'vuex';
   import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
-  
+  import {adminRoot} from "../../../constants/config";
+
   export default {
     components: {
       vuetable: Vuetable,
@@ -169,8 +170,8 @@
       },
       open_details(id){
         this.$router.push({
-        path: `${adminRoot}/auctions/auction`,
-        query: { id: id }
+        path: `${adminRoot}/delivery/details/${id}`,
+        // query: { id: id }
         });
       }
      

@@ -6,7 +6,10 @@ const state = {
     assigned: null,
     change: null,
     all_delivery: null,
-    delivery_paginations: null
+    delivery: null,
+    delivery_paginations: null,
+    deliveryOrders: null,
+    updateDeliveryBranches: null,
 }
 
 const getters = {
@@ -15,6 +18,9 @@ const getters = {
     _change: state => state.change,
     _all_deliveries: state => state.all_delivery,
     _delivery_paginations: state => state. delivery_paginations,
+    _deliveryOrders: state => state.deliveryOrders,
+    _delivery: state => state.delivery,
+    _updateDeliveryBranches: state => state.updateDeliveryBranches
 
 }
 
@@ -31,6 +37,15 @@ const mutations = {
     },
     change(state, payload){
       state.change = payload;
+    },
+    delivery(state, payload){
+      state.delivery = payload;
+    },
+    deliveryOrders(state, payload){
+      state.deliveryOrders = payload;
+    },
+    updateDeliveryBranches(state, payload){
+      state.updateDeliveryBranches = payload;
     }
 }
 
@@ -65,11 +80,32 @@ const actions = {
           
     },
     getDeliveryData({commit, dispatch}, payload){
+      const user_id = payload.user_id;
       return Axios
-      .get(`https://api2.laffahrestaurants.com/api/users?role=delivery`)
+      .get(`https://api2.laffahrestaurants.com/api/users/${user_id}`)
       .then(res =>{
         if (res.status === 200) {
             commit('delivery', res.data.data)
+          }
+        }
+      )
+      .catch(error => {
+      console.log(error);
+      });
+    },
+    getDeliveryOrders({commit, dispatch}, payload){
+      const user_id = payload.user_id;
+      const status_id = payload.status_id;
+      return Axios
+      .get(`https://api2.laffahrestaurants.com/api/orders/delivery`, {
+        params: {
+          user_id,
+          status_id
+        }
+      })
+      .then(res =>{
+        if (res.status === 200) {
+            commit('deliveryOrders', res.data.data)
           }
         }
       )
@@ -112,7 +148,26 @@ const actions = {
             console.log(error);
             });
         
-  }
+    },
+    updateDeliveryBranches({commit}, payload){
+      const formData = new FormData();
+        payload.branches.forEach(el => {
+          formData.append("branches[]", el);
+        });
+        formData.append("_method", 'PUT');
+      const user_id = payload.user_id;
+      return Axios
+            .post(`https://api2.laffahrestaurants.com/api/users/${user_id}`, formData)
+            .then(res =>{
+              if (res.status === 200) {
+                  commit('updateDeliveryBranches', res.data.data)
+                }
+              }
+            )
+            .catch(error => {
+            console.log(error);
+            });
+    }
  
 }
 

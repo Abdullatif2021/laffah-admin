@@ -238,7 +238,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['_deliveries', '_assign']),
+    ...mapGetters(['_deliveries', '_assigned', 'not_assigned']),
 
     order: {
       get: function () {
@@ -315,11 +315,9 @@ filterFunction() {
           // An error occurred
         })
     },
-    acceptOrder(){
-      if (parseInt(this.processed_order.status) < 2) {
-        this.changeStatus(this.processed_order, 4)
-      }
-      this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id})
+     acceptOrder(){
+       this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id})
+    
       // this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
     },
     hideModal(refname) {
@@ -392,6 +390,13 @@ filterFunction() {
     },
     _assigned: function(val){
       console.log('_assign', val);
+      this.changeStatus(this.processed_order, 4)
+      this.$notify("success", "Delivery has been assigned successfuly", null, { duration: 5000, permanent: false });
+    },
+    not_assigned: function(val){
+      console.log('not_assign', val);
+      this.$notify("warning", "Delivery didn't assigned, Please try again ", null, { duration: 5000, permanent: false });
+      this.$refs['delivery_popup'].hide();
     }
   }
 }

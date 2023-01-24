@@ -10,11 +10,13 @@ const state = {
     delivery_paginations: null,
     deliveryOrders: null,
     updateDeliveryBranches: null,
+    notAssigned: false,
 }
 
 const getters = {
     _deliveries: state => state.deliveries,
     _assigned: state => state.assigned,
+    not_assigned: state => state.notAssigned,
     _change: state => state.change,
     _all_deliveries: state => state.all_delivery,
     _delivery_paginations: state => state. delivery_paginations,
@@ -34,6 +36,10 @@ const mutations = {
     },
     assigned(state, payload){
       state.assigned = payload;
+    },
+    not_assign(state, payload){
+
+      state.notAssigned = payload;
     },
     change(state, payload){
       state.change = payload;
@@ -114,13 +120,12 @@ const actions = {
       });
     },
     assignToDelivery({commit, dispatch}, payload){
-        console.log('heree from store', payload)
         return Axios
               .post(`https://api2.laffahrestaurants.com/api/orders/assign-to-deliver`, {
                 user_id: payload.user_id,
                 order_id: payload.order_id,
               })
-              .then(res =>{ y
+              .then(res =>{
                 if (res.status === 201) {
                     console.log('this is the delivery guys', res.data.data)
                     commit('assigned', res.data.data)
@@ -129,6 +134,7 @@ const actions = {
               )
               .catch(error => {
               console.log(error);
+              commit('not_assign', error)
               });
           
     },

@@ -32,7 +32,7 @@
         </b-card>
       </b-colxx>
       <b-colxx xxs="8">
-        <b-card class="mb-4" title="Orders">
+        <b-card class="mb-4" title="Ready Orders">
           <b-form>
             <template v-if="branches.length > 0"> 
               <b-table
@@ -148,7 +148,7 @@ export default {
   },
   created(){
       this.getDeliveryData({user_id: this.$route.params.id});
-      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 6})
+      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 4})
       this.fetchBranches();
   },
   methods: {

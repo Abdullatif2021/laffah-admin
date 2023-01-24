@@ -9,6 +9,7 @@
         <b-row>
             <b-colxx xxs="12">
                 <vuetable
+                    table-body-class="vuetable-body"
                     ref="vuetable"
                     class="table-divided order-with-arrow"
                     :per-page="perPage"
@@ -154,7 +155,7 @@
         this.total = paginationData.total;
         this.lastPage = paginationData.last_page;
         this.items = paginationData.data;
-        this.$refs.pagination.setPaginationData(paginationData);
+        // this.$refs.pagination.setPaginationData(paginationData);
       },
       onChangePage(page) {
       this.$refs.vuetable.changePage(page);
@@ -200,10 +201,15 @@
             this.from = val.from;
             this.to = val.to;
             this.total = val.total;
-            this.$refs.pagination.setPaginationData(val);
+            // this.$refs.pagination.setPaginationData(val);
         }
   
     }
   };
   </script>
+<style scoped>
+  .vuetable-body {
+    background-color: red;
+}
+  </style>
   

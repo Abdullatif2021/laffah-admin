@@ -55,7 +55,7 @@
                       type="grow"
                       small></b-spinner>
                     <strong>{{
-                        i.title === 'IN_WAITING' ? 'WAITING PAYMENT GATEWAY' : i.title.replace('_', ' ')
+                        i.title === 'IN_WAITING' ? 'WAITING PAY...' : i.title.replace('_', ' ')
                       }}</strong>
                     <small class="mx-1">
                       <b-badge pill>{{ i.total > 0 ? i.total : '0' }}</b-badge>
@@ -365,7 +365,8 @@ export default {
         sts[6].urlParams = {status_id: [...sts[6].urlParams.status_id, ...sts[7].urlParams.status_id]}
         sts[6].count += sts[7].count
         sts.splice(7, 1)
-        sts.splice(3, 2)
+        // const test = sts.splice(3, 2)
+        // console.log('statussssssssssssss', test);
       }
       return sts
     },

@@ -317,10 +317,10 @@ filterFunction() {
     },
     acceptOrder(){
       if (parseInt(this.processed_order.status) < 2) {
-        this.changeStatus(this.processed_order, 2)
+        this.changeStatus(this.processed_order, 4)
       }
       this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id})
-      this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
+      // this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
     },
     hideModal(refname) {
       this.$refs[refname].hide();

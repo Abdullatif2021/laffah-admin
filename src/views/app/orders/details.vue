@@ -673,7 +673,7 @@ export default {
     },
     updateDeliveryGuy(val, order){
       console.log('updateDeliveryGuy', val, order)
-      this.changeDelivery({order_id: order.id, user_id: val.id})
+      this.changeDelivery({order_id: order.id, user_id: val._id})
     },
     updateFormModel(rawData) {
       let data = rawData
@@ -719,6 +719,7 @@ export default {
       })
     },
     searchOption(search, loading) {
+      console.log('here from search input', search)
       setTimeout(() => {
         this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
       }, 1000)
@@ -883,11 +884,12 @@ export default {
     _deliveries: function(data){
       console.log('from watcher deliveries', data) 
       data.forEach(el => {
+        console.log('ellllllll', el)
         this.delivery_options.push(
           new Object({ 
+            _id: el.id,
             name: el.first_name,
             fullName: `${el.first_name} ${el.last_name}`,
-            id: el.id
           }) 
         )
       })

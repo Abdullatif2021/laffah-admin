@@ -11,6 +11,8 @@ const state = {
     deliveryOrders: null,
     updateDeliveryBranches: null,
     notAssigned: false,
+    changeOrderStatus: null,
+    changeOrderStatusErr: null,
 }
 
 const getters = {
@@ -22,8 +24,9 @@ const getters = {
     _delivery_paginations: state => state. delivery_paginations,
     _deliveryOrders: state => state.deliveryOrders,
     _delivery: state => state.delivery,
-    _updateDeliveryBranches: state => state.updateDeliveryBranches
-
+    _updateDeliveryBranches: state => state.updateDeliveryBranches,
+    _changeOrderStatusErr: state => state.changeOrderStatusErr,
+    _changeOrderStatus: state => state.changeOrderStatus
 }
 
 const mutations = {
@@ -52,6 +55,12 @@ const mutations = {
     },
     updateDeliveryBranches(state, payload){
       state.updateDeliveryBranches = payload;
+    },
+    changeOrderStatus(state, payload){
+      state.changeOrderStatus = payload;
+    },
+    changeOrderStatusErr(state, payload){
+      state.changeOrderStatusErr = payload;
     }
 }
 
@@ -144,7 +153,7 @@ const actions = {
             .post(`https://api2.laffahrestaurants.com/api/orders/change-deliver/${order_id}`, {
               user_id: payload.user_id,
             })
-            .then(res =>{ y
+            .then(res =>{
               if (res.status === 201) {
                   commit('change', res.data.data)
                 }
@@ -154,6 +163,22 @@ const actions = {
             console.log(error);
             });
         
+    },
+    changeOrderStatus({commit, dispatch}, payload){
+      const order_id = payload.order_id;
+      return Axios
+            .post(`https://api2.laffahrestaurants.com/api/orders/updatestatus/${order_id}?_method=put`, {
+              status: payload.status,
+            }).then(res =>{
+              if (res.status === 200) {
+                  commit('changeOrderStatus', res.data.data)
+                }
+              }
+            )
+            .catch(error => {
+            console.log(error);
+            commit('changeOrderStatusErr', error)
+            });
     },
     updateDeliveryBranches({commit}, payload){
       const formData = new FormData();

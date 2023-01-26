@@ -238,7 +238,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['_deliveries', '_assigned', 'not_assigned']),
+    ...mapGetters(['_deliveries', '_assigned', 'not_assigned', '_changeOrderStatus', '_changeOrderStatusErr']),
 
     order: {
       get: function () {
@@ -254,7 +254,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getDeliveries', 'assignToDelivery']),
+    ...mapActions(['getDeliveries', 'assignToDelivery', 'changeOrderStatus']),
   myFunction() {
   document.getElementById("myDropdown").classList.toggle("show");
 },
@@ -316,9 +316,7 @@ filterFunction() {
         })
     },
      acceptOrder(){
-       this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id})
-    
-      // this.orderNextStep(this.processed_order, this.allStatus.find(x => parseInt(x.status_id) === 5), event);
+       this.changeOrderStatus({order_id: this.processed_order.id, status: 2})
     },
     hideModal(refname) {
       this.$refs[refname].hide();
@@ -351,9 +349,11 @@ filterFunction() {
       }
     },
     searchOption(search, loading) {
-      setTimeout(() => {
-        this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
-      }, 1000)
+      if(search != null){
+        setTimeout(() => {
+          this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
+        }, 1000)
+      }
     },
     orderNextStep(order, e) {
       const nextStepID = 6//status to complete
@@ -378,6 +378,7 @@ filterFunction() {
   watch: {
     _deliveries: function(data){
       console.log('from watcher deliveries', data) 
+      this.delivery_options = [];
       data.forEach(el => {
         this.delivery_options.push(
           new Object({ 
@@ -390,8 +391,17 @@ filterFunction() {
     },
     _assigned: function(val){
       console.log('_assign', val);
-      this.changeStatus(this.processed_order, 4)
       this.$notify("success", "Delivery has been assigned successfuly", null, { duration: 5000, permanent: false });
+    },
+    _changeOrderStatus: function(val){
+      this.$notify("success", "Order Status has been changed successfuly", null, { duration: 5000, permanent: false });
+      this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id});
+      this.$refs['delivery_popup'].hide();
+
+    },
+    _changeOrderStatusErr: function(val){
+      this.$notify("warning", "Some thing went wrong", null, { duration: 5000, permanent: false });
+      this.$refs['delivery_popup'].hide();
     },
     not_assigned: function(val){
       console.log('not_assign', val);

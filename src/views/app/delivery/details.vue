@@ -128,6 +128,7 @@ export default {
     return {
       perPage: 8,
       records: [],
+      test_array: [],
       selectedOption: null,
       column: [
         'key',
@@ -163,24 +164,24 @@ export default {
       });
     },
     searchOption(search, loading) {
-      setTimeout(() => {
-        this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
-      }, 1000)
+      if(search != null){
+        setTimeout(() => {
+          this.delivery_options = this.delivery_options.filter(option => option.name.toLowerCase().includes(search.toLowerCase()))
+        }, 1000)
+      }
     },
     somethingModal(selected){
-      this.changeDelivery({order_id: this.orderID, user_id: selected.id})
+      this.changeDelivery({order_id: this.orderID, user_id: selected._id})
     },
     hideModal(refname) {
       this.$refs[refname].hide();
     },
     async getDeliveryList(branch_id, order_id, delivery){
-      console.log('branch id ', branch_id)
-      await this.getDeliveries({branch_id:branch_id});
+     await this.getDeliveries({branch_id:branch_id});
       this.assigned_delivery = delivery;
       this.orderID = order_id;
     },
     getKey(val){
-      console.log('getkey', val)
       return val.order.order_key;
     },
     getClient(val){
@@ -212,7 +213,6 @@ export default {
   },
   watch: {
       _deliveryOrders: function(val){
-        console.log('_deliveryOrders', val)
         this.records = val;
       },
       _delivery: function(val){
@@ -225,26 +225,13 @@ export default {
         this.$notify("success", "Delivery Branches has been Updated Successfully", null, { duration: 5000, permanent: false });
       },
       assigned_delivery: function(val){
-        console.log(val);
-        setTimeout(() => {
-          this.selectedOption = this.delivery_options.find(i => {
-          return i.id = val.id;
-        });
-        console.log('this.selectedOption', this.selectedOption)
-        }, 2000);
+          this.selectedOption = this.delivery_options.filter(i => {
+            return i._id == val.user_id;
+          });
       },
-      _deliveries: function(data){
-        console.log('from watcher deliveries', data) 
+      _deliveries: function(val){
         this.delivery_options = [];
-        data.forEach(el => {
-          this.delivery_options.push(
-            new Object({ 
-              name: el.first_name,
-              fullName: `${el.first_name} ${el.last_name}`,
-              id: el.id
-            }) 
-          )
-        })
+        this.delivery_options = val.map(el => ({ name: el.first_name, fullName: `${el.first_name} ${el.last_name}`, _id: el.id }))
       },
       _change: function(val){
         this.$notify("success", "Delivery Guy has been Updated Successfully", null, { duration: 5000, permanent: false });

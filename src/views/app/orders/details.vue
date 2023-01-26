@@ -215,6 +215,7 @@
           </b-card>
           <!-- delivery guy -->
           <b-card
+          v-if="order.status === 4"
             header-tag="header"
             >
             <template #header>

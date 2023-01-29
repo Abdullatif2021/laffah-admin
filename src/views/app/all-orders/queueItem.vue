@@ -254,7 +254,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getDeliveries', 'assignToDelivery', 'changeOrderStatus']),
+    ...mapActions(['getDeliveries', 'assignToDelivery', 'changeOrderStatus', 'changeQueueCount']),
   myFunction() {
   document.getElementById("myDropdown").classList.toggle("show");
 },
@@ -352,6 +352,14 @@ filterFunction() {
         this.collapseToggleList.push(detail.id)
       }
     },
+    removeOrderFromQueue(order) {
+      const localData = JSON.parse(localStorage.getItem('currentOrders'));
+      const orderIndex = localData.findIndex(i => i.id == order.id)
+      this.visible = false
+      localData.splice(orderIndex, 1)
+      console.log('local storage has been updated');
+      localStorage.setItem('currentOrders', JSON.stringify(localData))
+    },
     searchOption(search, loading) {
       if(search != null){
         setTimeout(() => {
@@ -397,21 +405,26 @@ filterFunction() {
       console.log('_assign', val);
       this.$notify("success", "Delivery has been assigned successfuly", null, { duration: 5000, permanent: false });
       this.$refs['delivery_popup'].hide();
+      this.removeOrderFromQueue(this.processed_order)
+      this.changeQueueCount({data: this.processed_order});
+      this.processed_order = null;
+      
     },
     _changeOrderStatus: function(val){
       this.$notify("success", "Order Status has been changed successfuly", null, { duration: 5000, permanent: false });
       this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id});
-      this.$refs['delivery_popup'].hide();
 
     },
     _changeOrderStatusErr: function(val){
       this.$notify("warning", "Some thing went wrong", null, { duration: 5000, permanent: false });
       this.$refs['delivery_popup'].hide();
+      this.processed_order = null;
     },
     not_assigned: function(val){
       console.log('not_assign', val);
       this.$notify("warning", "Delivery didn't assigned, Please try again ", null, { duration: 5000, permanent: false });
       this.$refs['delivery_popup'].hide();
+      this.processed_order = null;
     }
   }
 }

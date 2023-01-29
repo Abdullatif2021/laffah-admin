@@ -13,6 +13,7 @@ const state = {
     notAssigned: false,
     changeOrderStatus: null,
     changeOrderStatusErr: null,
+    queueCount: null,
 }
 
 const getters = {
@@ -26,7 +27,8 @@ const getters = {
     _delivery: state => state.delivery,
     _updateDeliveryBranches: state => state.updateDeliveryBranches,
     _changeOrderStatusErr: state => state.changeOrderStatusErr,
-    _changeOrderStatus: state => state.changeOrderStatus
+    _changeOrderStatus: state => state.changeOrderStatus,
+    _queueCount: state => state.queueCount,
 }
 
 const mutations = {
@@ -61,6 +63,9 @@ const mutations = {
     },
     changeOrderStatusErr(state, payload){
       state.changeOrderStatusErr = payload;
+    },
+    changeQueueCount(state, payload){
+      state.queueCount = payload;
     }
 }
 
@@ -198,6 +203,9 @@ const actions = {
             .catch(error => {
             console.log(error);
             });
+    },
+    changeQueueCount({commit}, payload) {
+      commit('changeQueueCount', payload.data);
     }
  
 }

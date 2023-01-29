@@ -109,9 +109,16 @@ export default {
       timer: null
     }
   },
+  watch: {
+    queue: function(val){
+      console.log({val});
+      this.updateLocalStorage(val, false)
+    }
+  },
   computed: {
     ...mapGetters({
-      menuType: "getMenuType"
+      menuType: "getMenuType",
+      queue: "_queueCount"
     }),
     pendingOrders: ({orders}) => {
       if (Array.isArray(orders) && orders.length > 0) {

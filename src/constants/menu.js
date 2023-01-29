@@ -29,7 +29,7 @@ const data = [{
     icon: "iconsminds-scooter",
     label: "Delivery",
     to: `${adminRoot}/delivery`,
-    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher],
+    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin],
   },
   {
     id: "items",
@@ -127,7 +127,7 @@ const data = [{
     icon: "iconsminds-mens",
     label: "menu.users",
     to: `${adminRoot}/users`,
-    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin],
+    roles: [UserRole.superadmin, UserRole.admin],
 
   },
   {

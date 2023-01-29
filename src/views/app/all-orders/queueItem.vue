@@ -316,7 +316,11 @@ filterFunction() {
         })
     },
      acceptOrder(){
-       this.changeOrderStatus({order_id: this.processed_order.id, status: 2})
+      if (this.processed_order.status === 2) {
+        this.assignToDelivery({user_id: this.selectedOption.id, order_id: this.processed_order.id});
+      }else {
+        this.changeOrderStatus({order_id: this.processed_order.id, status: 2})
+      }
     },
     hideModal(refname) {
       this.$refs[refname].hide();
@@ -392,6 +396,7 @@ filterFunction() {
     _assigned: function(val){
       console.log('_assign', val);
       this.$notify("success", "Delivery has been assigned successfuly", null, { duration: 5000, permanent: false });
+      this.$refs['delivery_popup'].hide();
     },
     _changeOrderStatus: function(val){
       this.$notify("success", "Order Status has been changed successfuly", null, { duration: 5000, permanent: false });

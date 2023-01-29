@@ -170,10 +170,11 @@
         this.$refs.vuetable.refresh();
       },
       open_details(id){
-        this.$router.push({
-        path: `${adminRoot}/delivery/details/${id}`,
-        // query: { id: id }
-        });
+        this.$router.push(`details/${id}`)
+        // this.$router.push({
+        // path: `${adminRoot}/delivery/details/${id}`,
+        // // query: { id: id }
+        // });
       }
      
      

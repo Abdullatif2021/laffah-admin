@@ -115,12 +115,12 @@ const actions = {
     },
     getDeliveryOrders({commit, dispatch}, payload){
       const user_id = payload.user_id;
-      const status_id = payload.status_id;
+      const status = payload.status_id;
       return Axios
       .get(`https://api2.laffahrestaurants.com/api/orders/delivery`, {
         params: {
           user_id,
-          status_id
+          status
         }
       })
       .then(res =>{

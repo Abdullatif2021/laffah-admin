@@ -1,5 +1,160 @@
 <template>
-  <div>
+   <div>
+    <b-row>
+      <b-colxx xxs="12">
+        <h1>Delivery Details</h1>
+        <div v-if="filter" class="top-right-button-container">
+          <b-dropdown
+            id="ddown5"
+            text="Filter"
+            size="lg"
+            variant="outline-primary"
+            class="top-right-button top-right-button-single"
+            no-fade="true"
+          >
+            <b-dropdown-item>delivered</b-dropdown-item>
+            <b-dropdown-item>undelivered</b-dropdown-item>
+          </b-dropdown>
+        </div>
+        <piaf-breadcrumb />
+        <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
+          <b-tab @click="open_ready" title="Ready">
+            <b-row>
+              <b-colxx>
+                <b-card class="mb-4">
+                  <b-form>
+                    <template v-if="spinner"> 
+                      <b-table
+                        :items="records"
+                        :fields="column"
+                        striped
+                        hover
+                        :per-page="perPage"
+                      >
+                        <template #cell(key)="data">
+                          <b class="text-info">{{ getKey(data.item)}}</b>
+                        </template> 
+                        <template #cell(client)="data">
+                          <b class="text-info">{{ getClient(data.item)}}</b>
+                        </template>
+                        <template #cell(arrival)="data">
+                          <b class="text-info">{{ getArrival(data.item)}}</b>
+                        </template>
+                        <template #cell(total)="data">
+                          <b class="text-info">{{ getTotal(data.item)}}</b>
+                        </template>
+                        <template #cell(actions)="data">
+                          <b class="text-info">
+                            <b-dropdown
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                              <template #button-content>
+                                <div  class="py-0">
+                                  <b-link
+                                    id="edit"
+                                    @click="open_order(data.item.order_id)"
+                                    class="d-flex align-items-center  text-white px-2">
+                                    <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                                  </b-link>
+                                </div>
+                              </template>
+                                <b-dropdown-item
+                                  title="Delete Item"
+                                  class=""
+                                  @click="getDeliveryList(data.item.order.branch_id, data.item.order_id, data.item.order.delivery)"
+                                  v-b-modal="`modalbasic`"
+                                  scale="1.1">
+                                  <i class="iconsminds-scooter" /> <span class="mx-1">Change Delivery</span>
+                                </b-dropdown-item>
+                            </b-dropdown>
+                          </b>
+                        </template>
+                      </b-table>
+                    </template>
+                    <template v-else>
+                      <div class="loading"></div>
+                    </template>
+                  </b-form>
+                </b-card>
+              </b-colxx>
+            </b-row>
+          </b-tab>
+          <b-tab @click="open_completed" title="completed">
+            <b-row>
+              <b-colxx>
+                <b-card class="mb-4">
+                  <b-form>
+                    <template v-if="spinner"> 
+                      <b-table
+                        :items="records"
+                        :fields="completed_column"
+                        striped
+                        hover
+                        :per-page="perPage"
+                      >
+                        <template #cell(key)="data">
+                          <b class="text-info">{{ getKey(data.item)}}</b>
+                        </template> 
+                        <template #cell(client)="data">
+                          <b class="text-info">{{ getClient(data.item)}}</b>
+                        </template>
+                        <template #cell(arrival)="data">
+                          <b class="text-info">{{ getArrival(data.item)}}</b>
+                        </template>
+                        <template #cell(total)="data">
+                          <b class="text-info">{{ getTotal(data.item)}}</b>
+                        </template>
+                        <template #cell(actions)="data">
+                          <b class="text-info">
+                            <b-dropdown
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                              <template #button-content>
+                                <div  class="py-0">
+                                  <b-link
+                                    id="edit"
+                                    @click="open_order(data.item.order_id)"
+                                    class="d-flex align-items-center  text-white px-2">
+                                    <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                                  </b-link>
+                                </div>
+                              </template>
+                                <b-dropdown-item
+                                  title="Delete Item"
+                                  class=""
+                                  @click="getDeliveryList(data.item.order.branch_id, data.item.order_id, data.item.order.delivery)"
+                                  v-b-modal="`modalbasic`"
+                                  scale="1.1">
+                                  <i class="iconsminds-scooter" /> <span class="mx-1">Change Delivery</span>
+                                </b-dropdown-item>
+                            </b-dropdown>
+                          </b>
+                        </template>
+                      </b-table>
+                    </template>
+                    <template v-else>
+                      <div class="loading"></div>
+                    </template>
+                  </b-form>
+                </b-card>
+              </b-colxx>
+            </b-row>
+          </b-tab>
+        </b-tabs>
+      </b-colxx>
+    </b-row>
+  </div>
+  <!-- <div> 
     <b-row>
         <b-colxx xxs="12">
             <piaf-breadcrumb heading="Delivery Details"/>
@@ -110,7 +265,7 @@
             </template>
           </b-modal>
     </b-row>
-  </div>
+  </div> -->
 </template>
 <script>
 import Vuetable from "vuetable-2/src/components/Vuetable";
@@ -128,9 +283,18 @@ export default {
     return {
       perPage: 8,
       records: [],
+      filter: false,
       test_array: [],
       selectedOption: null,
+      spinner: false,
       column: [
+        'key',
+        'client',
+        'arrival',
+        'total',
+        'actions'
+      ],
+      completed_column: [
         'key',
         'client',
         'arrival',
@@ -149,13 +313,25 @@ export default {
   },
   created(){
       this.getDeliveryData({user_id: this.$route.params.id});
-      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 4})
+      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 'now'})
       this.fetchBranches();
   },
   methods: {
     ...mapActions(['getDeliveryData', 'getDeliveries', 'getDeliveryOrders', 'fetchBranches', 'updateDeliveryBranches', "changeDelivery"]),
     changeBranches(){
       this.updateDeliveryBranches({branches: this.usersForm.branch, user_id: this.delivery_id})
+    },
+    open_ready(){
+      this.spinner = false;
+      this.filter = false;
+      this.records = [];
+      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 'now'})
+    },
+    open_completed(){
+      this.spinner = false;
+      this.filter = true;
+      this.records = [];
+      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 'history'})
     },
     open_order(order_id){
       console.log(order_id);
@@ -214,6 +390,7 @@ export default {
   watch: {
       _deliveryOrders: function(val){
         this.records = val;
+        this.spinner = true;
       },
       _delivery: function(val){
         this.delivery_id = val.id;

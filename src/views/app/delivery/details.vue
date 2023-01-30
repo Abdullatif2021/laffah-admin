@@ -106,6 +106,9 @@
                         <template #cell(arrival)="data">
                           <b class="text-info">{{ getArrival(data.item)}}</b>
                         </template>
+                        <template #cell(rating)="data">
+                          <b class="text-info"><rating :value="data.item.rate"></rating></b>
+                        </template>
                         <template #cell(total)="data">
                           <b class="text-info">{{ getTotal(data.item)}}</b>
                         </template>
@@ -273,11 +276,13 @@ import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import {adminRoot} from "../../../constants/config";
+import rating from "../../../components/Listing/rating.vue"
 
 export default {
   components: {
     vuetable: Vuetable,
     'v-select' : vSelect,
+    rating: rating
   },
   data() {
     return {
@@ -298,6 +303,7 @@ export default {
         'key',
         'client',
         'arrival',
+        'rating',
         'total',
         'actions'
       ],

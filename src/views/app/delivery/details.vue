@@ -107,7 +107,7 @@
                           <b class="text-info">{{ getArrival(data.item)}}</b>
                         </template>
                         <template #cell(rating)="data">
-                          <b class="text-info"><rating :value="data.item.rate"></rating></b>
+                          <b class="text-info"><rating :value="4" :ewwe="data.item.rate"></rating></b>
                         </template>
                         <template #cell(total)="data">
                           <b class="text-info">{{ getTotal(data.item)}}</b>
@@ -132,14 +132,14 @@
                                   </b-link>
                                 </div>
                               </template>
-                                <b-dropdown-item
+                                <!-- <b-dropdown-item
                                   title="Delete Item"
                                   class=""
                                   @click="getDeliveryList(data.item.order.branch_id, data.item.order_id, data.item.order.delivery)"
                                   v-b-modal="`modalbasic`"
                                   scale="1.1">
                                   <i class="iconsminds-scooter" /> <span class="mx-1">Change Delivery</span>
-                                </b-dropdown-item>
+                                </b-dropdown-item> -->
                             </b-dropdown>
                           </b>
                         </template>

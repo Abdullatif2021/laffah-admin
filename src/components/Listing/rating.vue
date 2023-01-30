@@ -1,6 +1,6 @@
 <template>
     <div class="rating">
-      <i v-for="n in 5" :key="n" :class="['fa', n <= value ? 'fa-star' : 'fa-star-o']"></i>
+      <span v-for="n in 5" :key="n" :class="['star', n <= value ? 'filled' : '']" ></span>
     </div>
   </template>
   
@@ -12,17 +12,34 @@
         default: 0,
       },
     },
+    data() {
+      return {
+      };
+    },
+    methods: {
+      updateValue(value) {
+        this.value = value;
+      }
+    }
   };
   </script>
   
   <style>
   .rating {
-    text-align: center;
+    display: inline-block;
   }
-  .fa-star {
-    color: #ffd700;
+  
+  .star {
+    display: inline-block;
+    font-size: 1.5em;
+    cursor: pointer;
   }
-  .fa-star-o {
-    color: #ddd;
+  
+  .star:before {
+    content: '★';
+  }
+  
+  .filled {
+    color: gold;
   }
   </style>

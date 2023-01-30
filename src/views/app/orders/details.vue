@@ -233,6 +233,17 @@
               variant="outline-primary">Save
             </b-button>
           </b-card>
+            <!-- Rating -->
+            <b-card
+            v-if="order.status === 6"
+            header-tag="header"
+            body-class="body_class"
+            >
+            <template #header>
+              <h6 class="mb-0 text-muted"><span class="simple-icon-star"/> Rating</h6>
+            </template>
+              <rating :value="order.rate ? order.rate.rate : 0"></rating>
+          </b-card>
           <!--          delivery address-->
           <b-card
             v-if="order.promotion && Object.keys(order.promotion).length>0"
@@ -519,6 +530,7 @@ import _ from "lodash";
 import {apiUrl} from "@/constants/config";
 import {mapActions, mapGetters} from "vuex";
 import ThumbnailImage from "@/components/Cards/ThumbnailImage";
+import rating from "../../../components/Listing/rating.vue";
 import {
   BIcon,
   BIconArrowRepeat,
@@ -546,6 +558,7 @@ export default {
     "update-status": () => import('./UpdateOrderStatus'),
     'thumbnail-image': ThumbnailImage,
     'b-icon': BIcon,
+    rating: rating,
     'b-icon-pencil': BIconPencil,
     'b-icon-person': BIconPerson,
     'v-select' : vSelect,
@@ -929,5 +942,10 @@ export default {
 }
 .body_padding {
   padding: 0.75rem;
+}
+.body_class{
+  background-color: #fff;
+  text-align: center;
+  padding: 9px;
 }
 </style>

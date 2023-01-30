@@ -22,6 +22,7 @@ import RefreshButton from "./components/Common/RefreshButton";
 // Multi Language Add
 import en from "./locales/en.json";
 import es from "./locales/es.json";
+
 // Router & Store add
 import router from "./router";
 import store from "./store";
@@ -48,7 +49,6 @@ Vue.use(vueCrypt)
 Vue.use(BootstrapVue);
 Vue.use(VueI18n);
 Vue.component('multiselect', Multiselect)
-
 
 const messages = {en: en, es: es};
 const locale = getCurrentLanguage();

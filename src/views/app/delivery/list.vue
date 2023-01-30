@@ -19,6 +19,14 @@
                     pagination-path
                     @vuetable:pagination-data="onPaginationData"
                     >
+                    <!-- <template slot="rating" slot-scope="props">
+                      <div class="rating">
+                        <span v-for="n in 5" :key="n" :class="['star', n <= props.rowData.rate ? 'filled' : '']" ></span>
+                      </div>
+                    </template> -->
+                    <template slot="rating" slot-scope="props">
+                      <rating :value="4" :ewwe="props.rowData.id"></rating>
+                    </template>
                     <template slot="actions" slot-scope="props">
                         <b-dropdown
                             id="ddown2"
@@ -55,11 +63,13 @@
   import { mapActions, mapGetters } from 'vuex';
   import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
   import {adminRoot} from "../../../constants/config";
+  import rating from "../../../components/Listing/rating.vue"
 
   export default {
     components: {
       vuetable: Vuetable,
       "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
+      rating: rating
     },
     data() {
       return {
@@ -97,22 +107,28 @@
             title: "Telephone",
             titleClass: "",
             dataClass: "text-muted",
-            width: "20%"
+            width: "15%"
           },
           {
             name: "email",
             title: "Email",
             titleClass: "",
             dataClass: "text-muted",
+            width: "15%"
+          },
+          {
+            name: "__slot:rating",
+            title: "Rating",
+            titleClass: "center aligned text-left",
+            dataClass: "center aligned text-left",
             width: "20%"
           },
-     
           {
             name: "__slot:actions",
             title: "",
             titleClass: "center aligned text-right",
             dataClass: "center aligned text-right",
-            width: "20%"
+            width: "10%"
           }
         ]
       };
@@ -212,5 +228,22 @@
   .vuetable-body {
     background-color: red;
 }
+.rating {
+    display: inline-block;
+  }
+  
+  .star {
+    display: inline-block;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+  
+  .star:before {
+    content: '★';
+  }
+  
+  .filled {
+    color: gold;
+  }
   </style>
   

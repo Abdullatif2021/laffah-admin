@@ -3,20 +3,32 @@
     <b-row>
       <b-colxx xxs="12">
         <h1>Delivery Details</h1>
-        <div v-if="filter" class="top-right-button-container">
-          <b-dropdown
-            id="ddown5"
-            text="Filter"
-            size="lg"
-            variant="outline-primary"
-            class="top-right-button top-right-button-single"
-            no-fade="true"
-          >
-            <b-dropdown-item>delivered</b-dropdown-item>
-            <b-dropdown-item>undelivered</b-dropdown-item>
-          </b-dropdown>
-        </div>
+        
         <piaf-breadcrumb />
+        <div v-if="filter" class="mb-2 mt-2">
+     
+        <b-collapse id="displayOptions" class="d-md-block">
+         
+          <div class="d-block d-md-inline-block pt-1">
+            <b-dropdown
+              id="ddown1"
+              :text="`${$t('pages.orderby')} ${sort.label}`"
+              variant="outline-dark"
+              class="mr-1 float-md-left btn-group"
+              size="xs"
+            >
+              <b-dropdown-item
+                v-for="(order,index) in sortOptions"
+                :key="index"
+                @click="changeOrderBy(order)"
+              >{{ order.label }}</b-dropdown-item>
+            </b-dropdown>
+
+           
+          </div>
+         
+        </b-collapse>
+      </div>
         <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
           <b-tab @click="open_ready" title="Ready">
             <b-row>
@@ -288,6 +300,21 @@ export default {
     return {
       perPage: 8,
       records: [],
+      sort: {
+        column: "title",
+        label: "Product Name"
+      },
+      sortOptions: [
+        {
+          column: "deliverd",
+          label: "deliverd"
+        },
+        {
+          column: "undeliverd",
+          label: "undeliverd"
+        },
+       
+      ],
       filter: false,
       test_array: [],
       selectedOption: null,
@@ -332,6 +359,9 @@ export default {
       this.filter = false;
       this.records = [];
       this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 'now'})
+    },
+    changeOrderBy(sort) {
+      this.sort = sort;
     },
     open_completed(){
       this.spinner = false;

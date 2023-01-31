@@ -217,32 +217,30 @@
           <b-card
           v-if="order.status === 4"
             header-tag="header"
+            body-class="guy_body_class"
             >
             <template #header>
               <h6 class="mb-0 text-muted"><span class="simple-icon-user"/> Delivery Guy</h6>
             </template>
-            <b-card-body
-              class="align-self-center d-flex justify-content-center body_padding" >
-                <b-form-group class="full_width" label="Change Delivery">
+                <b-form-group  label="Change Delivery">
                   <v-select label="fullName" @input="searchOption" v-model="selectedOption" :options="delivery_options" />
                 </b-form-group>
-            </b-card-body>
             <b-button
               @click="updateDeliveryGuy(selectedOption, order)"
               target="_blank"
               variant="outline-primary">Save
             </b-button>
           </b-card>
-            <!-- Rating -->
-            <b-card
-            v-if="order.status === 6"
-            header-tag="header"
-            body-class="body_class"
-            >
-            <template #header>
-              <h6 class="mb-0 text-muted"><span class="simple-icon-star"/> Rating</h6>
-            </template>
-              <rating :value="order.rate ? order.rate.rate : 0"></rating>
+          <!-- Rating -->
+          <b-card
+          v-if="order.status === 6"
+          header-tag="header"
+          body-class="body_class"
+          >
+          <template #header>
+            <h6 class="mb-0 text-muted"><span class="simple-icon-star"/> Rating</h6>
+          </template>
+            <rating :value="order.rate ? order.rate.rate : 0"></rating>
           </b-card>
           <!--          delivery address-->
           <b-card
@@ -947,5 +945,9 @@ export default {
   background-color: #fff;
   text-align: center;
   padding: 9px;
+}
+.guy_body_class {
+  background: white;
+  padding: 10px 6px;
 }
 </style>

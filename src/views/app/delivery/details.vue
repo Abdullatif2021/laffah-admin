@@ -169,118 +169,7 @@
       </b-colxx>
     </b-row>
   </div>
-  <!-- <div> 
-    <b-row>
-        <b-colxx xxs="12">
-            <piaf-breadcrumb heading="Delivery Details"/>
-            <div class="separator mb-5"></div>
-        </b-colxx>
-    </b-row>
-    <b-row>
-      <b-colxx xxs="4">
-        <b-card class="mb-4" title="Branches">
-          <b-form>
-            <template v-if="branches.length > 0"> 
-              <b-form-group label-cols="2" horizontal>
-                <b-form-checkbox-group
-                  stacked
-                  switches
-                  button-variant="primary"
-                  class="mb-3 font-weight-bold "
-                  v-model="usersForm.branch"
-                  :options="branches"
-                  value-field="code"
-                  text-field="label">
-                </b-form-checkbox-group>            
-              </b-form-group>
-              <b-button @click="changeBranches" variant="primary" class="mt-4">Save</b-button>
-            </template>
-            <template v-else>
-              <div class="loading"></div>
-            </template>
-          </b-form>
-        </b-card>
-      </b-colxx>
-      <b-colxx xxs="8">
-        <b-card class="mb-4" title="Ready Orders">
-          <b-form>
-            <template v-if="branches.length > 0"> 
-              <b-table
-                :items="records"
-                :fields="column"
-                striped
-                hover
-                :per-page="perPage"
-              >
-                <template #cell(key)="data">
-                  <b class="text-info">{{ getKey(data.item)}}</b>
-                </template> 
-                <template #cell(client)="data">
-                  <b class="text-info">{{ getClient(data.item)}}</b>
-                </template>
-                <template #cell(arrival)="data">
-                  <b class="text-info">{{ getArrival(data.item)}}</b>
-                </template>
-                <template #cell(total)="data">
-                  <b class="text-info">{{ getTotal(data.item)}}</b>
-                </template>
-                <template #cell(actions)="data">
-                  <b class="text-info">
-                    <b-dropdown
-                      id="ddown2"
-                      size="xs"
-                      html=" "
-                      split
-                      split-class="p-0"
-                      class=""
-                      variant="secondary">
-                      <template #button-content>
-                        <div  class="py-0">
-                          <b-link
-                            id="edit"
-                            @click="open_order(data.item.order_id)"
-                            class="d-flex align-items-center  text-white px-2">
-                            <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
-                          </b-link>
-                        </div>
-                      </template>
-                        <b-dropdown-item
-                          title="Delete Item"
-                          class=""
-                          @click="getDeliveryList(data.item.order.branch_id, data.item.order_id, data.item.order.delivery)"
-                          v-b-modal="`modalbasic`"
-                          scale="1.1">
-                          <i class="iconsminds-scooter" /> <span class="mx-1">Change Delivery</span>
-                        </b-dropdown-item>
-                    </b-dropdown>
-                  </b>
-                </template>
-              </b-table>
-            </template>
-            <template v-else>
-              <div class="loading"></div>
-            </template>
-          </b-form>
-        </b-card>
-      </b-colxx>
-      <b-modal :id="`modalbasic`" ref="modalbasic" title="Change Delivery">
-            <form>
-            <template v-if="selectedOption != null"> 
-              <b-form-group class="full_width" label="Choose Delivery">
-                <v-select label="fullName" @input="searchOption" v-model="selectedOption" :options="delivery_options" />
-              </b-form-group>
-            </template>
-            <template v-else>
-              <div class="loading"></div>
-            </template>
-            </form>
-            <template slot="modal-footer">
-              <b-button variant="primary" @click="somethingModal(selectedOption)" class="mr-1">Save</b-button>
-              <b-button variant="secondary" @click="hideModal('modalbasic')">Cancel</b-button>
-            </template>
-          </b-modal>
-    </b-row>
-  </div> -->
+ 
 </template>
 <script>
 import Vuetable from "vuetable-2/src/components/Vuetable";
@@ -301,8 +190,8 @@ export default {
       perPage: 8,
       records: [],
       sort: {
-        column: "title",
-        label: "Product Name"
+        column: "deliverd",
+        label: "All"
       },
       sortOptions: [
         {

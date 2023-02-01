@@ -1,4 +1,17 @@
 <template>
+  <!-- <b-colxx
+      md="12"
+      class="mb-4">
+      <b-card :title="$t('dashboards.sales')">
+       <div
+        class="dashboard-line-chart"
+        v-if="showChart">
+        <line-chart
+         :data="lineChartData"
+         shadow />
+       </div>
+      </b-card>
+     </b-colxx> -->
  <div>
   <b-row>
    <b-colxx xxs="12">
@@ -10,11 +23,14 @@
    <b-colxx
     xl="6"
     lg="12">
-    <icon-cards-carousel
-     :pending="pendengOrders"
-     :completed="completedOrders"
-     :accepted="acceptedOrders"></icon-cards-carousel>
-    <b-row>
+    
+      <icon-cards-carousel
+       :pending="pendengOrders"
+       :completed="completedOrders"
+       :accepted="acceptedOrders"></icon-cards-carousel>
+   
+    
+     <b-row>
      <b-colxx
       md="12"
       class="mb-4">
@@ -29,6 +45,14 @@
       </b-card>
      </b-colxx>
     </b-row>
+    <!-- <b-row>
+     <b-colxx md="6" class="mb-4">
+      
+     </b-colxx>
+     <b-colxx md="6" class="mb-4">
+      <product-categories-doughnut></product-categories-doughnut>
+     </b-colxx>
+    </b-row> -->
    </b-colxx>
    <b-colxx
     lg="12"
@@ -58,7 +82,12 @@
     xl="5"
     lg="12"
     class="mb-4">
-    <tickets :topSellingItems="topSellingItems"></tickets>
+    <b-row>
+      <b-colxx class="mb-4"><tickets :topSellingItems="topSellingItems"></tickets></b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx class="mb-4"><product-categories-doughnut :title="`Orders Rating`" :data="doughnut_data"></product-categories-doughnut></b-colxx>
+    </b-row>
     <!--        <top-rated-items :topSellingItems="topSellingItems" ></top-rated-items>-->
    </b-colxx>
 
@@ -89,6 +118,8 @@ import SalesChartCard from "@/containers/dashboards/SalesChartCard";
 import TopRatedItems from "@/containers/dashboards/TopRatedItems";
 import LineChart from "@/components/Charts/Line";
 import Tickets from "@/containers/dashboards/Tickets";
+import ProductCategoriesDoughnut from "../../../containers/dashboards/ProductCategoriesDoughnut";
+
 //import {lineChartData} from "@/data/charts";
 import axios from "axios";
 import { ThemeColors } from '@/utils'
@@ -103,13 +134,14 @@ export default {
   "recent-orders": RecentOrders,
   "sales-chart-card": SalesChartCard,
   "top-rated-items": TopRatedItems,
-  tickets: Tickets
-
+  tickets: Tickets,
+  "product-categories-doughnut": ProductCategoriesDoughnut,
  },
  data() {
   return {
    isLoad: true,
    lineChartData: {
+    
     labels: [],
     datasets: [{
      label: '',
@@ -135,8 +167,28 @@ export default {
    showData: false,
    bestsellers: [],
    topSellingItems: [],
+   canvas: null,
    tempArray: [],
-   diffArray: []
+   diffArray: [],
+   doughnut_data: {
+    labels: ['1-2', '3-4', '4-5'],
+    datasets: [
+      {
+        label: '',
+        borderColor: [colors.themeColor3, colors.themeColor2, colors.themeColor1],
+        backgroundColor: [
+          colors.themeColor3_10,
+          colors.themeColor2_10,
+          colors.themeColor1_10
+        ],
+        borderWidth: 2,
+        data: [],
+        pointStyle: 'star',
+        usePointStyle: true
+      }
+    ]
+  },
+   doughnut_fields: [],
 
   }
  },
@@ -144,6 +196,8 @@ export default {
   this.fetchRecentOrders();
   this.fetchTopSelling();
   this.fetchOrders();
+  this.getRatingInfo();
+
 
   // this.timer = setInterval(this.fetchOrders, 300000000)
  },
@@ -151,6 +205,17 @@ export default {
   ...mapActions({
    loadStatuses: "orders/loadStatuses"
   }),
+  getRatingInfo(){
+    return axios.get('https://api2.laffahrestaurants.com/api/orders/rating-count').then(res => {
+      console.log({res})
+      this.doughnut_data.datasets[0]['data'].push(res.data.data.rating_one_tow)
+      this.doughnut_data.datasets[0]['data'].push(res.data.data.rating_three_four)
+      this.doughnut_data.datasets[0]['data'].push(res.data.data.rating_four_five)
+    })
+    .catch(error =>{
+      console.log(error)
+    })
+  },
   async fetchTopSelling() {
    const self = this
    await axios

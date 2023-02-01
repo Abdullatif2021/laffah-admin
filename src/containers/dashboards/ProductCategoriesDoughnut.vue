@@ -1,7 +1,9 @@
 <template>
-  <b-card class="h-100" :title="$t('dashboards.product-categories')">
+  <b-card>
+    <h5 v-if="title" class="card-title">{{ title }} <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></h5>
+    <h5 v-if="!title" class="card-title">{{ $t('dashboards.product-categories') }}</h5>
     <div class="dashboard-donut-chart">
-      <doughnut-chart :data="doughnutChartData" shadow />
+      <doughnut-chart :data="data ? data : doughnutChartData" shadow />
     </div>
   </b-card>
 </template>
@@ -10,6 +12,7 @@ import DoughnutChart from "../../components/Charts/Doughnut";
 import { doughnutChartData } from "../../data/charts";
 
 export default {
+  props: ['title', 'data'],
   components: {
     "doughnut-chart": DoughnutChart
   },
@@ -17,6 +20,18 @@ export default {
     return {
       doughnutChartData
     };
+  },
+  watch: {
+    data: function(val){
+      console.log(val)
+    }
   }
 };
 </script>
+<style scoped>
+.star {
+  color: #ffcc00;
+  font-size: 22px;
+  margin: 4px;
+}
+</style>

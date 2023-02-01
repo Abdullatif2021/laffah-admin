@@ -1,6 +1,7 @@
 <template>
   <div>
     <datatable-heading
+      v-if="show_heading"
       :title="title"
       :has-add-button="hasAddButton"
       :selectAll="selectAll"
@@ -133,10 +134,14 @@ export default {
     "fields",
     "disabled",
     "modelUrl",
+    "show_heading",
     "appendParams",
+    "page_size",
     'apiMode',
     'dataList',
-    'preSelectedItems'
+    'preSelectedItems',
+    'search_change',
+    'search_val'
   ],
   components: {
     vuetable: Vuetable,
@@ -245,6 +250,7 @@ export default {
       this.lastPage = this.total > this.perPage ?
         Math.ceil(this.total / this.perPage) :
         1;
+        this.$emit
     },
     makeQueryParams(sortOrder, currentPage, perPage) {
       // this.selectedItems = [];
@@ -426,6 +432,24 @@ export default {
     preSelectedItems(val) {
       this.calculatePagination()
       this.selectedItems = val
+    },
+    perPage: function(perPage){
+      this.$emit('perPage', perPage)
+    },
+    to: function(to){
+      this.$emit('to', to)
+    },
+    from: function(from){
+      this.$emit('from', from)
+    },
+    total: function(total){
+      this.$emit('total', total)
+    },
+    search_val: function(val){
+      this.searchChange(val);
+    },
+    page_size: function(val){
+      this.changePageSize(val);
     }
   }
 };

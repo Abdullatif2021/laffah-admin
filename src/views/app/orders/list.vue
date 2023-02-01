@@ -1,5 +1,150 @@
 <template>
-  <div>
+   <div>
+    <b-row>
+      <b-colxx xxs="12">
+        <h1 class="text-uppercase font-weight-bold">{{ title }}</h1>
+        
+        <piaf-breadcrumb />
+        <div class="mb-2 mt-2">
+        <b-button
+          variant="empty"          class="pt-0 pl-0 d-inline-block d-md-none"
+          v-b-toggle.displayOptions
+        >
+          {{ $t('pages.display-options') }}
+          <i class="simple-icon-arrow-down align-middle" />
+        </b-button>
+        <b-collapse id="displayOptions" class="d-md-block">
+          
+          <div class="d-block d-md-inline-block pt-1">
+           
+
+            <div class="search-sm d-inline-block float-md-left mr-1 align-top">
+              <b-input :placeholder="$t('menu.search')"  @input="(val) => searchChange(val)" />
+            </div>
+          </div>
+          <div class="float-md-right pt-1">
+            <span class="text-muted text-small mr-1 mb-2">{{from}}-{{to}} of {{ total }}</span>
+            <b-dropdown
+              id="ddown2"
+              right
+              :text="`${perPage}`"
+              variant="outline-dark"
+              class="d-inline-block"
+              size="xs"
+            >
+              <b-dropdown-item
+                v-for="(size,index) in pageSizes"
+                :key="index"
+                @click="changePageSize(size)"
+              >{{ size }}</b-dropdown-item>
+            </b-dropdown>
+          </div>
+        </b-collapse>
+      </div>
+        <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
+          <b-tab
+                  v-for="(i,index) in tabs"
+                  :key="'tab-' +index "
+                  lazy
+                  title-item-class="w-13">
+                  <template #title>
+                    <b-spinner
+                      v-if="false"
+                      type="grow"
+                      small></b-spinner>
+                    <strong style="font-size: 12px;">{{
+                        i.title === 'IN_WAITING' ? 'WAITING' : i.title.replace('_', ' ')
+                      }}</strong>
+                    <small class="mx-1">
+                      <b-badge pill>{{ i.total > 0 ? i.total : '0' }}</b-badge>
+                    </small>
+                  </template>
+                  <divided-table
+                    :ref="i.title"
+                    :show_heading="false"
+                    :page_size="page_size"
+                    @to="set_to"
+                    @from="set_from"
+                    @perPage="set_perPage"
+                    @total="set_total"
+                    :search_val="search_val"
+                    :key="i.total"
+                    :fields="fields"
+                    :has-modal="activateModal"
+                    :api-mode="true"
+                    :append-params="{...queryParams,...i.urlParams}"
+                    :has-add-button="tabIndex!==0?true:false"
+                    :modal-data="modalData"
+                    :model-url="apiBase">
+                    <template slot="updateOrderStatus" slot-scope="props">
+                      <update-order-status
+                        :data="props.rowData"
+                        :apiBase="apiBase"
+                        :orderStatuses="statuses">
+                      </update-order-status>
+                    </template>
+                    <template slot="features" slot-scope="props">
+                      <b-badge
+                        pill
+                        variant="outline-primary"
+                        v-if="props.rowData.promotion && props.rowData.promotion.id">
+                        {{ $t('tables.promotion') }}: {{ props.rowData.promotion.code }}
+                      </b-badge>
+                      <b-badge
+                        pill
+                        variant="outline-primary"
+                        v-else>{{ $t('tables.no-discounts') }}
+                      </b-badge>
+                    </template>
+                    <template slot="date" slot-scope="props">
+                      <h6>{{ getOnlyDate(props.rowData.entry_date) }}</h6>
+                    </template>
+                    <template slot="total" slot-scope="props">
+                      <h6>{{ getFormatNum(props.rowData.total, 2) }} {{ $t("tables.aed") }}</h6>
+                    </template>
+                    <template slot="events" slot-scope="props">
+                      <b-row
+                        align-h="around"
+                        class="pr-1 align-items-center">
+                        <b-link
+                          v-if="props.rowData.payment_method==='1'||tabIndex>0"
+                          :disabled="selectedItems.includes(props.rowData.id)">
+                          <update-order-status
+                            :data="props.rowData"
+                            :action="onValidateFormSubmit"/>
+                          <b-icon-gear-fill
+                            @click.prevent="updateFormModel(props)"
+                            font-scale="2"
+                            aria-hidden="true"
+                            :animation="selectedItems.includes(props.rowData.id)?'spin':''"/>
+                        </b-link>
+                        <b-link>
+                          <b-icon-exclamation-circle-fill
+                            @click.prevent="detailsForm(props.rowData)"
+                            font-scale="2"
+                            aria-hidden="true"/>
+                        </b-link>
+                        <b-icon
+                          :id="`refund-icon-${props.rowData.id}`"
+                          v-if="props.rowData.refund_request===1"
+                          icon="circle-fill"
+                          variant="danger"
+                          font-scale="1"/>
+                        <b-tooltip
+                          :target="`refund-icon-${props.rowData.id}`"
+                          triggers="hover">
+                          Go to item <b>page</b> content!
+                        </b-tooltip>
+                      </b-row>
+                    </template>
+                  </divided-table>
+                </b-tab>
+         
+        </b-tabs>
+      </b-colxx>
+    </b-row>
+  </div>
+  <!-- <div>
     <div
       v-if="tabs.length===0"
       class="loading"></div>
@@ -37,6 +182,7 @@
               class="mb-4"
               no-body>
               <b-tabs
+                nav-class="separator-tabs ml-0 mb-5" content-class="tab-content"
                 class="custom-tab"
                 v-if="rfq===''"
                 v-model="tabIndex"
@@ -190,7 +336,7 @@
         </b-row>
       </b-colxx>
     </b-row>
-  </div>
+  </div> -->
 </template>
 
 <script>
@@ -215,6 +361,16 @@ export default {
     return {
       isLoad: false,
       tabIndex: 1,
+      page: 1,
+      pageSizes: [12, 18, 25],
+      search_val: null,
+      perPage: 12,
+      search: "",
+      page_size: null,
+      from: 0,
+      to: 0,
+      total: 0,
+      lastPage: 0,
       rfq: '',
       options: [
         {text: 'All', value: '', checked: true},
@@ -229,7 +385,6 @@ export default {
       activateModal: false,
       sort: "",
       page: 1,
-      perPage: 4,
       search: "",
       from: 0,
       to: 0,
@@ -353,6 +508,7 @@ export default {
         fields: fields
       };
     },*/
+
     tabs({statuses}) {
       let sts = []
       if (statuses !== null && statuses.length > 8) {
@@ -364,7 +520,7 @@ export default {
         // sts[6].urlParams += `&${sts[7].urlParams}`
         sts[6].urlParams = {status_id: [...sts[6].urlParams.status_id, ...sts[7].urlParams.status_id]}
         sts[6].count += sts[7].count
-        sts.splice(7, 1)
+        // sts.splice(7, 1)
         // const test = sts.splice(3, 2)
         // console.log('statussssssssssssss', test);
       }
@@ -402,6 +558,24 @@ export default {
     },
     updateFormModel(rawData) {
       this.$bvModal.show(`status-${rawData.rowData.id}`)
+    },
+    searchChange(val) {
+      this.search_val = val;
+    },
+    set_to(val){
+      this.to = val;
+    },
+    set_from(val){
+      this.from = val;
+    },
+    set_perPage(val){
+      this.perPage = val;
+    },
+    set_total(val){
+      this.total = val;
+    },
+    changePageSize(val){
+      this.page_size = val;
     },
     detailsForm(data) {
       this.$router.push(`details/${data.id}`)

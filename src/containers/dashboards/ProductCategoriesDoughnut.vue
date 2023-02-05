@@ -1,5 +1,5 @@
 <template>
-  <b-card>
+  <b-card class="scale">
     <h5 v-if="title" class="card-title">{{ title }} <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></h5>
     <h5 v-if="!title" class="card-title">{{ $t('dashboards.product-categories') }}</h5>
     <div class="dashboard-donut-chart">
@@ -34,4 +34,5 @@ export default {
   font-size: 22px;
   margin: 4px;
 }
+
 </style>

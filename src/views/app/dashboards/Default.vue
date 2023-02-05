@@ -45,6 +45,9 @@
       </b-card>
      </b-colxx>
     </b-row>
+    <b-row>
+      <b-colxx class="mb-4"><tickets :topSellingItems="topSellingItems"></tickets></b-colxx>
+    </b-row>
     <!-- <b-row>
      <b-colxx md="6" class="mb-4">
       
@@ -58,19 +61,33 @@
     lg="12"
     xl="6"
     class="mb-4"
-    v-if="Array.isArray(recentOrders) && recentOrders.length> 0">
-    <recent-orders
-     :rorders="recentOrders"
-     :colorRecent="diffArray"
-     v-if="showData"
-     :isLoad="isLoad"
-     @refreshRecent="fetchRecentOrders()"></recent-orders>
+    >
+    <b-row>
+      <b-colxx class="mb-4">
+       <product-categories-doughnut :title="`Orders Rating`" :data="doughnut_data"></product-categories-doughnut>
+      </b-colxx>
+    </b-row>
+
+      <b-row>
+        <b-colxx
+        lg="12"
+        class="mb-4"
+        v-if="Array.isArray(recentOrders) && recentOrders.length> 0">
+        <recent-orders
+        :rorders="recentOrders"
+        :colorRecent="diffArray"
+        v-if="showData"
+        :isLoad="isLoad"
+        @refreshRecent="fetchRecentOrders()"></recent-orders>
+        </b-colxx>
+      </b-row>
    </b-colxx>
+   
   </b-row>
 
   <b-row>
    <b-colxx
-    xl="7"
+    xl="12"
     lg="12"
     class="mb-4">
     <best-sellers
@@ -78,7 +95,7 @@
      :bestData="bestsellers"
      :isLoad="isLoad"></best-sellers>
    </b-colxx>
-   <b-colxx
+   <!-- <b-colxx
     xl="5"
     lg="12"
     class="mb-4">
@@ -88,8 +105,7 @@
     <b-row>
       <b-colxx class="mb-4"><product-categories-doughnut :title="`Orders Rating`" :data="doughnut_data"></product-categories-doughnut></b-colxx>
     </b-row>
-    <!--        <top-rated-items :topSellingItems="topSellingItems" ></top-rated-items>-->
-   </b-colxx>
+   </b-colxx> -->
 
   </b-row>
   <!--    <b-row>-->
@@ -205,6 +221,27 @@ export default {
   ...mapActions({
    loadStatuses: "orders/loadStatuses"
   }),
+  mostRepeatedElement(arr) {
+  let count = {};
+  let maxElement = arr[0];
+  let maxCount = 1;
+  for (let i = 0; i < arr.length; i++) {
+    let element = arr[i];
+    if (count[element] == null) {
+      count[element] = 1;
+    } else {
+      count[element]++;
+    }
+    if (count[element] > maxCount) {
+      maxElement = element;
+      maxCount = count[element];
+    }
+  }
+  return { element: maxElement, count: maxCount };
+},
+on222click(){
+  this.mostRepeatedElement([2,1,2,3,2,2,4])
+},
   getRatingInfo(){
     return axios.get('https://api2.laffahrestaurants.com/api/orders/rating-count').then(res => {
       console.log({res})

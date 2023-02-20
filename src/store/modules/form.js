@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import {apiUrl} from "../../constants/config";
+import { apiUrl } from "../../constants/config";
 import Axios from "axios";
 
 const state = {
@@ -20,7 +20,7 @@ const state = {
   updatedItemMainImageSuccessfuly: null,
   updateBatch: null,
   deleteItem: null,
-}
+};
 
 const getters = {
   getFormType: (state) => state.formType,
@@ -28,184 +28,204 @@ const getters = {
   getStatus: (state) => state.status,
   getGroups: (state) => state.groups,
   _loadItem: (state) => state.loadItem,
-  _item: state => state.item,
-  _updatedItemMainImageSuccessfuly: state => state.updatedItemMainImageSuccessfuly,
-  create_item: state => state.create_item,
-  _updateItem: state => state.updateItem,
-  _deleteItem: state => state.deleteItem,
-  create_Batch: state => state.create_Batch,
-  _updateBatch: state => state.updateBatch, 
-  _deleteBatch: state => state.deleteBatch,
-  _batches: state => state.batches,
-  load_batches: state => state.load_batches
-}
+  _item: (state) => state.item,
+  _updatedItemMainImageSuccessfuly: (state) =>
+    state.updatedItemMainImageSuccessfuly,
+  create_item: (state) => state.create_item,
+  _updateItem: (state) => state.updateItem,
+  _deleteItem: (state) => state.deleteItem,
+  create_Batch: (state) => state.create_Batch,
+  _updateBatch: (state) => state.updateBatch,
+  _deleteBatch: (state) => state.deleteBatch,
+  _batches: (state) => state.batches,
+  load_batches: (state) => state.load_batches,
+};
 
 const mutations = {
   SET_Status(state, payload) {
-    let {status} = payload;
-    state.status = status
+    let { status } = payload;
+    state.status = status;
   },
-  crateItemSuccess(state, payload){
+  crateItemSuccess(state, payload) {
     state.create_item = payload;
   },
-  updateBatchSuccess(state, payload){
+  updateBatchSuccess(state, payload) {
     state.updateBatch = payload;
   },
-  crateBatchSuccess(state, payload){
+  crateBatchSuccess(state, payload) {
     state.create_Batch = payload;
   },
-  is_load_batches(state, payload){
+  is_load_batches(state, payload) {
     state.load_batches = payload;
   },
   SET_FormData(state, payload) {
-    let {item} = payload
-    state.form_Data = item
+    let { item } = payload;
+    state.form_Data = item;
   },
-  getBatchSuccess(state, payload){
+  getBatchSuccess(state, payload) {
     state.batches = payload;
   },
-  deleteBatchSuccess(state, payload){
+  deleteBatchSuccess(state, payload) {
     state.deleteBatch = payload;
   },
-  SET_FromType(state, payload) {
-  },
-  deleteItemSuccess(state, payload){
+  SET_FromType(state, payload) {},
+  deleteItemSuccess(state, payload) {
     state.deleteItem = payload;
   },
-  updateItemSuccess(state, payload){
+  updateItemSuccess(state, payload) {
     state.updateItem = payload;
   },
   get_customizationGroups(state, payload) {
-    state.groups = payload
+    state.groups = payload;
   },
-  is_load_item(state, payload){
+  is_load_item(state, payload) {
     state.loadItem = payload;
   },
-  getItemSuccess(state, payload){
+  getItemSuccess(state, payload) {
     state.item = payload;
   },
-  updateItemImage(state, payload){
+  updateItemImage(state, payload) {
     state.updatedItemMainImageSuccessfuly = payload;
-  }
-}
+  },
+};
 
 const actions = {
-  loadItems({commit}, payload) {
-    commit('SET_Items', items)
+  loadItems({ commit }, payload) {
+    commit("SET_Items", items);
   },
-  async handleSubmit({commit, dispatch}, payload) {
-    let {url, obj, options} = payload
+  async handleSubmit({ commit, dispatch }, payload) {
+    let { url, obj, options } = payload;
     //console.log(url,obj,'obj');
-    options = (obj instanceof FormData) ? {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    } : (options || {})
+    options =
+      obj instanceof FormData
+        ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        : options || {};
     return await /*new Promise((resolve, reject) => {*/
-      axios
-        .post(apiUrl + url, obj, options)
-        .then((response) => {
-          //    dispatch('item/changeIsLoad', true)
-          switch (response.status) {
-            case 201:
-              if (url.includes('items/batches')) {
-                dispatch('item/getItemBatches', url.split('/')[2])
-              }
-              this._vm.$notify("success", `${response.statusText} Successfully`, null, {
-                duration: 5000,
-                permanent: false
-              });
-              break
-            case 200:
-              // this._vm.$notify("success", `${this._vm.$t('response.edited-successfully')}`, null, {
-              this._vm.$notify("success", `Edited Successfully`, null, {
-                duration: 5000,
-                permanent: false
-              });
-              break
-            default:
-              this._vm.$notify("success", `Edited Successfully`, null, {
-                duration: 5000,
-                permanent: false
-              });
-          }
-          // request succeeded
-          // resolve(response) // return response data to calling function
-          return response
-        })
-        .catch(error => {
-          let {response} = error
-          if (response && response.status === 422) {
-            if (response.data.data instanceof Object) {
-              Object.keys(response.data.data).map(key => {
-                response.data.data[key].map(val => {
-                  this._vm.$notify("error", response.data.message, `${key} - ${val}`, {
-                    duration: 5000,
-                    permanent: false
-                  });
-                })
-              })
-            } else {
-              this._vm.$notify("error", response.data.message, response.data.data, {
-                duration: 5000,
-                permanent: false
-              });
+    axios
+      .post(apiUrl + url, obj, options)
+      .then((response) => {
+        //    dispatch('item/changeIsLoad', true)
+        switch (response.status) {
+          case 201:
+            if (url.includes("items/batches")) {
+              dispatch("item/getItemBatches", url.split("/")[2]);
             }
-
+            this._vm.$notify(
+              "success",
+              `${response.statusText} Successfully`,
+              null,
+              {
+                duration: 5000,
+                permanent: false,
+              }
+            );
+            break;
+          case 200:
+            // this._vm.$notify("success", `${this._vm.$t('response.edited-successfully')}`, null, {
+            this._vm.$notify("success", `Edited Successfully`, null, {
+              duration: 5000,
+              permanent: false,
+            });
+            break;
+          default:
+            this._vm.$notify("success", `Edited Successfully`, null, {
+              duration: 5000,
+              permanent: false,
+            });
+        }
+        // request succeeded
+        // resolve(response) // return response data to calling function
+        return response;
+      })
+      .catch((error) => {
+        let { response } = error;
+        if (response && response.status === 422) {
+          if (response.data.data instanceof Object) {
+            Object.keys(response.data.data).map((key) => {
+              response.data.data[key].map((val) => {
+                this._vm.$notify(
+                  "error",
+                  response.data.message,
+                  `${key} - ${val}`,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+              });
+            });
+          } else {
+            this._vm.$notify(
+              "error",
+              response.data.message,
+              response.data.data,
+              {
+                duration: 5000,
+                permanent: false,
+              }
+            );
           }
-          // request failed
-          // reject(error) // return error to calling function
-          return error
-        })
+        }
+        // request failed
+        // reject(error) // return error to calling function
+        return error;
+      });
     /*})*/
   },
-  createItem({commit, dispatch}, payload) {
-      const formData = new FormData();
-      console.log(payload);
-      Object.entries(payload.langs).forEach(([key, value]) => {
-        if (value){
-          const lang = key.toString().split("_")[0];
-          const type = key.toString().split("_")[1];
-          formData.append(`${lang}[${type}]`, value);
-        }
-      });
-      formData.append(`type`, 1);
-      formData.append(`image`, payload.image);
-      formData.append(`is_published`, payload.additional.published ? 1 : 0);
-      formData.append(`active`, payload.additional.active ? 1 : 0);
-      formData.append(`notes`, payload.additional.notes);
-      formData.append(`itemCategory[category_id]`, payload.additional.category);
-      formData.append(`record_order`, payload.additional.record_order);
-      const customization_groups = payload.customization_groups
-      formData.append(`customization_groups`, JSON.stringify({customization_groups}));
-      axios
-      .post(`https://api2.laffahrestaurants.com/api/items`, formData)
-      .then(res => {
+  createItem({ commit, dispatch }, payload) {
+    const formData = new FormData();
+    console.log(payload);
+    Object.entries(payload.langs).forEach(([key, value]) => {
+      if (value) {
+        const lang = key.toString().split("_")[0];
+        const type = key.toString().split("_")[1];
+        formData.append(`${lang}[${type}]`, value);
+      }
+    });
+    formData.append(`type`, 1);
+    formData.append(`image`, payload.image);
+    formData.append(`is_published`, payload.additional.published ? 1 : 0);
+    formData.append(`active`, payload.additional.active ? 1 : 0);
+    formData.append(`notes`, payload.additional.notes);
+    formData.append(`itemCategory[category_id]`, payload.additional.category);
+    formData.append(`record_order`, payload.additional.record_order);
+    const customization_groups = payload.customization_groups;
+    formData.append(
+      `customization_groups`,
+      JSON.stringify({ customization_groups })
+    );
+    axios
+      .post(`https://api-v2.laffahrestaurants.com/public/api/items`, formData)
+      .then((res) => {
         if (res.status === 201) {
-         commit('crateItemSuccess', res.data.data)     
+          commit("crateItemSuccess", res.data.data);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
-    },
-  updateItem({commit, dispatch}, payload) {
+  },
+  updateItem({ commit, dispatch }, payload) {
     const formData = new FormData();
-    const item_id = payload.id
-    console.log('updateItem payload', payload);
-   
-    if(payload.additional){
+    const item_id = payload.id;
+    console.log("updateItem payload", payload);
+
+    if (payload.additional) {
       formData.append(`is_published`, payload.additional.published ? 1 : 0);
       formData.append(`active`, payload.additional.active ? 1 : 0);
       formData.append(`itemCategory[category_id]`, payload.additional.category);
       formData.append(`record_order`, payload.additional.record_order);
     }
-    if(payload.notes){
+    if (payload.notes) {
       formData.append(`notes`, payload.notes);
     }
-    if(payload.langs){
+    if (payload.langs) {
       Object.entries(payload.langs).forEach(([key, value]) => {
-        if (value){
+        if (value) {
           const lang = key.toString().split("_")[0];
           const type = key.toString().split("_")[1];
           formData.append(`${lang}[${type}]`, value);
@@ -216,80 +236,90 @@ const actions = {
       formData.append("image", payload.image);
     }
     if (payload.customization_groups != null) {
-      const customization_groups = payload.customization_groups
-      formData.append(`customization_groups`, JSON.stringify({customization_groups}));
+      const customization_groups = payload.customization_groups;
+      formData.append(
+        `customization_groups`,
+        JSON.stringify({ customization_groups })
+      );
     }
     formData.append("_method", "PUT");
     axios
-    .post(`https://api2.laffahrestaurants.com/api/items/${item_id}`, formData)
-    .then(res => {
-      if (res.status === 200) {
-        if(payload.image){
-          commit('updateItemImage', res.data.data)
-        }else {
-          console.log('here from else', res.data.data)
-        commit('updateItemSuccess', res.data.data)
+      .post(
+        `https://api-v2.laffahrestaurants.com/public/api/items/${item_id}`,
+        formData
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          if (payload.image) {
+            commit("updateItemImage", res.data.data);
+          } else {
+            console.log("here from else", res.data.data);
+            commit("updateItemSuccess", res.data.data);
+          }
         }
-      }     
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  item_delete({commit}, payload){
+  item_delete({ commit }, payload) {
     const item_id = payload.item_id;
     axios
-    .delete(`https://api2.laffahrestaurants.com/api/items/${item_id}`)
-    .then(res => {
-      if (res.status === 200) {
-        commit('deleteItemSuccess', res.data.data)     
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .delete(
+        `https://api-v2.laffahrestaurants.com/public/api/items/${item_id}`
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          commit("deleteItemSuccess", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  getBatches({commit, dispatch}, payload){
+  getBatches({ commit, dispatch }, payload) {
     const item_id = payload.item_id;
-    commit('is_load_batches', false)
+    commit("is_load_batches", false);
     axios
-    .get(`https://api2.laffahrestaurants.com/api/item_batch_branches/${item_id}`)
-    .then(res => {
-      if (res.status === 200) {
-        commit('is_load_batches', true)
-        return res
-      }
-    })
-    .then(res => {
-      if (res.status === 200) {
-        commit('getBatchSuccess', res.data.data)     
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .get(
+        `https://api-v2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}`
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          commit("is_load_batches", true);
+          return res;
+        }
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          commit("getBatchSuccess", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  getItem({commit, dispatch}, payload){
+  getItem({ commit, dispatch }, payload) {
     const item_id = payload.id;
-    commit('is_load_item', false)
+    commit("is_load_item", false);
     axios
-    .get(`https://api2.laffahrestaurants.com/api/items/${item_id}`)
-    .then(res => {
-      if (res.status === 200) {
-        commit('is_load_item', true)
-        return res
-      }
-    })
-    .then(res => {
-      if (res.status === 200) {
-        commit('getItemSuccess', res.data.data)     
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .get(`https://api-v2.laffahrestaurants.com/public/api/items/${item_id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          commit("is_load_item", true);
+          return res;
+        }
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          commit("getItemSuccess", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  createBatch({commit, dispatch}, payload){
+  createBatch({ commit, dispatch }, payload) {
     const formData = new FormData();
     const item_id = payload.item_id;
     console.log(payload);
@@ -298,67 +328,78 @@ const actions = {
     formData.append(`price`, payload.price);
     formData.append(`branch_id`, payload.branch_id);
     axios
-    .post(`https://api2.laffahrestaurants.com/api/item_batch_branches/${item_id}`, formData)
-    .then(res => {
-      if (res.status === 201) {
-        commit('crateBatchSuccess', res.data.data)     
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
+      .post(
+        `https://api-v2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}`,
+        formData
+      )
+      .then((res) => {
+        if (res.status === 201) {
+          commit("crateBatchSuccess", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  updateBatch({commit, dispatch}, payload){
-  const formData = new FormData();
-  const item_id = payload.item_id;
-  const branch_id = payload.branch_id;
-  console.log('update Batch payload', payload)
-  const price = payload.price;
- 
-  const active = payload.batch_modify ? payload.active : payload.active ? 0 : 1;
-  axios
-  .put(`https://api2.laffahrestaurants.com/api/item_batch_branches/${item_id}/${branch_id}/${active}/${price}`)
-  .then(res => {
-      commit('updateBatchSuccess', res.data.data)     
-  })
-  .catch(error => {
-    console.log(error);
-  });
-  },
-  activateBatch(){
+  updateBatch({ commit, dispatch }, payload) {
+    const formData = new FormData();
+    const item_id = payload.item_id;
+    const branch_id = payload.branch_id;
+    console.log("update Batch payload", payload);
+    const price = payload.price;
 
+    const active = payload.batch_modify
+      ? payload.active
+      : payload.active
+      ? 0
+      : 1;
+    axios
+      .put(
+        `https://api-v2.laffahrestaurants.com/public/api/item_batch_branches/${item_id}/${branch_id}/${active}/${price}`
+      )
+      .then((res) => {
+        commit("updateBatchSuccess", res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  deleteBatch1({commit, dispatch}, payload){
+  activateBatch() {},
+  deleteBatch1({ commit, dispatch }, payload) {
     console.log(payload);
     const record_id = payload.record_id;
     axios
-    .delete(`https://api2.laffahrestaurants.com/api/item_batch_branches/${record_id}`)
-    .then(res => {
-      if (res.status === 200) {
-        commit('deleteBatchSuccess', res.data.data)     
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
-    },
+      .delete(
+        `https://api-v2.laffahrestaurants.com/public/api/item_batch_branches/${record_id}`
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          commit("deleteBatchSuccess", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
   getCustomizationGroups() {
-      axios
-      .get(`https://api2.laffahrestaurants.com/api/customizations/groups`)
-    .then(res => {
-      if (res.status === 200) {
-        commit("get_customizationGroups", res.data.data);
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  }
-}
+    axios
+      .get(
+        `https://api-v2.laffahrestaurants.com/public/api/customizations/groups`
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          commit("get_customizationGroups", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+};
 
 export default {
   state,
   getters,
   mutations,
-  actions
-}
+  actions,
+};

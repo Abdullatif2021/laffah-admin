@@ -661,7 +661,7 @@ export default {
    } else {
     if (this.type !== undefined) {
      axios
-      .get(`/${this.apiBase}${this.type}&orderBy[]=created_at&orderBy[]=desc`)
+      .get(`/${this.apiBase}${this.type}&orderBy[]=created_at&orderBy[]=desc&offset=0&limit=12`)
       .then(response => {
        this.data = response.data.data;
        this.total = response.data.total;

@@ -20,6 +20,7 @@ import todo from "./modules/todo";
 import user from "./modules/user";
 import users from "./modules/users";
 import delivery from "./modules/delivery";
+import settings from "./modules/settings";
 
 Vue.use(Vuex)
 
@@ -55,6 +56,7 @@ export default new Vuex.Store({
         orders,
         roles,
         users,
-        delivery
+        delivery,
+        settings
     }
 })

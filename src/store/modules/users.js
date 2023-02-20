@@ -20,6 +20,7 @@ const state = () => ({
 
 const actions = {
     async fetchSuperAdmin({ commit }, url) {
+        console.log('reerreerree', url);
         commit('LOAD_SUPERADMIN', false)
         await axios.get(`${apiUrl}${url}`).then(res => {
             let resultData = res.data.data;
@@ -31,7 +32,7 @@ const actions = {
     },
     async fetchAdmin({ commit }, url) {
         commit('LOAD_ADMIN', false)
-
+        console.log('fetchhhhhhh', url);
         await axios.get(`${apiUrl}${url}`).then(res => {
             let resultData = res.data.data;
             commit('SET_ADMIN', resultData),

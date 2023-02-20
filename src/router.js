@@ -702,6 +702,12 @@ const routes = [{
         }]
       },
       {
+        path: "settings",
+        component: () =>
+          import(/* webpackChunkName: "single" */ "./views/app/settings"),
+          meta: {loginRequired: true, roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin]},
+      },
+      {
         path: "seo",
         component: () =>
           import ( /* webpackChunkName: "seo" */ "./views/app/seo/index"),

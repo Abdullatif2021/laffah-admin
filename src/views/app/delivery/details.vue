@@ -5,7 +5,7 @@
         <h1>Delivery Details</h1>
         
         <piaf-breadcrumb />
-        <div v-if="filter" class="mb-2 mt-2">
+        <!-- <div v-if="filter" class="mb-2 mt-2">
      
         <b-collapse id="displayOptions" class="d-md-block">
          
@@ -28,7 +28,7 @@
           </div>
          
         </b-collapse>
-      </div>
+      </div> -->
         <b-tabs nav-class="separator-tabs ml-0 mb-5" content-class="tab-content" :no-fade="true">
           <b-tab @click="open_ready" title="Ready">
             <b-row>
@@ -97,6 +97,75 @@
             </b-row>
           </b-tab>
           <b-tab @click="open_completed" title="completed">
+            <b-row>
+              <b-colxx>
+                <b-card class="mb-4">
+                  <b-form>
+                    <template v-if="spinner"> 
+                      <b-table
+                        :items="records"
+                        :fields="completed_column"
+                        striped
+                        hover
+                        :per-page="perPage"
+                      >
+                        <template #cell(key)="data">
+                          <b class="text-info">{{ getKey(data.item)}}</b>
+                        </template> 
+                        <template #cell(client)="data">
+                          <b class="text-info">{{ getClient(data.item)}}</b>
+                        </template>
+                        <template #cell(arrival)="data">
+                          <b class="text-info">{{ getArrival(data.item)}}</b>
+                        </template>
+                        <template #cell(rating)="data">
+                          <b class="text-info"><rating :value="4" :ewwe="data.item.rate"></rating></b>
+                        </template>
+                        <template #cell(total)="data">
+                          <b class="text-info">{{ getTotal(data.item)}}</b>
+                        </template>
+                        <template #cell(actions)="data">
+                          <b class="text-info">
+                            <b-dropdown
+                              id="ddown2"
+                              size="xs"
+                              html=" "
+                              split
+                              split-class="p-0"
+                              class=""
+                              variant="secondary">
+                              <template #button-content>
+                                <div  class="py-0">
+                                  <b-link
+                                    id="edit"
+                                    @click="open_order(data.item.order_id)"
+                                    class="d-flex align-items-center  text-white px-2">
+                                    <i style="font-size:20px" class='iconsminds-gear-2 d-flex'></i>
+                                  </b-link>
+                                </div>
+                              </template>
+                                <!-- <b-dropdown-item
+                                  title="Delete Item"
+                                  class=""
+                                  @click="getDeliveryList(data.item.order.branch_id, data.item.order_id, data.item.order.delivery)"
+                                  v-b-modal="`modalbasic`"
+                                  scale="1.1">
+                                  <i class="iconsminds-scooter" /> <span class="mx-1">Change Delivery</span>
+                                </b-dropdown-item> -->
+                            </b-dropdown>
+                          </b>
+                        </template>
+                      </b-table>
+                    </template>
+                    <template v-else>
+                      <div class="loading"></div>
+                    </template>
+                  </b-form>
+                </b-card>
+              </b-colxx>
+            </b-row>
+          </b-tab>
+          <b-tab @click="open_canceled" title="canceled">
             <b-row>
               <b-colxx>
                 <b-card class="mb-4">
@@ -253,6 +322,12 @@ export default {
       this.sort = sort;
     },
     open_completed(){
+      this.spinner = false;
+      this.filter = true;
+      this.records = [];
+      this.getDeliveryOrders({user_id: this.$route.params.id, status_id: 'history'})
+    },
+    open_canceled(){
       this.spinner = false;
       this.filter = true;
       this.records = [];

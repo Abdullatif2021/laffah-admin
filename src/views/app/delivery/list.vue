@@ -1,249 +1,424 @@
 <template>
-    <div>
-        <b-row>
-            <b-colxx xxs="12">
-                <piaf-breadcrumb heading="Delivery"/>
-                <div class="separator mb-5"></div>
-            </b-colxx>
-        </b-row>
-        <b-row>
-            <b-colxx xxs="12">
-                <vuetable
-                    table-body-class="vuetable-body"
-                    ref="vuetable"
-                    class="table-divided order-with-arrow"
-                    :per-page="perPage"
-                    :reactive-api-url="true"
-                    :api-mode="false"
-                    :fields="fields"
-                    pagination-path
-                    @vuetable:pagination-data="onPaginationData"
-                    >
-                    <!-- <template slot="rating" slot-scope="props">
+  <div>
+    <b-row>
+      <b-colxx xxs="12">
+        <piaf-breadcrumb heading="Delivery" />
+        <div class="mb-2 mt-2">
+          <b-collapse id="displayOptions" class="d-md-block">
+            <div class="d-block d-md-inline-block pt-1">
+              <div
+                class="search-sm d-inline-block float-md-left mr-1 align-top"
+              >
+                <b-input
+                  :placeholder="$t('menu.search')"
+                  @input="(val) => searchChange(val)"
+                />
+              </div>
+            </div>
+            <div class="float-md-right pt-1">
+              <span class="text-muted text-small mr-1 mb-2"
+                >{{ from }}-{{ to }} of {{ total }}</span
+              >
+              <b-dropdown
+                id="ddown2"
+                right
+                :text="`${perPage}`"
+                variant="outline-dark"
+                class="d-inline-block"
+                size="xs"
+              >
+                <b-dropdown-item
+                  v-for="(size, index) in pageSizes"
+                  :key="index"
+                  @click="changePageSize(size)"
+                  >{{ size }}</b-dropdown-item
+                >
+              </b-dropdown>
+            </div>
+          </b-collapse>
+        </div>
+        <div class="separator mb-5"></div>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12">
+        <vuetable
+          table-body-class="vuetable-body"
+          ref="vuetable"
+          class="table-divided order-with-arrow"
+          :per-page="perPage"
+          :reactive-api-url="true"
+          :api-mode="false"
+          :fields="fields"
+          :data-manager="dataManager"
+          pagination-path
+          @vuetable:pagination-data="onPaginationData"
+        >
+          <!-- <template slot="rating" slot-scope="props">
                       <div class="rating">
                         <span v-for="n in 5" :key="n" :class="['star', n <= props.rowData.rate ? 'filled' : '']" ></span>
                       </div>
                     </template> -->
-                    <template slot="rating" slot-scope="props">
-                      <rating :value="4" :ewwe="props.rowData.id"></rating>
-                    </template>
-                    <template slot="actions" slot-scope="props">
-                        <b-dropdown
-                            id="ddown2"
-                            size="xs"
-                            html=" "
-                            split
-                            split-class="p-0"
-                            class=""
-                            variant="secondary">
-                            <template #button-content>
-                                <div class="py-0">
-                                    <b-link
-                                        @click="open_details(props.rowData.id)"
-                                        id="edit"
-                                        class="d-flex align-items-center  text-white px-2">
-                                        <i style='font-size:20px' class='iconsminds-gear-2 d-flex'></i>
-                                    </b-link>
-                                </div>
-                            </template>
-                        </b-dropdown>
-                    </template>
-                </vuetable>
-                <!-- <vuetable-pagination-bootstrap
-                class="mt-4"
-                ref="pagination"
-                @vuetable-pagination:change-page="onChangePage"
-                /> -->
-            </b-colxx>
-        </b-row>
-    </div>
-  </template>
-  <script>
-  import Vuetable from "vuetable-2/src/components/Vuetable";
-  import { mapActions, mapGetters } from 'vuex';
-  import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
-  import {adminRoot} from "../../../constants/config";
-  import rating from "../../../components/Listing/rating.vue"
+          <template slot="pending" slot-scope="props">
+            <div
+              :class="`${
+                props.rowData.pending_delivery_orders_count == 0
+                  ? 'number-container-active'
+                  : 'number-container-unactive'
+              }`"
+            >
+              <div class="number">
+                {{ props.rowData.pending_delivery_orders_count }}
+              </div>
+              <div class="pending">pending</div>
+            </div>
+          </template>
+          <template slot="rating" slot-scope="props">
+            <rating :value="4" :ewwe="props.rowData.id"></rating>
+          </template>
+          <template slot="status" slot-scope="props">
+            <div
+              style="margin-top: 15px"
+              @click="handleSwitchClick(props.rowData)"
+            >
+              <switches
+                v-model="props.rowData.delivery_status"
+                theme="custom"
+                color="primary"
+                class="vue-switcher-small"
+              ></switches>
+            </div>
+          </template>
+          <template slot="actions" slot-scope="props">
+            <b-row align-h="around" class="pr-1 align-items-center">
+              <b-link v-if="props.rowData">
+                <b-icon-gear-fill
+                  @click.prevent="open_details(props.rowData.id)"
+                  font-scale="2"
+                  aria-hidden="true"
+                  animation="spin"
+                />
+              </b-link>
+              <!-- <b-icon-exclamation-circle-fill
+                  <b-link>
+                      @click.prevent="detailsForm(props.rowData)"
+                      font-scale="2"
+                      aria-hidden="true"
+                    />
+                  </b-link>
+                  <b-icon
+                    :id="`refund-icon-${props.rowData.id}`"
+                    v-if="props.rowData.refund_request === 1"
+                    icon="circle-fill"
+                    variant="danger"
+                    font-scale="1"
+                  />
+                  <b-tooltip
+                    :target="`refund-icon-${props.rowData.id}`"
+                    triggers="hover"
+                  >
+                    Go to item <b>page</b> content!
+                  </b-tooltip> -->
+            </b-row>
+          </template>
+        </vuetable>
+        <vuetable-pagination-bootstrap
+          class="mt-4"
+          ref="pagination"
+          @vuetable-pagination:change-page="onChangePage"
+        />
+      </b-colxx>
+    </b-row>
+  </div>
+</template>
+<script>
+import Vuetable from "vuetable-2/src/components/Vuetable";
+import { mapActions, mapGetters } from "vuex";
+import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
+import { adminRoot } from "../../../constants/config";
+import rating from "../../../components/Listing/rating.vue";
+import Switches from "vue-switches";
+import {
+  BIconExclamationCircleFill,
+  BIconGearFill,
+  BIconCircleFill,
+  BootstrapVueIcons,
+} from "bootstrap-vue";
 
-  export default {
-    components: {
-      vuetable: Vuetable,
-      "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
-      rating: rating
-    },
-    data() {
-      return {
-        isLoad: false,
-        sort: "",
-        page: 1,
-        perPage: 8,
-        search: "",
-        from: 0,
-        to: 0,
-        total: 0,
-        lastPage: 0,
-        items: [],
-        selectedItems: [],
-  
-        fields: [
-          {
-            name: "first_name",
-            sortField: "first_name",
-            title: "First Name",
-            titleClass: "",
-            dataClass: "list-item-heading",
-            width: "20%"
-          },
-          {
-            name: "last_name",
-            sortField: "last_name",
-            title: "Last Name",
-            titleClass: "",
-            dataClass: "list-item-heading",
-            width: "20%"
-          },
-          {
-            name: "phone_number",
-            title: "Telephone",
-            titleClass: "",
-            dataClass: "text-muted",
-            width: "15%"
-          },
-          {
-            name: "email",
-            title: "Email",
-            titleClass: "",
-            dataClass: "text-muted",
-            width: "15%"
-          },
-          {
-            name: "__slot:rating",
-            title: "Rating",
-            titleClass: "center aligned text-left",
-            dataClass: "center aligned text-left",
-            width: "20%"
-          },
-          {
-            name: "__slot:actions",
-            title: "",
-            titleClass: "center aligned text-right",
-            dataClass: "center aligned text-right",
-            width: "10%"
-          }
-        ]
-      };
-    },
-    created(){
-        this.get_deliveries();
-    },
-    methods: {
-        ...mapActions(['get_deliveries']),
-      rowClicked(dataItem, event) {
-        const itemId = dataItem.id;
-        if (event.shiftKey && this.selectedItems.length > 0) {
-          let itemsForToggle = this.items;
-          var start = this.getIndex(itemId, itemsForToggle, "id");
-          var end = this.getIndex(
-            this.selectedItems[this.selectedItems.length - 1],
-            itemsForToggle,
-            "id"
-          );
-          itemsForToggle = itemsForToggle.slice(
-            Math.min(start, end),
-            Math.max(start, end) + 1
-          );
-          this.selectedItems.push(
-            ...itemsForToggle.map(item => {
-              return item.id;
-            })
-          );
-          this.selectedItems = [...new Set(this.selectedItems)];
-        } else {
-          if (this.selectedItems.includes(itemId)) {
-            this.selectedItems = this.selectedItems.filter(x => x !== itemId);
-          } else this.selectedItems.push(itemId);
-        }
-      },
-   
-      onPaginationData(paginationData) {
-        this.from = paginationData.from;
-        this.to = paginationData.to;
-        this.total = paginationData.total;
-        this.lastPage = paginationData.last_page;
-        this.items = paginationData.data;
-        // this.$refs.pagination.setPaginationData(paginationData);
-      },
-      onChangePage(page) {
-      this.$refs.vuetable.changePage(page);
+export default {
+  components: {
+    vuetable: Vuetable,
+    "b-icon-gear-fill": BIconGearFill,
+    "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
+    rating: rating,
+    switches: Switches,
+  },
+  data() {
+    return {
+      isLoad: false,
+      sort: "",
+      page: 1,
+      perPage: 8,
+      search: "",
+      from: 0,
+      to: 0,
+      total: 0,
+      lastPage: 0,
+      items: [],
+      selectedItems: [],
+      pageSizes: [12, 18, 25],
+      fields: [
+        {
+          name: "first_name",
+          sortField: "first_name",
+          title: "First Name",
+          titleClass: "",
+          dataClass: "list-item-heading",
+          width: "15%",
         },
-  
-      changePageSize(perPage) {
-        this.perPage = perPage;
-      },
-  
-      searchChange(val) {
-        this.search = val;
-        this.$refs.vuetable.refresh();
-      },
-      open_details(id){
-        this.$router.push(`details/${id}`)
-        // this.$router.push({
-        // path: `${adminRoot}/delivery/details/${id}`,
-        // // query: { id: id }
-        // });
-      }
-     
-     
-      
-    },
-    computed: {
-      ...mapGetters(['_all_deliveries', '_delivery_paginations']),
-      isSelectedAll() {
-        return this.selectedItems.length >= this.items.length;
-      },
-      isAnyItemSelected() {
-        return (
-          this.selectedItems.length > 0 &&
-          this.selectedItems.length < this.items.length
+        {
+          name: "last_name",
+          sortField: "last_name",
+          title: "Last Name",
+          titleClass: "",
+          dataClass: "list-item-heading",
+          width: "15%",
+        },
+        {
+          name: "phone_number",
+          title: "Telephone",
+          titleClass: "",
+          dataClass: "text-muted",
+          width: "10%",
+        },
+        {
+          name: "email",
+          title: "Email",
+          titleClass: "",
+          dataClass: "text-muted",
+          width: "10%",
+        },
+        {
+          name: "__slot:pending",
+          title: "Pending Orders",
+          sortField: "pending",
+          titleClass: "center aligned text-left",
+          dataClass: "center aligned text-left",
+          width: "15%",
+        },
+        {
+          name: "__slot:status",
+          title: "Status",
+          sortField: "status",
+          titleClass: "center aligned text-left",
+          dataClass: "center aligned text-left",
+          width: "10%",
+        },
+        {
+          name: "__slot:rating",
+          title: "Rating",
+          sortField: "rating",
+          titleClass: "center aligned text-left",
+          dataClass: "center aligned text-left",
+          width: "15%",
+        },
+        {
+          name: "__slot:actions",
+          title: "",
+          titleClass: "center aligned text-right",
+          dataClass: "center aligned text-right",
+          width: "10%",
+        },
+      ],
+    };
+  },
+  created() {
+    this.get_deliveries({
+      order_dir: null,
+      keyword: null,
+      order_by: null,
+    });
+  },
+  methods: {
+    ...mapActions(["get_deliveries", "updateDliveryState"]),
+    rowClicked(dataItem, event) {
+      const itemId = dataItem.id;
+      if (event.shiftKey && this.selectedItems.length > 0) {
+        let itemsForToggle = this.items;
+        var start = this.getIndex(itemId, itemsForToggle, "id");
+        var end = this.getIndex(
+          this.selectedItems[this.selectedItems.length - 1],
+          itemsForToggle,
+          "id"
         );
+        itemsForToggle = itemsForToggle.slice(
+          Math.min(start, end),
+          Math.max(start, end) + 1
+        );
+        this.selectedItems.push(
+          ...itemsForToggle.map((item) => {
+            return item.id;
+          })
+        );
+        this.selectedItems = [...new Set(this.selectedItems)];
+      } else {
+        if (this.selectedItems.includes(itemId)) {
+          this.selectedItems = this.selectedItems.filter((x) => x !== itemId);
+        } else this.selectedItems.push(itemId);
       }
     },
-    watch: {
-        _all_deliveries: function(val){
-            console.log('all deliveries watcher', val)
-            this.$refs.vuetable.setData(val);
-        },
-        _delivery_paginations: function(val) {
-            this.perPage = val.per_page;
-            this.from = val.from;
-            this.to = val.to;
-            this.total = val.total;
-            // this.$refs.pagination.setPaginationData(val);
+    handleSwitchClick(item) {
+      console.log(item);
+      this.updateDliveryState({
+        item_id: item.id,
+        status: item.delivery_status ? 0 : 1,
+      });
+    },
+
+    onPaginationData(paginationData) {
+      this.from = paginationData.from;
+      this.to = paginationData.to;
+      this.total = paginationData.total;
+      this.lastPage = paginationData.last_page;
+      this.items = paginationData.data;
+      // this.$refs.pagination.setPaginationData(paginationData);
+    },
+    onChangePage(page) {
+      // this.$refs.vuetable.changePage(page);
+    },
+
+    changePageSize(perPage) {
+      this.perPage = perPage;
+    },
+
+    searchChange(val) {
+      this.search = val;
+      this.get_deliveries({
+        order_dir: null,
+        keyword: val,
+        order_by: null,
+      });
+    },
+    open_details(id) {
+      this.$router.push(`details/${id}`);
+      // this.$router.push({
+      // path: `${adminRoot}/delivery/details/${id}`,
+      // // query: { id: id }
+      // });
+    },
+    searchChange(val) {
+      this.search = val;
+      this.get_deliveries({
+        order_dir: null,
+        keyword: val,
+        order_by: null,
+      });
+    },
+    dataManager(sortOrder, pagination) {
+      console.log(sortOrder[0].direction);
+      if (sortOrder.length > 0) {
+        if (sortOrder[0].direction == "asc") {
+          this.get_deliveries({
+            order_dir: "ASC",
+            keyword: this.search,
+            order_by: sortOrder[0].sortField,
+          });
         }
-  
-    }
-  };
-  </script>
+        if (sortOrder[0].direction == "desc") {
+          this.get_deliveries({
+            order_dir: "DESC",
+            keyword: this.search,
+            order_by: sortOrder[0].sortField,
+          });
+        }
+      }
+    },
+  },
+  computed: {
+    ...mapGetters([
+      "_all_deliveries",
+      "_delivery_paginations",
+      "_changeDeliveryStatus",
+    ]),
+    isSelectedAll() {
+      return this.selectedItems.length >= this.items.length;
+    },
+    isAnyItemSelected() {
+      return (
+        this.selectedItems.length > 0 &&
+        this.selectedItems.length < this.items.length
+      );
+    },
+  },
+  watch: {
+    _all_deliveries: function (val) {
+      console.log("all deliveries watcher", val);
+      this.$refs.vuetable.setData(val);
+    },
+    _delivery_paginations: function (val) {
+      this.perPage = val.per_page;
+      this.from = val.from;
+      this.to = val.to;
+      this.total = val.total;
+      // this.$refs.pagination.setPaginationData(val);
+    },
+    _changeDeliveryStatus: function (val) {
+      console.log(val, val);
+      this.$notify(
+        "success",
+        "Delivery Status has been Updated Successfully",
+        null,
+        { duration: 5000, permanent: false }
+      );
+    },
+  },
+};
+</script>
 <style scoped>
-  .vuetable-body {
-    background-color: red;
+.vuetable-body {
+  background-color: red;
 }
 .rating {
-    display: inline-block;
-  }
-  
-  .star {
-    display: inline-block;
-    font-size: 1.5em;
-    cursor: pointer;
-  }
-  
-  .star:before {
-    content: '★';
-  }
-  
-  .filled {
-    color: gold;
-  }
-  </style>
-  
+  display: inline-block;
+}
+
+.star {
+  display: inline-block;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.star:before {
+  content: "★";
+}
+
+.filled {
+  color: gold;
+}
+.number-container-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #4caf50; /* green color */
+  padding: 5px;
+  border-radius: 20px;
+}
+.number-container-unactive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ce1a1a; /* green color */
+  padding: 5px;
+  border-radius: 20px;
+}
+
+.number {
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.pending {
+  font-weight: bold;
+}
+</style>

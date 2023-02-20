@@ -156,6 +156,13 @@ const data = [{
 
   },
   {
+    id: "Settings",
+    icon: "simple-icon-settings",
+    label: "Settings",
+    to: `${adminRoot}/settings`,
+    roles: [UserRole.superadmin, UserRole.admin]
+  },
+  {
     id: "reports",
     icon: "iconsminds-paper",
     label: "menu.reports",

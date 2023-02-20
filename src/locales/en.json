@@ -26,7 +26,7 @@
   "menu": {
     "reports": "Reports",
     "recipes": "Recipes",
-    "delivery":"Delivery",
+    "delivery": "Delivery",
     "settings": "Settings",
     "site": "Site",
     "rfqs": "RFQs",
@@ -549,6 +549,9 @@
     "order": "Order",
     "social": "Social",
     "site": "Site",
+    "nationality": "Nationality",
+    "job-title": "Job Title",
+    "num-of-points": "Num of points",
     "vat": "Vat",
     "minimum-order": "Minimum Order",
     "vat-registration-number": "Vat Registration Number",

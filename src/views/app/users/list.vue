@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!-- <div>
     <b-row>
       <b-colxx xxs="12">
         <b-row>
@@ -17,6 +17,13 @@
                     v-if="selected_tab_name == `${i.title}`"
                     :fieldsNames="fields"
                     :perPage="perPage"
+                    :show_heading="false"
+                    :page_size="page_size"
+                    @to="set_to"
+                    @from="set_from"
+                    @perPage="set_perPage"
+                    @total="set_total"
+                    :search_val="search_val"
                     :search="search"
                     :apiBase="`${apiBase}`"
                     :type="i.role"
@@ -34,7 +41,89 @@
         </b-row>
       </b-colxx>
     </b-row>
-  </div>
+  </div> -->
+  <b-row>
+    <b-colxx xxs="12">
+      <h1>USERS</h1>
+      <div class="top-right-button-container">
+        <b-button
+          variant="primary"
+          class="top-right-button"
+          @click="itemActions('reset')"
+          >{{ $t("pages.add-new") }}
+        </b-button>
+      </div>
+      <piaf-breadcrumb />
+      <div class="mb-2 mt-2">
+        <b-collapse id="displayOptions" class="d-md-block">
+          <div class="d-block d-md-inline-block pt-1">
+            <div class="search-sm d-inline-block float-md-left mr-1 align-top">
+              <b-input
+                :placeholder="$t('menu.search')"
+                @input="(val) => searchChange(val)"
+              />
+            </div>
+          </div>
+          <div class="float-md-right pt-1">
+            <span class="text-muted text-small mr-1 mb-2"
+              >{{ from }}-{{ to }} of {{ total }}</span
+            >
+            <b-dropdown
+              id="ddown2"
+              right
+              :text="`${perPage}`"
+              variant="outline-dark"
+              class="d-inline-block"
+              size="xs"
+            >
+              <b-dropdown-item
+                v-for="(size, index) in pageSizes"
+                :key="index"
+                @click="changePageSize(size)"
+                >{{ size }}
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
+        </b-collapse>
+      </div>
+      <b-tabs
+        nav-class="separator-tabs ml-0 mb-5"
+        content-class="tab-content"
+        :no-fade="true"
+      >
+        <b-tab
+          v-for="(i, index) in tabs"
+          :key="'tab-' + index"
+          :title="i.title"
+          :title-item-class="tabWidth + ' text-center font-weight-bold'"
+          @click="changeTab(i.title)"
+        >
+          <grid-body
+            v-if="selected_tab_name == `${i.title}`"
+            :fieldsNames="fields"
+            :perPage="perPage"
+            :page_size="page_size"
+            :show_heading="false"
+            :search="search"
+            :apiBase="`${apiBase}`"
+            :type="i.role"
+            :addRow="addRow"
+            :title="title"
+            :search_val="search_val"
+            :read="read"
+            @to="set_to"
+            @from="set_from"
+            @perPage="set_perPage"
+            @total="set_total"
+            :addNew="addNew"
+            :addEdit="addEdit"
+            :addDelete="addDelete"
+            :addMeta="false"
+          ></grid-body>
+        </b-tab>
+      </b-tabs>
+    </b-colxx>
+  </b-row>
 </template>
 
 <script>
@@ -55,10 +144,14 @@ export default {
   data() {
     return {
       isLoad: false,
+      read: null,
+      page_size: 12,
       apiBase: "users",
       sort: "",
+      pageSizes: [12, 18, 25],
       page: 1,
-      perPage: 3,
+      search_val: "",
+      perPage: 12,
       search: "",
       from: 0,
       to: 0,
@@ -128,6 +221,26 @@ export default {
     changeTab(val) {
       this.selected_tab_name = val;
     },
+    searchChange(val) {
+      this.search_val = val;
+      this.read = val;
+    },
+    set_to(val) {
+      this.to = val;
+    },
+    set_from(val) {
+      this.from = val;
+    },
+    set_perPage(val) {
+      this.perPage = val;
+    },
+    set_total(val) {
+      this.total = val;
+    },
+    changePageSize(val) {
+      this.page_size = val;
+    },
+    itemActions() {},
     // ...mapActions(["fetchSuperAdmin"]),
     // ...mapActions(["fetchAdmin"]),
     // ...mapActions(["fetchBranchAdmin"]),

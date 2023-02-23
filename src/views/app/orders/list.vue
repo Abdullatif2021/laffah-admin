@@ -181,6 +181,7 @@ import {
 Vue.use(BootstrapVueIcons);
 export default {
   name: "Orders",
+  props: ["search_val", "page_size"],
   components: {
     "divided-table": DividedTable,
     "update-order-status": UpdateOrderStatus,
@@ -489,6 +490,24 @@ export default {
       if (val !== oldVal) {
         this.loadStatusCount();
       }
+    },
+    perPage: function (perPage) {
+      this.$emit("perPage", perPage);
+    },
+    to: function (to) {
+      this.$emit("to", to);
+    },
+    from: function (from) {
+      this.$emit("from", from);
+    },
+    total: function (total) {
+      this.$emit("total", total);
+    },
+    search_val: function (val) {
+      this.searchChange(val);
+    },
+    page_size: function (val) {
+      this.changePageSize(val);
     },
   },
   async mounted() {

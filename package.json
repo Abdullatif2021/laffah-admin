@@ -9,7 +9,6 @@
         "build": "vue-cli-service build"
     },
     "dependencies": {
-
         "@glidejs/glide": "^3.4.1",
         "axios": "^0.20.0",
         "bootstrap-vue": "^2.15.0",
@@ -45,6 +44,7 @@
         "vue-switches": "^2.0.1",
         "vue-vanilla-datetime-picker": "^1.2.0",
         "vue-yandex-maps": "^0.10.8",
+        "vue2-datepicker": "^3.11.1",
         "vue2-dropzone": "^3.6.0",
         "vue2-google-maps": "^0.10.7",
         "vuedraggable": "^2.24.0",

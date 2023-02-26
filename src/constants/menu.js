@@ -1,28 +1,37 @@
-import {UserRole} from "@/utils/auth.roles";
-import {adminRoot} from "./config";
+import { UserRole } from "@/utils/auth.roles";
+import { adminRoot } from "./config";
 
-const data = [{
-  id: "dashboards",
-  icon: "iconsminds-shop-4",
-  label: "menu.dashboards",
-  to: `${adminRoot}/dashboards/default`,
-  roles: [UserRole.superadmin, UserRole.casher],
-},
+const data = [
+  {
+    id: "dashboards",
+    icon: "iconsminds-shop-4",
+    label: "menu.dashboards",
+    to: `${adminRoot}/dashboards/default`,
+    roles: [UserRole.superadmin, UserRole.casher],
+  },
   {
     id: "all-orders",
     icon: "iconsminds-cash-register-2",
     label: "menu.new-orders",
     to: `${adminRoot}/all-orders`,
-    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher],
-
+    roles: [
+      UserRole.superadmin,
+      UserRole.admin,
+      UserRole.branchadmin,
+      UserRole.casher,
+    ],
   },
   {
     id: "orders",
     icon: "iconsminds-money-bag",
     label: "menu.orders",
     to: `${adminRoot}/orders`,
-    roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin, UserRole.casher],
-
+    roles: [
+      UserRole.superadmin,
+      UserRole.admin,
+      UserRole.branchadmin,
+      UserRole.casher,
+    ],
   },
   {
     id: "Delivery",
@@ -30,6 +39,13 @@ const data = [{
     label: "Delivery",
     to: `${adminRoot}/delivery`,
     roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin],
+  },
+  {
+    id: "Coupon",
+    icon: "iconsminds-gift-box",
+    label: "Coupon",
+    to: `${adminRoot}/coupon`,
+    roles: [UserRole.superadmin, UserRole.admin],
   },
   {
     id: "items",
@@ -103,7 +119,7 @@ const data = [{
         //     },
         // ]
       },
-    ]
+    ],
   },
   {
     id: "Blocks",
@@ -111,7 +127,6 @@ const data = [{
     label: "menu.blocks",
     to: `${adminRoot}/blocks`,
     roles: [UserRole.superadmin, UserRole.admin],
-
   },
   {
     id: "branches",
@@ -119,7 +134,6 @@ const data = [{
     label: "menu.branches",
     to: `${adminRoot}/branches`,
     roles: [UserRole.superadmin],
-
   },
 
   {
@@ -128,7 +142,6 @@ const data = [{
     label: "menu.users",
     to: `${adminRoot}/users`,
     roles: [UserRole.superadmin, UserRole.admin],
-
   },
   {
     id: "careers",
@@ -136,7 +149,6 @@ const data = [{
     label: "menu.careers",
     to: `${adminRoot}/careers`,
     roles: [UserRole.superadmin, UserRole.admin],
-
   },
 
   {
@@ -145,7 +157,6 @@ const data = [{
     label: "menu.page",
     to: `${adminRoot}/page`,
     roles: [UserRole.superadmin, UserRole.admin],
-
   },
   {
     id: "areas",
@@ -153,14 +164,13 @@ const data = [{
     label: "menu.areas",
     to: `${adminRoot}/areas`,
     roles: [UserRole.superadmin, UserRole.admin],
-
   },
   {
     id: "Settings",
     icon: "simple-icon-settings",
     label: "Settings",
     to: `${adminRoot}/settings`,
-    roles: [UserRole.superadmin, UserRole.admin]
+    roles: [UserRole.superadmin, UserRole.admin],
   },
   {
     id: "reports",
@@ -168,7 +178,6 @@ const data = [{
     label: "menu.reports",
     to: `${adminRoot}/reports`,
     roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin],
-
   },
   /*{
       id: "pages",

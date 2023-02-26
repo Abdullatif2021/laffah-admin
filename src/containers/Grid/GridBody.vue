@@ -507,9 +507,7 @@ export default {
     search_val: {
       type: String,
     },
-    page_size: {
-      type: Number,
-    },
+    page_size: {},
   },
   components: {
     vuetable: Vuetable,

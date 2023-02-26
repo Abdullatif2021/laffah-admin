@@ -15,7 +15,7 @@
                 />
               </div>
             </div>
-            <div class="float-md-right pt-1">
+            <!-- <div class="float-md-right pt-1">
               <span class="text-muted text-small mr-1 mb-2"
                 >{{ from }}-{{ to }} of {{ total }}</span
               >
@@ -34,7 +34,7 @@
                   >{{ size }}</b-dropdown-item
                 >
               </b-dropdown>
-            </div>
+            </div> -->
           </b-collapse>
         </div>
         <div class="separator mb-5"></div>
@@ -122,11 +122,11 @@
             </b-row>
           </template>
         </vuetable>
-        <vuetable-pagination-bootstrap
+        <!-- <vuetable-pagination-bootstrap
           class="mt-4"
           ref="pagination"
           @vuetable-pagination:change-page="onChangePage"
-        />
+        /> -->
       </b-colxx>
     </b-row>
   </div>
@@ -158,7 +158,7 @@ export default {
       isLoad: false,
       sort: "",
       page: 1,
-      perPage: 8,
+      perPage: 12,
       search: "",
       from: 0,
       to: 0,
@@ -284,13 +284,19 @@ export default {
       // this.$refs.pagination.setPaginationData(paginationData);
     },
     onChangePage(page) {
-      // this.$refs.vuetable.changePage(page);
+      this.page = page;
+      this.$refs.vuetable.changePage(page);
     },
 
     changePageSize(perPage) {
       this.perPage = perPage;
     },
-
+    calculatePagination() {
+      this.from = (this.page - 1) * this.perPage + 1;
+      let tempTo = this.from + this.perPage - 1;
+      this.to = tempTo <= this.total ? tempTo : this.total;
+      this.lastPage = Number((this.total / this.perPage).toFixed(0));
+    },
     searchChange(val) {
       this.search = val;
       this.get_deliveries({
@@ -315,23 +321,62 @@ export default {
       });
     },
     dataManager(sortOrder, pagination) {
-      console.log(sortOrder[0].direction);
-      if (sortOrder.length > 0) {
-        if (sortOrder[0].direction == "asc") {
-          this.get_deliveries({
-            order_dir: "ASC",
-            keyword: this.search,
-            order_by: sortOrder[0].sortField,
-          });
-        }
-        if (sortOrder[0].direction == "desc") {
-          this.get_deliveries({
-            order_dir: "DESC",
-            keyword: this.search,
-            order_by: sortOrder[0].sortField,
-          });
-        }
-      }
+      // console.log("RRR", this.data)
+      let local = this.data;
+      // console.log(local, 'ddddd')
+      // if (this.search) {
+      //   //console.log(this.search, 'ssssss')
+      //   // the text should be case insensitive
+      //   let txt = new RegExp(this.search, "i");
+      //   let dataFields = this.fieldsNames
+      //     .map(function (el) {
+      //       return el.name;
+      //     })
+      //     .filter(function (e) {
+      //       return e.search("slot") < 0;
+      //     });
+      //   local = _.filter(this.data, function (item) {
+      //     for (let i = 0; i < dataFields.length; i++) {
+      //       if (dataFields[i] != undefined) {
+      //         let x;
+      //         eval("x=item." + dataFields[i]);
+      //         if (x != null && x != 1) {
+      //           try {
+      //             if (x.search(txt) >= 0) {
+      //               // console.log(x)
+      //               return true;
+      //             }
+      //           } catch (err) {}
+      //         }
+      //       }
+      //     }
+      //   });
+      //   // local = _.filter(this.data, function (item) {
+      //   //  console.log(item.locales.en.name.search(txt));
+      //   //   return item.locales.en.name.search(txt) >= 0
+      //   // })
+      // }
+      // sortOrder can be empty, so we have to check for that as well
+      // if (sortOrder.length > 0) {
+      //   // console.log("orderBy:", sortOrder[0].sortField, sortOrder[0].direction);
+      //   local = _.orderBy(
+      //     local,
+      //     sortOrder[0].sortField,
+      //     sortOrder[0].direction
+      //   );
+      // }
+
+      pagination = this.$refs.vuetable.makePagination(
+        local.length,
+        this.perPage
+      );
+      console.log("pagination:", pagination);
+      let from = pagination.from - 1;
+      let to = from + this.perPage;
+      return {
+        pagination: pagination,
+        data: _.slice(local, from, to),
+      };
     },
   },
   computed: {
@@ -360,6 +405,7 @@ export default {
       this.from = val.from;
       this.to = val.to;
       this.total = val.total;
+      this.calculatePagination();
       // this.$refs.pagination.setPaginationData(val);
     },
     _changeDeliveryStatus: function (val) {

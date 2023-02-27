@@ -10,7 +10,7 @@
       @submit.prevent="onValidateCategoryFormFormSubmit"
       class="av-tooltip tooltip-label-bottom"
     >
-      <b-form-group
+      <!-- <b-form-group
         v-if="batches"
         v-for="(city,index) in cities"
         :label="`${city.locales[$i18n.locale].name} >> Branches:`" v-slot="{ ariaDescribedby }">
@@ -31,27 +31,24 @@
             {{ batch.branch.locales[$i18n.locale].name }}
           </b-form-checkbox>
         </b-form-checkbox-group>
-      </b-form-group>
-
+      </b-form-group> -->
     </b-form>
-
   </b-modal>
 </template>
 
 <script>
 import "vue-select/dist/vue-select.css";
-import {BFormGroup} from 'bootstrap-vue'
-import {mapGetters} from 'vuex';
-import {apiUrl} from "@/constants/config";
-import axios from 'axios'
-import {decrypt} from '../../../utils';
-
+import { BFormGroup } from "bootstrap-vue";
+import { mapGetters } from "vuex";
+import { apiUrl } from "@/constants/config";
+import axios from "axios";
+import { decrypt } from "../../../utils";
 
 export default {
   components: {
     "b-from-group": BFormGroup,
   },
-  props: ["attributes",],
+  props: ["attributes"],
   data() {
     return {
       visibleState: "visible",
@@ -65,53 +62,50 @@ export default {
     };
   },
   mounted() {
-    this.$store.dispatch('fetchCities')
+    this.$store.dispatch("fetchCities");
   },
   computed: {
     ...mapGetters({
-      cities: 'getCities',
+      cities: "getCities",
     }),
-    ...mapGetters('item', {
-      batches: 'getItemBatchBranches',
-      item: 'getItem'
+    ...mapGetters("item", {
+      batches: "getItemBatchBranches",
+      item: "getItem",
     }),
   },
   methods: {
     async changeActiveState(id) {
-      let active = 0
-      active = this.selected.indexOf(id) > -1 ? 1 : 0
-      console.log(active)
+      let active = 0;
+      active = this.selected.indexOf(id) > -1 ? 1 : 0;
+      console.log(active);
       await axios
         .put(`${apiUrl}item_batch_branches/${this.item.id}/${id}/${active}`)
-        .then(response => {
-          console.log(response.data)
-          return response.data
+        .then((response) => {
+          console.log(response.data);
+          return response.data;
         })
-        .catch(error => console.log(error))
-    }
+        .catch((error) => console.log(error));
+    },
   },
   onValidateCategoryFormFormSubmit: function () {
-    console.log('form submit')
+    console.log("form submit");
   },
   hideModal(refname) {
     this.$refs[refname].hide();
   },
   watch: {
-    'batches':
-      {
-        handler: function (batches) {
-          this.selected = batches.map((batch, index) => {
-            if (batch.active === 1) {
-              console.log(batch.active)
-              return batch.branch_id
-            }
-          })
-        }
-        ,
-        deep: true,
-        immediate: true
+    batches: {
+      handler: function (batches) {
+        this.selected = batches.map((batch, index) => {
+          if (batch.active === 1) {
+            console.log(batch.active);
+            return batch.branch_id;
+          }
+        });
       },
-  }
-}
-;
+      deep: true,
+      immediate: true,
+    },
+  },
+};
 </script>

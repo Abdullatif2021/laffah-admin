@@ -3,12 +3,14 @@ import { apiUrl } from "../../constants/config";
 
 const state = {
   coupons: null,
+  coupon: null,
   users: null,
   createCoupon: null,
 };
 
 const getters = {
   coupons: (state) => state.coupons,
+  _coupon: (state) => state.coupon,
   _users: (state) => state.users,
   _createCoupon: (state) => state.createCoupon,
 };
@@ -18,6 +20,9 @@ const mutations = {
     console.log("and herre i am", payload);
     state.coupons = payload;
     console.log("and herre i am", state.coupons);
+  },
+  coupon(state, payload) {
+    state.coupon = payload;
   },
   user_list(state, payload) {
     state.users = payload;
@@ -43,6 +48,22 @@ const actions = {
         console.log(error);
       });
   },
+  getCoupon({ commit, dispatch }, payload) {
+    const id = payload.coupon_id;
+    return Axios.get(
+      `https://api-v2.laffahrestaurants.com/public/api/promocode/${id}`
+    )
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          console.log("here i am");
+          commit("coupon", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
   createCoupon({ commit }, payload) {
     const formData = new FormData();
     Object.entries(payload).forEach((entry) => {
@@ -54,6 +75,30 @@ const actions = {
 
     return Axios.post(
       `https://api-v2.laffahrestaurants.com/public/api/promocode`,
+      formData,
+      {}
+    )
+      .then((res) => {
+        if (res.status === 201) {
+          commit("createCouponSuccessfuly", res);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+  updateCoupon({ commit }, payload) {
+    const id = payload.coupon_id;
+    const formData = new FormData();
+    Object.entries(payload).forEach((entry) => {
+      const [key, value] = entry;
+      if (value != null) {
+        formData.append(key, value);
+      }
+    });
+
+    return Axios.put(
+      `https://api-v2.laffahrestaurants.com/public/api/promocode/${id}`,
       formData,
       {}
     )

@@ -13,6 +13,9 @@
         <b-card class="mb-4 auction_card" title="Type">
           <b-form>
             <b-row>
+              <b-colxx v-if="coupon_id" class="code_container" sm="12">
+                <h3 class="code">{{ code }}</h3>
+              </b-colxx>
               <b-colxx class="flex" sm="12">
                 <b-form-group label="Coupon Type" class="error-l-150">
                   <b-form-checkbox-group v-model.trim="$v.couponType.$model">
@@ -117,7 +120,14 @@
                 </b-form-group>
               </b-colxx>
               <b-colxx sm="12">
-                <b-form-group class="form-group-label" label="User">
+                <b-form-group
+                  class="form-group-label"
+                  :label="
+                    coupon_id && show_user
+                      ? `User : ${user.first_name} ${user.last_name}, Email:  ${user.email}, Phone number: ${user.phone_number}`
+                      : 'User'
+                  "
+                >
                   <v-select
                     label="name"
                     :filterable="false"
@@ -151,6 +161,7 @@
             <b-button
               @click="onValitadeFormSubmit"
               type="submit"
+              :disabled="enable_submit"
               variant="primary"
               class="mt-4"
               >{{ $t("forms.submit") }}</b-button
@@ -206,6 +217,7 @@ export default {
       name: "",
       endDateSelected: false,
       startDateSelected: false,
+      code: null,
       enablevalidateForm1: false,
       discount: "",
       select: "",
@@ -214,6 +226,8 @@ export default {
       end_date: null,
       coupon_id: null,
       max_discount: null,
+      enable_submit: false,
+      show_user: true,
       detail: "",
       customRadio: "",
       usages_left: "",
@@ -253,25 +267,45 @@ export default {
     this.getUserList();
     this.coupon_id = this.$route.query.id;
     console.log(this.coupon_id);
+    this.coupon_id ? this.getCoupon({ coupon_id: this.$route.query.id }) : "";
   },
   methods: {
-    ...mapActions(["getUserList", "createCoupon"]),
+    ...mapActions(["getUserList", "createCoupon", "getCoupon", "updateCoupon"]),
     onValitadeFormSubmit() {
-      console.log(this.user?.id);
       this.$v.$touch();
       this.date_check();
-      console.log(this.start_date, this.end_date);
       if (this.enablevalidateForm1) {
-        console.log(this.start_date, this.end_date);
-        this.createCoupon({
-          discount: this.discount,
-          max_discount: this.max_discount,
-          user_id: this.user?.id,
-          usages_left: this.usages_left,
-          type: this.couponType,
-          expire_date: this.end_date,
-          start_date: this.start_date,
-        });
+        if (this.coupon_id) {
+          if (this.start_date < new Date()) {
+            this.$notify(
+              "error",
+              "You Cannot update this coupon anymore",
+              "because it has started working",
+              { duration: 4000, permanent: false }
+            );
+          } else {
+            this.updateCoupon({
+              coupon_id: this.coupon_id,
+              discount: this.discount,
+              max_discount: this.max_discount,
+              user_id: this.user?.id,
+              usages_left: this.usages_left,
+              type: this.couponType,
+              expire_date: this.end_date,
+              start_date: this.start_date,
+            });
+          }
+        } else {
+          this.createCoupon({
+            discount: this.discount,
+            max_discount: this.max_discount,
+            user_id: this.user?.id,
+            usages_left: this.usages_left,
+            type: this.couponType,
+            expire_date: this.end_date,
+            start_date: this.start_date,
+          });
+        }
       }
     },
 
@@ -309,14 +343,21 @@ export default {
       }
     },
     fetchOptions(search, loading) {
+      console.log("Loading", loading);
       loading(true);
+      this.enable_submit = true;
+      this.show_user = false;
       setTimeout(() => {
         return Axios.get(
           `https://api-v2.laffahrestaurants.com/public/api/users?role=user&keyword=${search}`
         ).then((res) => {
           console.log(res);
+          this.enable_submit = false;
           this.vueSelectOptions = res.data.data.map((x) => {
-            return { name: `${x.first_name} ${x.last_name}`, id: x.id };
+            return {
+              name: `Name: ${x.first_name} ${x.last_name}, Email: ${x.email}, Phone Number: ${x.phone_number}`,
+              id: x.id,
+            };
           });
 
           loading(false);
@@ -325,11 +366,25 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["_users", "_createCoupon"]),
+    ...mapGetters(["_users", "_createCoupon", "_coupon"]),
   },
   watch: {
     couponType: function (val) {
       console.log(val);
+    },
+    _coupon: function (val) {
+      this.start_date = val.start_date;
+      const date = new Date(val.expired_at);
+      const dateStr = date.toISOString().slice(0, 10);
+      const timeStr = date.toISOString().slice(11, 19);
+      this.end_date = `${dateStr} ${timeStr}`;
+      this.discount = val.details.discount;
+      console.log(this.discount);
+      this.max_discount = val.details.max_discount;
+      this.couponType = val.type;
+      this.usages_left = val.usages_left;
+      this.code = val.code;
+      this.user = val.user;
     },
     _createCoupon: function (val) {
       this.$router.push(`${adminRoot}/coupon`);
@@ -366,5 +421,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.code_container {
+  position: absolute;
+  top: -24px;
+  left: 1px;
+  padding: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.code {
+  background: white;
+  padding: 19px;
+  border-radius: 34px;
+  border: 1px solid #a0a1a4;
 }
 </style>

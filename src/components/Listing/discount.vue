@@ -1,10 +1,6 @@
 <template>
   <div class="rating">
-    <span
-      v-for="n in 5"
-      :key="n"
-      :class="['star', n <= value ? 'filled' : '']"
-    ></span>
+    <span class="points">{{ value }}</span> <span class="text">Point</span>
   </div>
 </template>
 
@@ -31,18 +27,12 @@ export default {
 .rating {
   display: inline-block;
 }
-
-.star {
-  display: inline-block;
-  font-size: 1.5em;
-  cursor: pointer;
+.points {
+  font-size: 23px;
+  color: #f7bb07;
+  font-weight: bold;
 }
-
-.star:before {
-  content: "★";
-}
-
-.filled {
-  color: gold;
+.text {
+  font-size: 15px;
 }
 </style>

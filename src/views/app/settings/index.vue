@@ -1,12 +1,19 @@
 <template>
   <b-row>
     <b-colxx xxs="12">
-      <piaf-breadcrumb :heading="$t('menu.settings-list')" />
+      <piaf-breadcrumb heading="Settings List" />
       <div class="separator mb-5"></div>
     </b-colxx>
     <template v-if="!isLoadSettings">
-      <b-colxx xxs="6" v-for="item in settings" :key="item.id">
-        <b-card class="mb-4" :title="item.key">
+      <b-colxx xxs="6" v-for="item in settings_list" :key="item.id">
+        <b-card
+          class="mb-4 auction_card"
+          :title="
+            item.key == 'OrderCreated'
+              ? 'when order created then earns points'
+              : item.key
+          "
+        >
           <b-form>
             <b-row>
               <b-colxx xxs="12">
@@ -21,7 +28,7 @@
         </b-card>
       </b-colxx>
       <b-colxx xxs="12">
-        <b-card v-if="!isLoadSettings" class="mb-4">
+        <b-card v-if="!isLoadSettings" class="mb-4 auction_card">
           <b-form>
             <b-row>
               <b-colxx
@@ -60,6 +67,7 @@ export default {
   data() {
     return {
       items: [],
+      settings_list: null,
     };
   },
   methods: {
@@ -84,6 +92,16 @@ export default {
     ...mapGetters(["settings", "isLoadSettings", "updatedSuccessfuly"]),
   },
   watch: {
+    settings: function (val) {
+      this.settings_list = val.map((el) => {
+        return {
+          key: el.key == 20 ? "Every 20 points equals: " : el.key,
+          value: el.value,
+          id: el.id,
+        };
+      });
+      console.log("reerrerereer", this.settings_list);
+    },
     updatedSuccessfuly() {
       this.$notify(
         "success",
@@ -96,3 +114,14 @@ export default {
   destroyed() {},
 };
 </script>
+<style scoped>
+.auction_card {
+  border-radius: 24px;
+  background: linear-gradient(
+    109.6deg,
+    rgb(255, 255, 255) 30.1%,
+    rgb(243, 244, 248) 100.2%
+  );
+  /* // box-shadow: 3px 3px rgb(79, 78, 78), 3px 3px rgb(84, 84, 84); */
+}
+</style>

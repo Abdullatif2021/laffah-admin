@@ -25,7 +25,7 @@
                 />
               </div>
             </div>
-            <div class="float-md-right pt-1">
+            <!-- <div class="float-md-right pt-1">
               <span class="text-muted text-small mr-1 mb-2"
                 >{{ from }}-{{ to }} of {{ total }}</span
               >
@@ -44,7 +44,7 @@
                   >{{ size }}</b-dropdown-item
                 >
               </b-dropdown>
-            </div>
+            </div> -->
           </b-collapse>
         </div>
         <div class="separator mb-5" />
@@ -122,7 +122,7 @@ export default {
         },
         {
           name: "details",
-          sortField: "discount",
+          // sortField: "discount",
           title: "Discount",
           titleClass: "",
           dataClass: "text-muted",
@@ -143,7 +143,7 @@ export default {
         },
         {
           name: "type",
-          sortField: "type",
+          // sortField: "type",
           title: "Type",
           titleClass: "",
           dataClass: "text-muted",
@@ -151,7 +151,7 @@ export default {
         },
         {
           name: "usages_left",
-          sortField: "usages_left",
+          // sortField: "usages_left",
           title: "Usage left",
           titleClass: "",
           dataClass: "text-muted",
@@ -168,7 +168,9 @@ export default {
     };
   },
   created() {
-    this.getCoupons();
+    this.getCoupons({
+      keyword: null,
+    });
   },
   methods: {
     ...mapActions(["getCoupons"]),
@@ -256,7 +258,9 @@ export default {
 
     searchChange(val) {
       this.search = val;
-      this.$refs.vuetable.refresh();
+      this.getCoupons({
+        keyword: val,
+      });
     },
 
     selectAll(isToggle) {

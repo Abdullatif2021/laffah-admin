@@ -5,15 +5,15 @@ const state = {
   paginations: null,
   settings: null,
   updatedSuccessfuly: false,
-  Error: ""
+  Error: "",
 };
 
 const getters = {
-  isLoadSettings: state => state.isLoadSettings,
-  Error: state => state.Error,
-  paginations: state => state.paginations,
-  settings: state => state.settings,
-  updatedSuccessfuly: state => state.updatedSuccessfuly
+  isLoadSettings: (state) => state.isLoadSettings,
+  Error: (state) => state.Error,
+  paginations: (state) => state.paginations,
+  settings: (state) => state.settings,
+  updatedSuccessfuly: (state) => state.updatedSuccessfuly,
 };
 
 const mutations = {
@@ -32,15 +32,17 @@ const mutations = {
     state.isLoadSettings = false;
     state.Error = error;
     state.settings = null;
-  }
+  },
 };
 
 const actions = {
   getSettings({ commit }, payload) {
     commit("getSettingsStarted");
-    
-    axios.get(`${apiUrl}setting`).then(res => res.data)
-      .then(res => {
+
+    axios
+      .get(`${apiUrl}setting`)
+      .then((res) => res.data)
+      .then((res) => {
         if (res.status) {
           commit("getSettingsSuccess", res.data);
         } else {
@@ -51,17 +53,17 @@ const actions = {
   updateSettings({ commit }, payload) {
     const id = payload.id;
     const value = payload.value;
-    axios.put(`${apiUrl}setting/${id}`,{value: value},{}).then(res => {
-        if (res.status === 200) {
-          commit("updatedSuccessfuly");
-        }
-      });
-  }
+    axios.put(`${apiUrl}setting/${id}`, { value: value }, {}).then((res) => {
+      if (res.status === 200) {
+        commit("updatedSuccessfuly");
+      }
+    });
+  },
 };
 
 export default {
   state,
   getters,
   mutations,
-  actions
+  actions,
 };

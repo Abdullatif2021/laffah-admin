@@ -34,8 +34,12 @@ const mutations = {
 
 const actions = {
   getCoupons({ commit, dispatch }, payload) {
+    const params = {
+      keyword: payload?.keyword,
+    };
     return Axios.get(
-      `https://api-v2.laffahrestaurants.com/public/api/promocode`
+      `https://api-v2.laffahrestaurants.com/public/api/promocode`,
+      { params }
     )
       .then((res) => {
         console.log(res);

@@ -17,7 +17,7 @@
                     v-if="selected_tab_name == `${i.title}`"
                     :fieldsNames="fields"
                     :perPage="perPage"
-                    :show_heading="false"
+                    :show_heading="true"
                     :page_size="page_size"
                     @to="set_to"
                     @from="set_from"
@@ -46,12 +46,14 @@
     <b-colxx xxs="12">
       <h1>USERS</h1>
       <div class="top-right-button-container">
-        <b-button
-          variant="primary"
-          class="top-right-button"
-          @click="itemActions('reset')"
-          >{{ $t("pages.add-new") }}
-        </b-button>
+        <router-link
+          v-if="addNew && !apiBase.includes('customization')"
+          ref="link"
+          :to="addRow"
+          class="btn top-right-button btn-primary btn-lg"
+        >
+          {{ $t("pages.add-new") }}
+        </router-link>
       </div>
       <piaf-breadcrumb />
       <div class="mb-2 mt-2">
@@ -220,6 +222,10 @@ export default {
   methods: {
     changeTab(val) {
       this.selected_tab_name = val;
+    },
+    addNewUsr() {
+      console.log("selected_");
+      this.addNew = !this.addNew;
     },
     searchChange(val) {
       this.search_val = val;

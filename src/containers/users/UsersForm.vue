@@ -263,33 +263,33 @@
                     <b-colxx xxs="12">
                       <b-card class="mb-4">
                         <div
-                          v-for="(item, index) in items"
+                          v-for="(item, index) in _userPoints"
                           :key="index"
-                          :class="{ 'mb-3': items.length != index + 1 }"
+                          :class="{ 'mb-3': _userPoints.length != index + 1 }"
                         >
                           <router-link
-                            :to="`#${item.id}`"
+                            :to="`${adminRoot}/orders/details/${item.order_id}`"
                             class="w-40 w-sm-100"
                           >
                             <p class="list-item-heading mb-1 color-theme-1">
-                              Order Product Name (reffer to the order details)
+                              Order Details
                             </p>
                             <p class="mb-1 text-muted text-small">
-                              Branch Name | Num of Points
+                              Num of Points : {{ item.point }}
                             </p>
                             <!-- <p class="mb-4 text-small">
                               {{ item.description }}
                             </p> -->
                           </router-link>
-                          <div
+                          <!-- <div
                             class="separator mb-5"
-                            v-if="items.length != index + 1"
-                          ></div>
+                            v-if="_userPoints.length != index + 1"
+                          ></div> -->
                         </div>
                       </b-card>
                     </b-colxx>
                     <b-colxx xxs="12" class="mt-3">
-                      <b-pagination-nav
+                      <!-- <b-pagination-nav
                         class="justify-content-center pagination"
                         :number-of-pages="totalPage"
                         :link-gen="linkGen"
@@ -309,7 +309,7 @@
                         <template v-slot:last-text>
                           <i class="simple-icon-control-end" />
                         </template>
-                      </b-pagination-nav>
+                      </b-pagination-nav> -->
                     </b-colxx>
                   </b-row>
                 </b-colxx>
@@ -605,7 +605,6 @@ import Datepicker from "vuejs-datepicker";
 import { barChartOptions } from "../../components/Charts/config";
 import { defaultDirection } from "../../constants/config";
 import { BIconArrowDownSquareFill } from "bootstrap-vue";
-import items from "../../data/products";
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
@@ -613,6 +612,7 @@ import { quillEditor } from "vue-quill-editor";
 import ThumbnailImage from "../../components/Cards/ThumbnailImage";
 import Switches from "vue-switches";
 import { mapGetters, mapActions } from "vuex";
+import { adminRoot } from "../../constants/config";
 
 const { required, maxLength, integer } = require("vuelidate/lib/validators");
 export default {
@@ -657,8 +657,9 @@ export default {
       required: null,
       isfile: false,
       currentPage: 1,
+      adminRoot: adminRoot,
       totalPage: 4,
-      items,
+      points: null,
       fileUrl: "",
       editable: false,
       toggleState: true,
@@ -720,6 +721,7 @@ export default {
     },
     _userPoints: function (val) {
       console.log("point: ", val);
+      this.points = val;
     },
   },
   computed: {

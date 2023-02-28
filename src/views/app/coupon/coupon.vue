@@ -10,160 +10,267 @@
     </b-row>
     <b-row>
       <b-colxx xxs="12">
-        <b-card class="mb-4 auction_card" title="Type">
-          <b-form>
-            <b-row>
-              <b-colxx v-if="coupon_id" class="code_container" sm="12">
-                <h3 class="code">{{ code }}</h3>
-              </b-colxx>
-              <b-colxx class="flex" sm="12">
-                <b-form-group label="Coupon Type" class="error-l-150">
-                  <b-form-checkbox-group v-model.trim="$v.couponType.$model">
-                    <b-form-checkbox value="percent"
-                      >Percentage</b-form-checkbox
-                    >
-                    <b-form-checkbox value="fixprice">Discount</b-form-checkbox>
-                  </b-form-checkbox-group>
-                  <b-form-invalid-feedback
-                    class="d-block"
-                    v-if="!$v.couponType.required && $v.couponType.$dirty"
-                    >Please select Type!</b-form-invalid-feedback
-                  >
-                </b-form-group>
-              </b-colxx>
-              <b-colxx sm="6">
-                <b-form-group class="form-group-label" label="Type Value">
-                  <b-input-group
-                    class="mb-3"
-                    :append="couponType == 'fixprice' ? '$' : '%'"
-                  >
-                    <b-form-input
-                      type="number"
-                      v-model.trim="$v.discount.$model"
-                      :state="!$v.discount.$error"
-                    />
-                    <b-form-invalid-feedback
-                      >Please enter the value!</b-form-invalid-feedback
-                    >
-                  </b-input-group>
-                </b-form-group>
-              </b-colxx>
+        <b-row>
+          <b-colxx xxs="6">
+            <b-card class="mb-4 auction_card" title="TYPE">
+              <b-form>
+                <b-row>
+                  <b-colxx v-if="coupon_id" class="code_container" sm="12">
+                    <h3 class="code">{{ code }}</h3>
+                  </b-colxx>
+                  <b-colxx class="flex" sm="12">
+                    <b-form-group label="Coupon Type" class="error-l-150">
+                      <b-form-checkbox-group
+                        v-model.trim="$v.couponType.$model"
+                      >
+                        <b-form-checkbox value="percent"
+                          >Percentage</b-form-checkbox
+                        >
+                        <b-form-checkbox value="fixprice"
+                          >Discount</b-form-checkbox
+                        >
+                      </b-form-checkbox-group>
+                      <b-form-invalid-feedback
+                        class="d-block"
+                        v-if="!$v.couponType.required && $v.couponType.$dirty"
+                        >Please select Type!</b-form-invalid-feedback
+                      >
+                    </b-form-group>
+                  </b-colxx>
+                  <b-colxx sm="6">
+                    <b-form-group class="form-group-label" label="Type Value">
+                      <b-input-group
+                        class="mb-3"
+                        :append="couponType == 'fixprice' ? '$' : '%'"
+                      >
+                        <b-form-input
+                          type="number"
+                          v-model.trim="$v.discount.$model"
+                          :state="!$v.discount.$error"
+                        />
+                        <b-form-invalid-feedback
+                          >Please enter the value!</b-form-invalid-feedback
+                        >
+                      </b-input-group>
+                    </b-form-group>
+                  </b-colxx>
 
-              <b-colxx v-if="couponType == 'percent'" sm="6">
-                <b-form-group class="form-group-label" label="Max Discount">
-                  <b-form-input
-                    type="number"
-                    v-model.trim="$v.max_discount.$model"
-                  />
-                </b-form-group>
-              </b-colxx>
-            </b-row> </b-form
-        ></b-card>
-        <b-card class="mb-4 auction_card" title="Date">
-          <b-form>
-            <b-row>
-              <b-colxx sm="6">
-                <b-form-group class="form-group-label" label="Start Date">
-                  <datepicker
-                    style="width: 100%"
-                    type="datetime"
-                    :disabled-date="disableDate"
-                    value-type="YYYY-MM-DD HH:mm:ss"
-                    v-model="$v.start_date.$model"
-                    @change="selectedDate('start')"
-                  ></datepicker>
+                  <b-colxx v-if="couponType == 'percent'" sm="6">
+                    <b-form-group class="form-group-label" label="Max Discount">
+                      <b-form-input
+                        type="number"
+                        v-model.trim="$v.max_discount.$model"
+                      />
+                    </b-form-group>
+                  </b-colxx>
+                </b-row> </b-form
+            ></b-card>
+          </b-colxx>
+          <b-colxx xxs="6">
+            <b-card class="mb-4 auction_card" title="DATE">
+              <b-form>
+                <b-row style="height: 155px">
+                  <b-colxx sm="6">
+                    <b-form-group class="form-group-label" label="Start Date">
+                      <datepicker
+                        style="width: 100%"
+                        type="datetime"
+                        :disabled-date="disableDate"
+                        value-type="YYYY-MM-DD HH:mm:ss"
+                        v-model="$v.start_date.$model"
+                        @change="selectedDate('start')"
+                      ></datepicker>
 
-                  <div
-                    :class="{
-                      'invalid-feedback': true,
-                      'd-block':
-                        $v.start_date.$error && !$v.start_date.required,
-                    }"
-                  >
-                    Start Date is required
-                  </div>
-                </b-form-group>
-              </b-colxx>
-              <b-colxx sm="6">
-                <b-form-group class="form-group-label" label="Expired Date">
-                  <datepicker
-                    style="width: 100%"
-                    type="datetime"
-                    :disabled-date="disableDate"
-                    value-type="YYYY-MM-DD HH:mm:ss"
-                    v-model="$v.end_date.$model"
-                    @change="selectedDate('end')"
-                  >
-                  </datepicker>
-                  <div
-                    :class="{
-                      'invalid-feedback': true,
-                      'd-block': $v.end_date.$error && !$v.end_date.required,
-                    }"
-                  >
-                    End Date is required
-                  </div>
-                </b-form-group>
-              </b-colxx>
-            </b-row>
-          </b-form>
-        </b-card>
-        <b-card class="mb-4 auction_card" title="Usage">
-          <b-form>
-            <b-row>
-              <b-colxx sm="12">
-                <b-form-group class="form-group-label" label="Usages Left">
-                  <b-form-input
-                    type="number"
-                    v-model.trim="$v.usages_left.$model"
-                  />
-                </b-form-group>
-              </b-colxx>
-              <b-colxx sm="12">
-                <b-form-group
-                  class="form-group-label"
-                  :label="
-                    coupon_id && show_user
-                      ? `User : ${user.first_name} ${user.last_name}, Email:  ${user.email}, Phone number: ${user.phone_number}`
-                      : 'User'
-                  "
-                >
-                  <v-select
-                    label="name"
-                    :filterable="false"
-                    :options="vueSelectOptions"
-                    @search="fetchOptions"
-                    v-model="user"
-                  >
-                    <template slot="no-options"
-                      >type to search users List..</template
-                    >
-
-                    <template slot="selected-option" slot-scope="option">
-                      <div class="selected d-center">
-                        {{ option.name }}
-                      </div>
-                    </template>
-                    <template slot="spinner" slot-scope="spinner">
                       <div
-                        class="spinner-border text-primary"
-                        v-show="spinner"
-                      ></div>
-                    </template>
-                  </v-select>
-                </b-form-group>
-              </b-colxx>
-            </b-row>
-          </b-form>
-        </b-card>
-        <b-card class="mb-4 auction_card">
+                        :class="{
+                          'invalid-feedback': true,
+                          'd-block':
+                            $v.start_date.$error && !$v.start_date.required,
+                        }"
+                      >
+                        Start Date is required
+                      </div>
+                    </b-form-group>
+                  </b-colxx>
+                  <b-colxx sm="6">
+                    <b-form-group class="form-group-label" label="Expired Date">
+                      <datepicker
+                        style="width: 100%"
+                        type="datetime"
+                        :disabled-date="disableDate"
+                        value-type="YYYY-MM-DD HH:mm:ss"
+                        v-model="$v.end_date.$model"
+                        @change="selectedDate('end')"
+                      >
+                      </datepicker>
+                      <div
+                        :class="{
+                          'invalid-feedback': true,
+                          'd-block':
+                            $v.end_date.$error && !$v.end_date.required,
+                        }"
+                      >
+                        End Date is required
+                      </div>
+                    </b-form-group>
+                  </b-colxx>
+                </b-row>
+              </b-form>
+            </b-card>
+          </b-colxx>
+        </b-row>
+        <b-row>
+          <b-colxx xxs="8">
+            <b-card class="mb-4 auction_card" title="USAGE">
+              <b-form>
+                <b-row>
+                  <b-colxx sm="12">
+                    <b-form-group class="form-group-label" label="Usages Left">
+                      <b-form-input
+                        type="number"
+                        v-model.trim="$v.usages_left.$model"
+                      />
+                    </b-form-group>
+                  </b-colxx>
+                  <b-colxx sm="12">
+                    <b-form-group class="form-group-label" label="Choose user">
+                      <v-select
+                        label="name"
+                        :filterable="false"
+                        :options="vueSelectOptions"
+                        @search="fetchOptions"
+                        v-model="user"
+                      >
+                        <template slot="no-options"
+                          >type to search users List..</template
+                        >
+
+                        <template slot="selected-option" slot-scope="option">
+                          <div class="selected d-center">
+                            Name: {{ option.first_name }}
+                            {{ option.last_name }}, Email: {{ option.email }},
+                            phone number: {{ option.phone_number }}
+                          </div>
+                        </template>
+                        <template slot="spinner" slot-scope="spinner">
+                          <div
+                            class="spinner-border text-primary"
+                            v-show="spinner"
+                          ></div>
+                        </template>
+                      </v-select>
+                    </b-form-group>
+                  </b-colxx>
+                </b-row>
+              </b-form>
+            </b-card>
+          </b-colxx>
+          <b-colxx xxs="4">
+            <b-card class="mb-4 auction_card" title="USER">
+              <template v-if="user">
+                <b-form>
+                  <b-row>
+                    <b-colxx sm="6">
+                      <h3
+                        style="
+                          color: #303030;
+                          font-size: 18px;
+                          line-height: 1.6;
+                          font-weight: 500;
+                        "
+                      >
+                        Full name
+                      </h3>
+                      <p
+                        style="
+                          background-color: #f1f1f1;
+                          padding: 8px 15px;
+                          border-radius: 50px;
+                          display: inline-block;
+                          margin-bottom: 20px;
+                          font-size: 14px;
+                          line-height: 1.4;
+                          font-family: Courier New, Courier, monospace;
+                          margin-top: 0;
+                        "
+                      >
+                        {{ user.first_name }} {{ user.last_name }}
+                      </p>
+                    </b-colxx>
+                    <b-colxx sm="6">
+                      <h3
+                        style="
+                          color: #303030;
+                          font-size: 18px;
+                          line-height: 1.6;
+                          font-weight: 500;
+                        "
+                      >
+                        Phone Number
+                      </h3>
+                      <p
+                        style="
+                          background-color: #f1f1f1;
+                          padding: 8px 15px;
+                          border-radius: 50px;
+                          display: inline-block;
+                          margin-bottom: 20px;
+                          font-size: 14px;
+                          line-height: 1.4;
+                          font-family: Courier New, Courier, monospace;
+                          margin-top: 0;
+                        "
+                      >
+                        {{ user.phone_number }}
+                      </p>
+                    </b-colxx>
+                  </b-row>
+                  <b-row>
+                    <b-colxx sm="12">
+                      <h3
+                        style="
+                          color: #303030;
+                          font-size: 18px;
+                          line-height: 1.6;
+                          font-weight: 500;
+                        "
+                      >
+                        Email
+                      </h3>
+                      <p
+                        style="
+                          background-color: #f1f1f1;
+                          padding: 8px 15px;
+                          border-radius: 50px;
+                          display: inline-block;
+                          margin-bottom: 20px;
+                          font-size: 14px;
+                          line-height: 1.4;
+                          font-family: Courier New, Courier, monospace;
+                          margin-top: 0;
+                        "
+                      >
+                        {{ user.email }}
+                      </p>
+                    </b-colxx>
+                  </b-row>
+                </b-form>
+              </template>
+              <template v-else>
+                <div class="spinner-border text-primary" v-show="spinner"></div>
+              </template>
+            </b-card>
+          </b-colxx>
+        </b-row>
+
+        <b-card class="auction_card">
           <b-card-body class="justify-content-center d-flex">
             <b-button
               @click="onValitadeFormSubmit"
               type="submit"
               :disabled="enable_submit"
               variant="primary"
-              class="mt-4"
+              class=""
               >{{ $t("forms.submit") }}</b-button
             >
           </b-card-body>
@@ -352,10 +459,13 @@ export default {
           `https://api-v2.laffahrestaurants.com/public/api/users?role=user&keyword=${search}`
         ).then((res) => {
           console.log(res);
+          this.user = res.data.data[0];
           this.enable_submit = false;
           this.vueSelectOptions = res.data.data.map((x) => {
             return {
-              name: `Name: ${x.first_name} ${x.last_name}, Email: ${x.email}, Phone Number: ${x.phone_number}`,
+              name: `${x.first_name} ${x.last_name} `,
+              email: x.email,
+              phone_number: x.phone_number,
               id: x.id,
             };
           });
@@ -366,23 +476,35 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["_users", "_createCoupon", "_coupon"]),
+    ...mapGetters([
+      "_users",
+      "_createCoupon",
+      "_updateCoupon",
+      "_cannotupdate",
+      "_coupon",
+    ]),
   },
   watch: {
     couponType: function (val) {
       console.log(val);
     },
     _coupon: function (val) {
-      this.start_date = val.start_date;
+      // assign start date ........
+      const start_date = new Date(val.start_date);
+      const start_dateStr = start_date.toISOString().slice(0, 10);
+      const start_timeStr = start_date.toISOString().slice(11, 19);
+      this.start_date = `${start_dateStr} ${start_timeStr}`;
+      // assign end date ........
       const date = new Date(val.expired_at);
       const dateStr = date.toISOString().slice(0, 10);
       const timeStr = date.toISOString().slice(11, 19);
       this.end_date = `${dateStr} ${timeStr}`;
+      // rest ..........
       this.discount = val.details.discount;
       console.log(this.discount);
       this.max_discount = val.details.max_discount;
-      this.couponType = val.type;
       this.usages_left = val.usages_left;
+      this.couponType = val.type;
       this.code = val.code;
       this.user = val.user;
     },
@@ -393,13 +515,35 @@ export default {
         permanent: false,
       });
     },
+    _updateCoupon: function (val) {
+      this.$router.push(`${adminRoot}/coupon`);
+      this.$notify("success", "Coupon has been Updated Successfully", "", {
+        duration: 4000,
+        permanent: false,
+      });
+    },
+    _cannotupdate: function (val) {
+      this.$router.push(`${adminRoot}/coupon`);
+      this.$notify(
+        "error",
+        "You cannot update the coupon ",
+        "because it has started working",
+        {
+          duration: 5000,
+          permanent: false,
+        }
+      );
+    },
     _users: function (val) {
       //   this.users_array = val.map((el) => {
       //     name : `${el.first_name} ${el.last_name}`,
       //     id :
       //     ;
       //   });
-      //   console.log(this.users_array);
+      //   console.losg(this.users_array);
+    },
+    user: function (val) {
+      console.log(val, "userrrrrrrrrrrrrrrrrrrrrrrrrrr");
     },
     couponType: function (val) {
       this.discount = "";
@@ -424,12 +568,13 @@ export default {
 }
 .code_container {
   position: absolute;
-  top: -24px;
-  left: 1px;
+  top: -40px;
+  left: 331px;
   padding: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10000;
 }
 .code {
   background: white;

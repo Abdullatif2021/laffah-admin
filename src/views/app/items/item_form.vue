@@ -10,7 +10,7 @@
               size="lg"
               class="top-right-button"
               v-b-modal.modalright
-              @click="batch_modify = false"
+              @click="add_new"
               >Add new Batch</b-button
             >
           </div>
@@ -1398,6 +1398,10 @@ export default {
     getPrice(val) {
       return val;
     },
+    add_new() {
+      this.batch_modify = false;
+      this.selectedBranch = null;
+    },
     getBranchName(val) {
       return val.locales.en.name;
     },
@@ -1836,6 +1840,7 @@ export default {
       this.$refs["modalright_related"].hide();
       this.$refs["modalright"].hide();
       this.selected_branches = [];
+      this.selectedBranch = null;
       let branch_ids = [];
       this.batch_modify = false;
       this.oldBranches = [];
@@ -1867,6 +1872,7 @@ export default {
         { duration: 4000, permanent: false }
       );
       this.getBatches({ item_id: this.item_id });
+      this.batch_modify = false;
       this.checkboxOptions = [];
     },
     _batches: function (val) {
@@ -2067,8 +2073,8 @@ export default {
   margin-top: -10px;
 }
 .toggle_span_off_en {
-  height: 16px;
-  width: 16px;
+  height: 15px;
+  width: 15px;
   background-color: #1ec200;
   border-radius: 50%;
   display: inline-block;

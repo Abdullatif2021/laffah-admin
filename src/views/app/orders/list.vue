@@ -348,6 +348,7 @@ export default {
       let sts = [];
       if (statuses !== null && statuses.length > 8) {
         sts = statuses;
+        console.log("sttttststtststssttsstststst", sts);
         // sts[4].urlParams += `&${sts[5].urlParams}`
         sts[4].urlParams = {
           status_id: [

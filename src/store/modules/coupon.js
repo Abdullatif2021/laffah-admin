@@ -6,6 +6,8 @@ const state = {
   coupon: null,
   users: null,
   createCoupon: null,
+  updateCoupon: null,
+  cannotupdate: null,
 };
 
 const getters = {
@@ -13,6 +15,8 @@ const getters = {
   _coupon: (state) => state.coupon,
   _users: (state) => state.users,
   _createCoupon: (state) => state.createCoupon,
+  _updateCoupon: (state) => state.updateCoupon,
+  _cannotupdate: (state) => state.cannotupdate,
 };
 
 const mutations = {
@@ -29,6 +33,12 @@ const mutations = {
   },
   createCouponSuccessfuly(state, payload) {
     state.createCoupon = payload;
+  },
+  updateCouponSuccessfuly(state, payload) {
+    state.updateCoupon = payload;
+  },
+  cannotUpdateCoupon(state, payload) {
+    state.cannotupdate = payload;
   },
 };
 
@@ -107,8 +117,13 @@ const actions = {
       {}
     )
       .then((res) => {
-        if (res.status === 201) {
+        console.log("you cannot update", res);
+        if (res.data.status === 200) {
           commit("createCouponSuccessfuly", res);
+        }
+        if (res.data.status === 422) {
+          commit("cannotUpdateCoupon", res);
+          console.log("you cannot update");
         }
       })
       .catch((error) => {

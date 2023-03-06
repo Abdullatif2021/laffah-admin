@@ -233,9 +233,7 @@ const routes = [
       {
         path: "items",
         component: () =>
-          import(
-            /* webpackChunkName: "dashboards" */ "./views/app/items/index"
-          ),
+          import(/* webpackChunkName: "items" */ "./views/app/items/index"),
         redirect: `${adminRoot}/items/items-list`,
         meta: {
           loginRequired: true,
@@ -246,7 +244,7 @@ const routes = [
             path: "item-form/:id",
             component: () =>
               import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/item_form"
+                /* webpackChunkName: "items" */ "./views/app/items/item_form"
               ),
             meta: {
               loginRequired: true,
@@ -261,7 +259,7 @@ const routes = [
             path: "item-form",
             component: () =>
               import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/item_form"
+                /* webpackChunkName: "items" */ "./views/app/items/item_form"
               ),
             meta: { loginRequired: true, roles: [UserRole.superadmin] },
           },
@@ -275,7 +273,7 @@ const routes = [
             path: "items-list",
             component: () =>
               import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/items-list"
+                /* webpackChunkName: "items" */ "./views/app/items/items-list"
               ),
             meta: {
               loginRequired: true,
@@ -428,7 +426,7 @@ const routes = [
             path: "customizations",
             component: () =>
               import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/customizations"
+                /* webpackChunkName: "customizations" */ "./views/app/items/customizations"
               ),
             meta: {
               loginRequired: true,
@@ -439,7 +437,7 @@ const routes = [
             path: "categories",
             component: () =>
               import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/index"
+                /* webpackChunkName: "categories" */ "./views/app/items/index"
               ),
             redirect: `${adminRoot}/items/categories/list`,
             meta: {
@@ -455,7 +453,7 @@ const routes = [
                 path: "create-category",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/categories/form"
+                    /* webpackChunkName: "categories" */ "./views/app/items/categories/form"
                   ),
                 meta: { loginRequired: true, roles: [UserRole.superadmin] },
               },
@@ -463,7 +461,7 @@ const routes = [
                 path: "list",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/categories/list"
+                    /* webpackChunkName: "categories" */ "./views/app/items/categories/list"
                   ),
                 meta: {
                   loginRequired: true,
@@ -478,7 +476,7 @@ const routes = [
                 path: "create-category/:id",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/categories/form"
+                    /* webpackChunkName: "categories" */ "./views/app/items/categories/form"
                   ),
                 meta: {
                   loginRequired: true,
@@ -510,7 +508,7 @@ const routes = [
             path: "branches-form",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/branches/branches-form"
+                /* webpackChunkName : "branches" */ "./views/app/branches/branches-form"
               ),
             meta: { loginRequired: true, roles: [UserRole.superadmin] },
           },
@@ -518,7 +516,7 @@ const routes = [
             path: "branches-list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/branches/branches-list"
+                /* webpackChunkName : "branches" */ "./views/app/branches/branches-list"
               ),
             meta: {
               loginRequired: true,
@@ -549,7 +547,7 @@ const routes = [
       {
         path: "users",
         component: () =>
-          import(/* webpackChunkName: "branches" */ "./views/app/users/index"),
+          import(/* webpackChunkName: "users" */ "./views/app/users/index"),
         redirect: `${adminRoot}/users/list`,
         meta: {
           loginRequired: true,
@@ -561,7 +559,7 @@ const routes = [
             path: "users-form",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/users/users-form"
+                /* webpackChunkName : "users" */ "./views/app/users/users-form"
               ),
             meta: {
               loginRequired: true,
@@ -575,9 +573,7 @@ const routes = [
           {
             path: "list",
             component: () =>
-              import(
-                /* webpackChunkName : "product" */ "./views/app/users/list"
-              ),
+              import(/* webpackChunkName : "users" */ "./views/app/users/list"),
             meta: {
               loginRequired: true,
               roles: [
@@ -591,7 +587,7 @@ const routes = [
             path: "users-form/:id",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/users/users-form"
+                /* webpackChunkName : "users" */ "./views/app/users/users-form"
               ),
             meta: {
               loginRequired: true,
@@ -608,7 +604,7 @@ const routes = [
         path: "delivery",
         component: () =>
           import(
-            /* webpackChunkName: "branches" */ "./views/app/delivery/index"
+            /* webpackChunkName: "delivery" */ "./views/app/delivery/index"
           ),
         redirect: `${adminRoot}/delivery/list`,
         meta: {
@@ -626,7 +622,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/delivery/list"
+                /* webpackChunkName : "delivery" */ "./views/app/delivery/list"
               ),
             meta: {
               loginRequired: true,
@@ -642,7 +638,7 @@ const routes = [
             path: "details/:id",
             component: () =>
               import(
-                /* webpackChunkName: "branches" */ "./views/app/delivery/details"
+                /* webpackChunkName: "delivery" */ "./views/app/delivery/details"
               ),
             meta: {
               loginRequired: true,
@@ -659,7 +655,7 @@ const routes = [
       {
         path: "orders",
         component: () =>
-          import(/* webpackChunkName: "branches" */ "./views/app/orders/index"),
+          import(/* webpackChunkName: "orders" */ "./views/app/orders/index"),
         redirect: `${adminRoot}/orders/list`,
         meta: {
           loginRequired: true,
@@ -676,7 +672,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/orders/list"
+                /* webpackChunkName : "orders" */ "./views/app/orders/list"
               ),
             meta: {
               loginRequired: true,
@@ -692,7 +688,7 @@ const routes = [
             path: "details/:id",
             component: () =>
               import(
-                /* webpackChunkName: "branches" */ "./views/app/orders/details"
+                /* webpackChunkName: "orders" */ "./views/app/orders/details"
               ),
             meta: {
               loginRequired: true,
@@ -709,7 +705,7 @@ const routes = [
       {
         path: "coupon",
         component: () =>
-          import(/* webpackChunkName: "branches" */ "./views/app/coupon/index"),
+          import(/* webpackChunkName: "coupon" */ "./views/app/coupon/index"),
         redirect: `${adminRoot}/coupon/list`,
         meta: {
           loginRequired: true,
@@ -721,7 +717,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/coupon/list"
+                /* webpackChunkName : "coupon" */ "./views/app/coupon/list"
               ),
             meta: {
               loginRequired: true,
@@ -732,7 +728,7 @@ const routes = [
             path: "couponDetails",
             component: () =>
               import(
-                /* webpackChunkName: "branches" */ "./views/app/coupon/coupon"
+                /* webpackChunkName: "coupon" */ "./views/app/coupon/coupon"
               ),
             meta: {
               loginRequired: true,
@@ -753,9 +749,7 @@ const routes = [
       {
         path: "careers",
         component: () =>
-          import(
-            /* webpackChunkName: "branches" */ "./views/app/careers/index"
-          ),
+          import(/* webpackChunkName: "careers" */ "./views/app/careers/index"),
         redirect: `${adminRoot}/careers/careers-list`,
         meta: {
           loginRequired: true,
@@ -767,7 +761,7 @@ const routes = [
             path: "careers-list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/careers/careers-list"
+                /* webpackChunkName : "careers" */ "./views/app/careers/careers-list"
               ),
             meta: {
               loginRequired: true,
@@ -782,7 +776,7 @@ const routes = [
             path: "careers-form",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/careers/careers-form"
+                /* webpackChunkName : "careers" */ "./views/app/careers/careers-form"
               ),
             meta: {
               loginRequired: true,
@@ -797,7 +791,7 @@ const routes = [
             path: "careers-form/:id",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/careers/careers-form"
+                /* webpackChunkName : "careers" */ "./views/app/careers/careers-form"
               ),
             meta: {
               loginRequired: true,
@@ -812,7 +806,7 @@ const routes = [
             path: "applicants",
             component: () =>
               import(
-                /* webpackChunkName: "branches" */ "./views/app/careers/applicants/applicants-list"
+                /* webpackChunkName: "careers" */ "./views/app/careers/applicants/applicants-list"
               ),
             // redirect: `${adminRoot}/careers/careers-list`,
             meta: {
@@ -848,7 +842,7 @@ const routes = [
       {
         path: "page",
         component: () =>
-          import(/* webpackChunkName: "branches" */ "./views/app/page/index"),
+          import(/* webpackChunkName: "page" */ "./views/app/page/index"),
         redirect: `${adminRoot}/page/pages-list`,
         meta: {
           loginRequired: true,
@@ -860,7 +854,7 @@ const routes = [
             path: "pages-list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/page/pages-list"
+                /* webpackChunkName : "page" */ "./views/app/page/pages-list"
               ),
             meta: {
               loginRequired: true,
@@ -875,7 +869,7 @@ const routes = [
             path: "pages-form/:id",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/page/pages-form"
+                /* webpackChunkName : "page" */ "./views/app/page/pages-form"
               ),
             meta: {
               loginRequired: true,
@@ -892,7 +886,7 @@ const routes = [
       {
         path: "areas",
         component: () =>
-          import(/* webpackChunkName: "branches" */ "./views/app/areas/index"),
+          import(/* webpackChunkName: "areas" */ "./views/app/areas/index"),
         redirect: `${adminRoot}/areas/list`,
         meta: {
           loginRequired: true,
@@ -904,7 +898,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/areas/areas-list"
+                /* webpackChunkName : "areas" */ "./views/app/areas/areas-list"
               ),
             meta: {
               loginRequired: true,
@@ -1168,7 +1162,22 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/notifications/list"
+                /* webpackChunkName : "notifications" */ "./views/app/notifications/list"
+              ),
+            meta: {
+              loginRequired: true,
+              roles: [
+                UserRole.superadmin,
+                UserRole.admin,
+                UserRole.branchadmin,
+              ],
+            },
+          },
+          {
+            path: "send",
+            component: () =>
+              import(
+                /* webpackChunkName : "notifications" */ "./views/app/notifications/send"
               ),
             meta: {
               loginRequired: true,
@@ -1184,9 +1193,7 @@ const routes = [
       {
         path: "reports",
         component: () =>
-          import(
-            /* webpackChunkName: "notifications" */ "./views/app/reports/index"
-          ),
+          import(/* webpackChunkName: "reports" */ "./views/app/reports/index"),
         redirect: `${adminRoot}/reports/list`,
         meta: {
           loginRequired: true,
@@ -1198,7 +1205,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/reports/list"
+                /* webpackChunkName : "reports" */ "./views/app/reports/list"
               ),
             meta: {
               loginRequired: true,
@@ -1630,7 +1637,7 @@ const routes = [
         path: "all-orders",
         component: () =>
           import(
-            /* webpackChunkName: "branches" */ "./views/app/all-orders/index"
+            /* webpackChunkName: "all-orders" */ "./views/app/all-orders/index"
           ),
         redirect: `${adminRoot}/all-orders/list`,
         meta: {
@@ -1648,7 +1655,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/all-orders/list"
+                /* webpackChunkName : "all-orders" */ "./views/app/all-orders/list"
               ),
             meta: {
               loginRequired: true,

@@ -144,10 +144,10 @@ const data = [
     roles: [UserRole.superadmin, UserRole.admin],
   },
   {
-    id: "careers",
-    icon: "iconsminds-engineering",
-    label: "menu.careers",
-    to: `${adminRoot}/careers`,
+    id: "noification",
+    icon: "simple-icon-cursor",
+    label: "menu.send-notification",
+    to: `${adminRoot}/notifications/send`,
     roles: [UserRole.superadmin, UserRole.admin],
   },
 

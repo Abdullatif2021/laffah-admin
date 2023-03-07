@@ -191,12 +191,17 @@ const actions = {
       .catch((error) => console.log(error));
   },
   sendNotification({ commit }, payload) {
-    const data = {
-      title: payload.title,
-      body: payload.details,
-    };
+    const formData = new FormData();
+    formData.append("title", payload.title);
+    formData.append("body", payload.details);
+    formData.append("image", payload.image[0]);
+
     return axios
-      .post("https://api-v2.laffahrestaurants.com/api/sendnotification", data)
+      .post(
+        "https://api-v2.laffahrestaurants.com/api/sendnotification",
+        formData,
+        {}
+      )
       .then((res) => {
         if (res.data.status === 201) {
           commit("send_notif_success", res.data);

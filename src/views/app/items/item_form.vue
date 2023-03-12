@@ -458,6 +458,7 @@
               <form-wizard
                 :with-validate="true"
                 :saveBtn="saveBtn"
+                @previousTab="previousTab"
                 :top-nav-disabled="true"
                 :last-step-end="true"
                 nav-class="justify-content-between"
@@ -701,9 +702,9 @@
                                 variant="primary"
                                 v-b-modal.modalright
                                 class="top-right-button"
-                                @click="itemActions('reset')"
+                                @click="add_new"
                               >
-                                {{ $t("pages.add-new") }}
+                                Add New Batch
                               </b-button>
                             </div>
                           </b-colxx>
@@ -827,7 +828,9 @@
                               </b-table>
                             </template>
                             <template v-else>
-                              <div class="loading"></div>
+                              <div class="not-batches">
+                                No Batches Added Yet
+                              </div>
                             </template>
                           </b-colxx>
                         </template>
@@ -1482,6 +1485,9 @@ export default {
         langs: null,
       });
     },
+    previousTab() {
+      this.saveBtn = "Next";
+    },
     getAssighedBranch(val) {
       console.log(val);
       this.oldBranches = [];
@@ -1929,6 +1935,7 @@ export default {
     create_item: function (val) {
       this.item_id = val.id;
       this.isStillCreated = true;
+      this.saveBtn = "Finish";
       this.$notify(
         "success",
         "Operation completed successfully",
@@ -1945,6 +1952,13 @@ export default {
 };
 </script>
 <style scoped>
+.not-batches {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 900;
+}
 .status_container {
   display: flex;
   align-items: center;

@@ -245,7 +245,7 @@ export default {
           titleClass: "px-1",
           dataClass: "px-1",
           width: "12%",
-          callback: this.nameFriendly,
+          // callback: this.nameFriendly,
         },
         {
           name: "payment_method",
@@ -366,7 +366,7 @@ export default {
           ],
         };
         sts[6].count += sts[7].count;
-        // sts.splice(7, 1)
+        sts.splice(7, 1);
         // const test = sts.splice(3, 2)
         // console.log('statussssssssssssss', test);
       }

@@ -76,9 +76,12 @@
               >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
             </b-card-text>
             <b-card-text
-              v-if="order.discount_value !== null"
+              v-if="order.discount_value !== 0"
               class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
-              >Discount: <b> {{ order.discount_value }}</b>
+              >{{
+                `Discount(${order.points_discounts ? "points" : "coupon"}):`
+              }}
+              <b> {{ order.discount_value }}</b>
             </b-card-text>
             <br />
             <b-card-text>

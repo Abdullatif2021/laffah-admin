@@ -3,6 +3,7 @@ import Vue from "vue";
 import axios from "axios";
 
 import { apiUrl } from "@/constants/config";
+import so_und from "@/assets/sounds/notif.mp3";
 
 const namespaced = true;
 const modelUrl = "notifications";
@@ -106,6 +107,12 @@ const actions = {
       )
       .then((response) => response.data)
       .then(({ data, total_unread }) => {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted");
+          }
+        });
+
         if (Array.isArray(data) && data.length > 0) {
           let currList = [];
           if (localStorage.getItem("notesData") != undefined) {
@@ -118,10 +125,21 @@ const actions = {
           // console.log(diffArray.length,'diffArray')
           if (diffArray.length > 0) {
             console.log(diffArray.length, "diffArray");
+
             Vue.prototype.$notify("primary", "New notification Added", null, {
               duration: 5000,
               permanent: false,
             });
+            const sound = new Audio(so_und);
+            sound.play();
+            if (Notification.permission === "granted") {
+              new Notification("Laffah Admin", {
+                body: "New Notification is added",
+                icon: "/assets/logos/logo.png",
+                badge: "/assets/logos/logo.png",
+                silent: true,
+              });
+            }
           }
         }
         commit("SET_NotificationsList", data);

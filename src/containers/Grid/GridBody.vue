@@ -750,7 +750,6 @@ export default {
     },
 
     changePageSize(perPage) {
-      console.log("changePageSize grid body", perPage);
       this.perPage = perPage;
       this.$refs.vuetable.refresh();
     },

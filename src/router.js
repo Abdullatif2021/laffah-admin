@@ -573,7 +573,9 @@ const routes = [
           {
             path: "list",
             component: () =>
-              import(/* webpackChunkName : "users" */ "./views/app/users/list"),
+              import(
+                /* webpackChunkName : "users" */ "./views/app/users/list2"
+              ),
             meta: {
               loginRequired: true,
               roles: [
@@ -689,6 +691,42 @@ const routes = [
             component: () =>
               import(
                 /* webpackChunkName: "orders" */ "./views/app/orders/details"
+              ),
+            meta: {
+              loginRequired: true,
+              roles: [
+                UserRole.superadmin,
+                UserRole.admin,
+                UserRole.branchadmin,
+                UserRole.casher,
+              ],
+            },
+          },
+        ],
+      },
+      {
+        path: "waiting-orders",
+        component: () =>
+          import(
+            /* webpackChunkName: "orders" */ "./views/app/waiting-orders/index"
+          ),
+        redirect: `${adminRoot}/waiting-orders/list`,
+        meta: {
+          loginRequired: true,
+          roles: [
+            UserRole.superadmin,
+            UserRole.admin,
+            UserRole.branchadmin,
+            UserRole.casher,
+          ],
+        },
+
+        children: [
+          {
+            path: "list",
+            component: () =>
+              import(
+                /* webpackChunkName : "orders" */ "./views/app/waiting-orders/list"
               ),
             meta: {
               loginRequired: true,

@@ -264,26 +264,53 @@
     <b-modal
       id="delivery_popup"
       ref="delivery_popup"
-      title="Did you print the Order?"
       :no-close-on-backdrop="true"
+      hide-header
+      title-tag="h3"
     >
-      <b-form-group label="Choose Delivery">
+      <h3 class="custom-title">Did you print the order ?</h3>
+      <b-form-group label="Please Select">
+        <b-form-radio-group
+          stacked
+          v-model="$v.choosenType.$model"
+          :state="!$v.choosenType.$error"
+        >
+          <b-form-radio value="delivery">Choose Delivery</b-form-radio>
+          <v-select
+            aria-placeholder="Please Select Delivery"
+            styles=""
+            label="fullName"
+            @input="searchOption"
+            :disabled="choosenType === 'non_delivery'"
+            v-model="selectedOption"
+            :options="delivery_options"
+          />
+          <b-form-radio value="non_delivery">Without delivery</b-form-radio>
+        </b-form-radio-group>
+        <b-form-invalid-feedback class="d-block" v-if="!$v.choosenType.required"
+          >Please select one!</b-form-invalid-feedback
+        >
+      </b-form-group>
+      <!-- <b-form-group label="Choose Delivery">
         <v-select
           label="fullName"
           @input="searchOption"
           v-model="selectedOption"
           :options="delivery_options"
         />
-      </b-form-group>
+      </b-form-group> -->
       <template slot="modal-footer">
         <b-button
           variant="primary"
-          @click="acceptOrder()"
+          @click="acceptOrder(true)"
           class="mr-1"
-          :disabled="!selectedOption"
+          :disabled="!disable_btn"
           >Yes</b-button
         >
-        <b-button variant="secondary" @click="hideModal('delivery_popup')"
+        <b-button
+          @click="acceptOrder(false)"
+          :disabled="!disable_btn"
+          variant="secondary"
           >No</b-button
         >
       </template>
@@ -299,7 +326,8 @@ import Invoice from "@/containers/orders/invoice";
 import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-
+import { validationMixin } from "vuelidate";
+const { required } = require("vuelidate/lib/validators");
 export default {
   name: "queueItem",
   components: { Invoice, "v-select": vSelect },
@@ -310,11 +338,19 @@ export default {
     "allStatus",
     "className",
   ],
+  mixins: [validationMixin],
+  validations: {
+    choosenType: {
+      required,
+    },
+  },
   data() {
     return {
       rejectOrder: null,
       printOrder: null,
       visible: true,
+      disable_btn: false,
+      choosenType: "delivery",
       delivery_options: [],
       selectedOption: null,
       completed: false,
@@ -423,16 +459,39 @@ export default {
           // An error occurred
         });
     },
-    acceptOrder() {
-      if (this.processed_order.status === 2) {
+    askForPrint() {},
+    acceptOrder(val) {
+      this.disable_btn = false;
+      if (this.choosenType === "delivery" && val) {
         this.assignToDelivery({
           user_id: this.selectedOption.id,
           order_id: this.processed_order.id,
         });
-      } else {
+        this.changeOrderStatus({
+          order_id: this.processed_order.id,
+          status: 3,
+        });
+      }
+      if (this.choosenType === "delivery" && !val) {
+        this.assignToDelivery({
+          user_id: this.selectedOption.id,
+          order_id: this.processed_order.id,
+        });
         this.changeOrderStatus({
           order_id: this.processed_order.id,
           status: 2,
+        });
+      }
+      if (this.choosenType === "non_delivery" && !val) {
+        this.changeOrderStatus({
+          order_id: this.processed_order.id,
+          status: 2,
+        });
+      }
+      if (this.choosenType === "non_delivery" && val) {
+        this.changeOrderStatus({
+          order_id: this.processed_order.id,
+          status: 6,
         });
       }
     },
@@ -504,6 +563,19 @@ export default {
     },
   },
   watch: {
+    selectedOption: function (val) {
+      if (val) {
+        this.disable_btn = true;
+      }
+    },
+    choosenType: function (val) {
+      if (val === "non_delivery") {
+        this.selectedOption = null;
+        this.disable_btn = true;
+      } else {
+        this.disable_btn = false;
+      }
+    },
     _deliveries: function (data) {
       console.log("from watcher deliveries", data);
       this.delivery_options = [];
@@ -524,6 +596,7 @@ export default {
         permanent: false,
       });
       this.$refs["delivery_popup"].hide();
+      console.log(this.processed_order);
       this.removeOrderFromQueue(this.processed_order);
       this.changeQueueCount({ data: this.processed_order });
       this.processed_order = null;
@@ -535,10 +608,12 @@ export default {
         null,
         { duration: 5000, permanent: false }
       );
-      this.assignToDelivery({
-        user_id: this.selectedOption.id,
-        order_id: this.processed_order.id,
-      });
+      // this.assignToDelivery({
+      //   user_id: this.selectedOption.id,
+      //   order_id: this.processed_order.id,
+      // });
+      this.$refs["delivery_popup"].hide();
+      this.processed_order = null;
     },
     _changeOrderStatusErr: function (val) {
       this.$notify("warning", "Some thing went wrong", null, {
@@ -564,6 +639,13 @@ export default {
 </script>
 
 <style scoped>
+.v-select {
+  margin: 10px 0px 22px 18px !important;
+}
+.custom-title {
+  font-weight: 600;
+  margin-bottom: 30px;
+}
 /deep/ .badge-type {
   /*top: 45% !important;*/
   /*right: -22px !important;*/

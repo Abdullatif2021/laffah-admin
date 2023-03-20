@@ -369,6 +369,7 @@ export default {
         sts.splice(7, 1);
         // const test = sts.splice(3, 2)
         // console.log('statussssssssssssss', test);
+        sts.shift();
       }
       return sts;
     },
@@ -488,6 +489,7 @@ export default {
   },
   watch: {
     tabIndex(val, oldVal) {
+      console.log("tab indexxxxxx");
       if (val !== oldVal) {
         this.loadStatusCount();
       }

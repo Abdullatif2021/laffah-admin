@@ -255,7 +255,7 @@
           </b-card>
           <!-- delivery guy -->
           <b-card
-            v-if="order.status === 4"
+            v-if="order.status === 3 || order.status === 2"
             header-tag="header"
             body-class="guy_body_class"
           >
@@ -264,7 +264,11 @@
                 <span class="simple-icon-user" /> Delivery Guy
               </h6>
             </template>
-            <b-form-group label="Change Delivery">
+            <b-form-group
+              :label="
+                order.delivery === '' ? 'Choose Delivery' : 'Change Delivery'
+              "
+            >
               <v-select
                 label="fullName"
                 @input="searchOption"
@@ -794,7 +798,13 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["fetchBranches", "getDeliveries", "changeDelivery"]),
+    ...mapActions([
+      "fetchBranches",
+      "getDeliveries",
+      "changeDelivery",
+      "changeOrderStatus",
+      "assignToDelivery",
+    ]),
     ...mapActions({
       loadOrderStatuses: "orders/loadStatuses",
       // loadNoteStatuses: 'note/loadStatuses',
@@ -840,7 +850,11 @@ export default {
     },
     updateDeliveryGuy(val, order) {
       console.log("updateDeliveryGuy", val, order);
-      this.changeDelivery({ order_id: order.id, user_id: val._id });
+      if (order.delivery === "") {
+        this.assignToDelivery({ order_id: order.id, user_id: val._id });
+      } else {
+        this.changeDelivery({ order_id: order.id, user_id: val._id });
+      }
     },
     updateFormModel(rawData) {
       let data = rawData;
@@ -966,7 +980,13 @@ export default {
       statuses: "orders/getStatuses",
       // noteStatuses: 'note/getStatuses'
     }),
-    ...mapGetters(["getBranches", "_deliveries", "_change"]),
+    ...mapGetters([
+      "getBranches",
+      "_deliveries",
+      "_change",
+      "_assigned",
+      "not_assigned",
+    ]),
     modalData: ({ schema, initData, modalTitle, onValidateFormSubmit }) => {
       return {
         schema: schema,
@@ -1023,6 +1043,27 @@ export default {
     },
   },
   watch: {
+    _assigned: function (val) {
+      console.log("_assign", val);
+      this.$notify("success", "Delivery has been assigned successfuly", null, {
+        duration: 5000,
+        permanent: false,
+      });
+      this.changeOrderStatus({
+        order_id: this.order.id,
+        status: 3,
+      });
+      this.$router.push(`/app/orders`);
+    },
+    not_assigned: function (val) {
+      console.log("not_assign", val);
+      this.$notify(
+        "warning",
+        "Delivery didn't assigned, Please try again ",
+        null,
+        { duration: 5000, permanent: false }
+      );
+    },
     "$route.params.id": {
       handler: function (id) {
         this.orderId = id;

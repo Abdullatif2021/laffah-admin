@@ -8,6 +8,7 @@ const state = {
   createCoupon: null,
   updateCoupon: null,
   cannotupdate: null,
+  categoies: null,
 };
 
 const getters = {
@@ -17,6 +18,7 @@ const getters = {
   _createCoupon: (state) => state.createCoupon,
   _updateCoupon: (state) => state.updateCoupon,
   _cannotupdate: (state) => state.cannotupdate,
+  _categories: (state) => state.categoies,
 };
 
 const mutations = {
@@ -40,6 +42,9 @@ const mutations = {
   cannotUpdateCoupon(state, payload) {
     state.cannotupdate = payload;
   },
+  get_categories(state, payload) {
+    state.categoies = payload;
+  },
 };
 
 const actions = {
@@ -56,6 +61,20 @@ const actions = {
         if (res.status === 200) {
           console.log("here i am");
           commit("all_coupons", res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+  getCategories({ commit }, payload) {
+    return Axios.get(
+      `https://api-v2.laffahrestaurants.com/public/api/categories`
+    )
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          commit("get_categories", res.data.data);
         }
       })
       .catch((error) => {

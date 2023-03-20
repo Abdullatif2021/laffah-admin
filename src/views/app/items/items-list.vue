@@ -7,7 +7,8 @@
       :search="search"
       :apiBase="apiBase"
       :add-meta="true"
-      :addRow="addRow"></grid-body>
+      :addRow="addRow"
+    ></grid-body>
   </div>
 </template>
 
@@ -15,7 +16,7 @@
 import Vuetable from "vuetable-2/src/components/Vuetable";
 import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
 import GridBody from "../../../containers/Grid/GridBody";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   props: ["title"],
@@ -23,7 +24,7 @@ export default {
     GridBody,
     vuetable: Vuetable,
     "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
-    "gird-body": GridBody
+    "gird-body": GridBody,
   },
   data() {
     return {
@@ -36,77 +37,86 @@ export default {
       search: "",
       selectedItems: [],
 
-      fields: [{
-        name: "__slot:image",
-        title: "",
-        titleClass: "center aligned text-right",
-        dataClass: "center aligned text-right",
-        width: "2%"
-      },
+      fields: [
+        {
+          name: "__slot:image",
+          title: "",
+          titleClass: "center aligned text-right",
+          dataClass: "center aligned text-right",
+          width: "2%",
+        },
         {
           name: `locales.en.name`,
-          title: `${this.$t('forms.name-en')}`,
+          title: `${this.$t("forms.name-en")}`,
           titleClass: "",
           dataClass: "list-item-heading",
-          width: "10%"
+          width: "10%",
         },
         {
           name: `locales.ar.name`,
-          title: `${this.$t('forms.name-ar')}`,
+          title: `${this.$t("forms.name-ar")}`,
           titleClass: "",
           dataClass: "list-item-heading",
-          width: "10%"
+          width: "10%",
         },
         {
           name: "category",
-          title: `${this.$t('tables.category')}`,
+          title: `${this.$t("tables.category")}`,
           titleClass: "",
           dataClass: "list-item-heading",
           width: "10%",
-          callback: this.viewCategory
+          callback: this.viewCategory,
         },
         {
           name: "",
-          title: `${this.$t('tables.online-state')}`,
+          title: `${this.$t("tables.online-state")}`,
           titleClass: "",
           dataClass: "list-item-heading",
           width: "10%",
-          callback: value => {
-            return `<b-button class="${value.is_published === "1" ? `toggle_btn_on_en`: `toggle_btn_off_en`}" variant="primary">
-              <span class="${value.is_published === "1" ? `toggle_span_on_en`: `toggle_span_off_en`}"></span>
+          callback: (value) => {
+            return `<b-button class="${
+              value.is_published === "1"
+                ? `toggle_btn_on_en`
+                : `toggle_btn_off_en`
+            }" variant="primary">
+              <span class="${
+                value.is_published === "1"
+                  ? `toggle_span_on_en`
+                  : `toggle_span_off_en`
+              }"></span>
               </b-button>`;
           },
         },
         {
           name: "__slot:price",
-          title: `${this.$t('tables.price')}`,
+          title: `${this.$t("tables.price")}`,
           titleClass: "center aligned",
           dataClass: "center aligned",
-          width: "10%"
+          width: "10%",
         },
         {
           name: "__slot:active",
-          title: `${this.$t('tables.active')}`,
+          title: `${this.$t("tables.active")}`,
           titleClass: "center aligned",
           dataClass: "center aligned",
-          width: "10%"
+          width: "10%",
         },
         {
           name: "__slot:actions",
           title: "",
           titleClass: "center aligned text-right",
           dataClass: "center aligned text-right",
-          width: "5%"
-        }
-      ]
+          width: "5%",
+        },
+      ],
     };
   },
   computed: {
-    ...mapGetters('category', ['selectData',]),
+    ...mapGetters("category", ["selectData"]),
   },
   mounted() {
-    this.$store.dispatch('category/loadCategoriesList')
-    this.$store.dispatch('item/loadItemsList')
+    this.$store.dispatch("category/loadCategoriesList");
+    this.$store.dispatch("item/loadItemsList");
   },
   methods: {
     changePageSize(perPage) {
@@ -116,11 +126,17 @@ export default {
 
     viewCategory(value) {
       console.log(value);
-      return (this.selectData.find(category => category.category_id === value[0]) || {}).title || 'Deleted  '
+      return (
+        (
+          this.selectData.find(
+            (category) => category.category_id === value[0]
+          ) || {}
+        ).title || "Deleted  "
+      );
     },
     viewStatus(value) {
-        console.log('puplish', value)
-      return ;
+      console.log("puplish", value);
+      return;
 
       // return value === 1 ? this.$t('tables.published') : this.$t('tables.published')
     },
@@ -133,7 +149,7 @@ export default {
       if (this.selectedItems.length >= this.items.length) {
         if (isToggle) this.selectedItems = [];
       } else {
-        this.selectedItems = this.items.map(x => x.id);
+        this.selectedItems = this.items.map((x) => x.id);
       }
     },
     keymap(event) {
@@ -145,12 +161,12 @@ export default {
           this.selectedItems = [];
           break;
       }
-    }
+    },
   },
 };
 </script>
 <style scoped>
-.toggle_btn_on_en{
+.toggle_btn_on_en {
   background: white;
   padding-left: 50px;
   border-radius: 17px;
@@ -159,7 +175,7 @@ export default {
   padding-top: -7px;
   font-size: 12px;
 }
-.toggle_btn_off_en{
+.toggle_btn_off_en {
   background: white;
   padding-left: 50px;
   border-radius: 17px;
@@ -168,7 +184,7 @@ export default {
   padding-top: -7px;
   font-size: 12px;
 }
-.toggle_btn_on_ar{
+.toggle_btn_on_ar {
   background: white;
   padding-left: 50px;
   border-radius: 17px;
@@ -177,7 +193,7 @@ export default {
   padding-top: -7px;
   font-size: 12px;
 }
-.toggle_btn_off_ar{
+.toggle_btn_off_ar {
   background: white;
   padding-left: 50px;
   border-radius: 17px;
@@ -186,7 +202,7 @@ export default {
   padding-top: -7px;
   font-size: 12px;
 }
-.toggle_span_on_en{
+.toggle_span_on_en {
   height: 16px;
   width: 16px;
   background-color: #1ec200;
@@ -196,9 +212,8 @@ export default {
   margin-left: -43px;
   position: absolute;
   margin-top: 5px;
-
 }
-.toggle_span_off_en{
+.toggle_span_off_en {
   height: 16px;
   width: 16px;
   background-color: #c20000;
@@ -208,9 +223,8 @@ export default {
   margin-left: -21px;
   position: absolute;
   margin-top: 5px;
-
 }
-.toggle_span_on_ar{
+.toggle_span_on_ar {
   height: 16px;
   width: 16px;
   background-color: #1ec200;
@@ -220,6 +234,5 @@ export default {
   margin-right: 5px;
   position: absolute;
   margin-top: 5px;
-
 }
 </style>

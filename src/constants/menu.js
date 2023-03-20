@@ -34,6 +34,18 @@ const data = [
     ],
   },
   {
+    id: "ًwaiting-orders",
+    icon: "iconsminds-sand-watch-2",
+    label: "menu.waiting-orders",
+    to: `${adminRoot}/waiting-orders`,
+    roles: [
+      UserRole.superadmin,
+      UserRole.admin,
+      UserRole.branchadmin,
+      UserRole.casher,
+    ],
+  },
+  {
     id: "Delivery",
     icon: "iconsminds-scooter",
     label: "Delivery",

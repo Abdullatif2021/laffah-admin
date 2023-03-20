@@ -4,22 +4,28 @@ import {
   defaultLocale,
   localeOptions,
   themeRadiusStorageKey,
-  themeSelectedColorStorageKey
+  themeSelectedColorStorageKey,
 } from "@/constants/config";
-import Vue from 'vue'
-import invoice from '@/containers/orders/invoice'
+import Vue from "vue";
+import invoice from "@/containers/orders/invoice";
 
 export const printInvoice = (order) => {
   // Get HTML to print from element
-  const prtHtml = document.getElementById('invoice-' + order.id).innerHTML;
-// Get all stylesheets HTML
-  let stylesHtml = '';
-  for (const node of [...document.querySelectorAll('link[rel="stylesheet"], style')]) {
+  const prtHtml = document.getElementById("invoice-" + order.id).innerHTML;
+  // Get all stylesheets HTML
+  let stylesHtml = "";
+  for (const node of [
+    ...document.querySelectorAll('link[rel="stylesheet"], style'),
+  ]) {
     stylesHtml += node.outerHTML;
   }
 
-// Open the print window
-  const WinPrint = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+  // Open the print window
+  const WinPrint = window.open(
+    "",
+    "",
+    "left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0"
+  );
 
   WinPrint.document.write(`<!DOCTYPE html>
 <html>
@@ -34,125 +40,127 @@ export const printInvoice = (order) => {
   WinPrint.document.close();
   WinPrint.focus();
   WinPrint.document.onreadystatechange = () => {
-    if (document.readyState === 'complete') {
-      console.log('DOM is ready.')
-      return true
+    if (document.readyState === "complete") {
+      console.log("DOM is ready.");
+      return true;
     }
-    return false
+    return false;
   };
   if (WinPrint.document.onreadystatechange) {
     WinPrint.print();
     window.onfocus = function () {
+      console.log("from print utillllllllllllllll");
       window.close();
-    }
-    return true
+    };
+    return true;
   } else {
-    return false
+    return false;
   }
-
-}
+};
 
 export const mapOrder = (array, order, key) => {
   array.sort(function (a, b) {
-    var A = a[key]
-    var B = b[key]
-    if (order.indexOf(A + '') > order.indexOf(B + '')) {
-      return 1
+    var A = a[key];
+    var B = b[key];
+    if (order.indexOf(A + "") > order.indexOf(B + "")) {
+      return 1;
     } else {
-      return -1
+      return -1;
     }
-  })
-  return array
-}
+  });
+  return array;
+};
 
 export const getOnlyDate = (date) => {
   let newDate = new Date(date);
-  return newDate.getDate() + '-' + newDate.getMonth() + '-' + newDate.getFullYear()
-}
+  return (
+    newDate.getDate() + "-" + newDate.getMonth() + "-" + newDate.getFullYear()
+  );
+};
 export const getDateWithFormat = () => {
-  const today = new Date()
-  let dd = today.getDate()
-  let mm = today.getMonth() + 1 // January is 0!
+  const today = new Date();
+  let dd = today.getDate();
+  let mm = today.getMonth() + 1; // January is 0!
 
-  var yyyy = today.getFullYear()
+  var yyyy = today.getFullYear();
   if (dd < 10) {
-    dd = '0' + dd
+    dd = "0" + dd;
   }
   if (mm < 10) {
-    mm = '0' + mm
+    mm = "0" + mm;
   }
-  return dd + '.' + mm + '.' + yyyy
-}
+  return dd + "." + mm + "." + yyyy;
+};
 
 export const getCurrentTime = () => {
-  const now = new Date()
-  return now.getHours() + ':' + now.getMinutes()
-}
+  const now = new Date();
+  return now.getHours() + ":" + now.getMinutes();
+};
 
 export const ThemeColors = () => {
-  let rootStyle = getComputedStyle(document.body)
+  let rootStyle = getComputedStyle(document.body);
   return {
-    themeColor1: rootStyle.getPropertyValue('--theme-color-1').trim(),
-    themeColor2: rootStyle.getPropertyValue('--theme-color-2').trim(),
-    themeColor3: rootStyle.getPropertyValue('--theme-color-3').trim(),
-    themeColor4: rootStyle.getPropertyValue('--theme-color-4').trim(),
-    themeColor5: rootStyle.getPropertyValue('--theme-color-5').trim(),
-    themeColor6: rootStyle.getPropertyValue('--theme-color-6').trim(),
-    themeColor1_10: rootStyle.getPropertyValue('--theme-color-1-10').trim(),
-    themeColor2_10: rootStyle.getPropertyValue('--theme-color-2-10').trim(),
-    themeColor3_10: rootStyle.getPropertyValue('--theme-color-3-10').trim(),
-    themeColor4_10: rootStyle.getPropertyValue('--theme-color-3-10').trim(),
-    themeColor5_10: rootStyle.getPropertyValue('--theme-color-3-10').trim(),
-    themeColor6_10: rootStyle.getPropertyValue('--theme-color-3-10').trim(),
-    primaryColor: rootStyle.getPropertyValue('--primary-color').trim(),
-    foregroundColor: rootStyle.getPropertyValue('--foreground-color').trim(),
-    separatorColor: rootStyle.getPropertyValue('--separator-color').trim()
-  }
-}
+    themeColor1: rootStyle.getPropertyValue("--theme-color-1").trim(),
+    themeColor2: rootStyle.getPropertyValue("--theme-color-2").trim(),
+    themeColor3: rootStyle.getPropertyValue("--theme-color-3").trim(),
+    themeColor4: rootStyle.getPropertyValue("--theme-color-4").trim(),
+    themeColor5: rootStyle.getPropertyValue("--theme-color-5").trim(),
+    themeColor6: rootStyle.getPropertyValue("--theme-color-6").trim(),
+    themeColor1_10: rootStyle.getPropertyValue("--theme-color-1-10").trim(),
+    themeColor2_10: rootStyle.getPropertyValue("--theme-color-2-10").trim(),
+    themeColor3_10: rootStyle.getPropertyValue("--theme-color-3-10").trim(),
+    themeColor4_10: rootStyle.getPropertyValue("--theme-color-3-10").trim(),
+    themeColor5_10: rootStyle.getPropertyValue("--theme-color-3-10").trim(),
+    themeColor6_10: rootStyle.getPropertyValue("--theme-color-3-10").trim(),
+    primaryColor: rootStyle.getPropertyValue("--primary-color").trim(),
+    foregroundColor: rootStyle.getPropertyValue("--foreground-color").trim(),
+    separatorColor: rootStyle.getPropertyValue("--separator-color").trim(),
+  };
+};
 
 export const getDirection = () => {
-  let direction = defaultDirection
-  if (localStorage.getItem('direction')) {
-    const localValue = localStorage.getItem('direction')
-    if (localValue === 'rtl' || localValue === 'ltr') {
-      direction = localValue
+  let direction = defaultDirection;
+  if (localStorage.getItem("direction")) {
+    const localValue = localStorage.getItem("direction");
+    if (localValue === "rtl" || localValue === "ltr") {
+      direction = localValue;
     }
   }
   return {
     direction,
-    isRtl: direction === 'rtl'
-  }
-}
+    isRtl: direction === "rtl",
+  };
+};
 
-export const setDirection = localValue => {
-  let direction = 'ltr'
-  if (localValue === 'rtl' || localValue === 'ltr') {
-    direction = localValue
+export const setDirection = (localValue) => {
+  let direction = "ltr";
+  if (localValue === "rtl" || localValue === "ltr") {
+    direction = localValue;
   }
-  localStorage.setItem('direction', direction)
-}
-
+  localStorage.setItem("direction", direction);
+};
 
 export const getThemeColor = () => {
   let color = defaultColor;
   try {
     if (localStorage.getItem(themeSelectedColorStorageKey)) {
-      color = localStorage.getItem(themeSelectedColorStorageKey) || defaultColor;
+      color =
+        localStorage.getItem(themeSelectedColorStorageKey) || defaultColor;
     }
   } catch (error) {
-    console.log(">>>> src/utils/index.js : getThemeColor -> error", error)
+    console.log(">>>> src/utils/index.js : getThemeColor -> error", error);
     color = defaultColor;
   }
   return color;
-}
+};
 
 export const setThemeColor = (color) => {
   try {
     localStorage.setItem(themeSelectedColorStorageKey, color);
   } catch (error) {
-    console.log(">>>> src/utils/index.js : setThemeColor -> error", error)
+    console.log(">>>> src/utils/index.js : setThemeColor -> error", error);
   }
-}
+};
 
 export const getThemeRadius = () => {
   let radius = "rounded";
@@ -161,71 +169,74 @@ export const getThemeRadius = () => {
       radius = localStorage.getItem(themeRadiusStorageKey) || "rounded";
     }
   } catch (error) {
-    console.log(">>>> src/utils/index.js : getThemeRadius -> error", error)
+    console.log(">>>> src/utils/index.js : getThemeRadius -> error", error);
     radius = "rounded";
   }
   return radius;
-}
+};
 
 export const setThemeRadius = (radius) => {
   try {
     localStorage.setItem(themeRadiusStorageKey, radius);
   } catch (error) {
-    console.log(">>>> src/utils/index.js : setThemeRadius -> error", error)
+    console.log(">>>> src/utils/index.js : setThemeRadius -> error", error);
   }
-}
+};
 
 export const getCurrentLanguage = () => {
   let locale = defaultLocale;
   try {
-    if (localStorage.getItem('currentLanguage') && localeOptions.filter(x => x.id === localStorage.getItem('currentLanguage')).length > 0) {
-      locale = localStorage.getItem('currentLanguage');
+    if (
+      localStorage.getItem("currentLanguage") &&
+      localeOptions.filter(
+        (x) => x.id === localStorage.getItem("currentLanguage")
+      ).length > 0
+    ) {
+      locale = localStorage.getItem("currentLanguage");
     }
   } catch (error) {
-    console.log(">>>> src/utils/index.js : getCurrentLanguage -> error", error)
+    console.log(">>>> src/utils/index.js : getCurrentLanguage -> error", error);
     locale = defaultLocale;
   }
   return locale;
-}
+};
 
 export const setCurrentLanguage = (lang) => {
   try {
-    localStorage.setItem('currentLanguage', lang)
+    localStorage.setItem("currentLanguage", lang);
   } catch (error) {
-    console.log(">>>> src/utils/index.js : setCurrentLanguage -> error", error)
+    console.log(">>>> src/utils/index.js : setCurrentLanguage -> error", error);
   }
-}
-
+};
 
 export const getCurrentUser = () => {
   let user = null;
   try {
-    if (localStorage.getItem('user') != undefined) {
-      let userDecrypt = decrypt(localStorage.getItem('user'))
+    if (localStorage.getItem("user") != undefined) {
+      let userDecrypt = decrypt(localStorage.getItem("user"));
       user = userDecrypt != null ? JSON.parse(userDecrypt) : null;
     } else {
-      user = null
+      user = null;
     }
-
   } catch (error) {
-    console.log(">>>> src/utils/index.js : getCurrentUser -> error", error)
+    console.log(">>>> src/utils/index.js : getCurrentUser -> error", error);
     user = null;
   }
   return user;
-}
+};
 
 export const setCurrentUser = (user) => {
   try {
     if (user) {
-      let userCrypt = encrypt(JSON.stringify(user))
-      localStorage.setItem('user', userCrypt)
+      let userCrypt = encrypt(JSON.stringify(user));
+      localStorage.setItem("user", userCrypt);
     } else {
-      localStorage.removeItem('user');
+      localStorage.removeItem("user");
     }
   } catch (error) {
-    console.log(">>>> src/utils/index.js : setCurrentUser -> error", error)
+    console.log(">>>> src/utils/index.js : setCurrentUser -> error", error);
   }
-}
+};
 export const encrypt = (plainText) => {
   // if (plainText.startsWith("Bearer")) {
   //     console.log("in encrypt : ")
@@ -247,12 +258,12 @@ export const encrypt = (plainText) => {
 
   // let enc = this.$aes.encrypt(plainText)
   // return enc
-  return plainText
-}
+  return plainText;
+};
 export const decrypt = (cipherText) => {
-//   this.$aes.setKey('myPassword')
-//   let dec = this.$aes.decrypt(cipherText)
-// return dec
+  //   this.$aes.setKey('myPassword')
+  //   let dec = this.$aes.decrypt(cipherText)
+  // return dec
   // const decryptedString = cryptr.decrypt(cipherText);
   // console.log("plain text : " + decryptedString);
   // return decryptedString
@@ -262,5 +273,5 @@ export const decrypt = (cipherText) => {
   // let plainText = bytes.toString(CryptoJS.enc.Utf8);
   // console.log("plain text length : " + plainText.length);
   // return plainText
-  return cipherText
-}
+  return cipherText;
+};

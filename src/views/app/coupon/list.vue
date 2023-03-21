@@ -25,9 +25,9 @@
                 />
               </div>
             </div>
-            <!-- <div class="float-md-right pt-1">
+            <div class="float-md-right pt-1">
               <span class="text-muted text-small mr-1 mb-2"
-                >{{ from }}-{{ to }} of {{ total }}</span
+                >{{ from }}-{{ to }} of {{ totalItems }}</span
               >
               <b-dropdown
                 id="ddown2"
@@ -44,7 +44,7 @@
                   >{{ size }}</b-dropdown-item
                 >
               </b-dropdown>
-            </div> -->
+            </div>
           </b-collapse>
         </div>
         <div class="separator mb-5" />
@@ -59,9 +59,6 @@
           :per-page="perPage"
           :reactive-api-url="true"
           :fields="fields"
-          pagination-path
-          :row-class="onRowClass"
-          @vuetable:pagination-data="onPaginationData"
         >
           <template slot="actions" slot-scope="props">
             <b-row align-h="around" class="pr-1 align-items-center">
@@ -76,11 +73,21 @@
             </b-row>
           </template>
         </vuetable>
-        <vuetable-pagination-bootstrap
-          class="mt-4"
-          ref="pagination"
-          @vuetable-pagination:change-page="onChangePage"
-        />
+        <div class="d-flex justify-content-center">
+          <b-pagination
+            v-if="totalItems > perPage"
+            v-model="currentPage"
+            :total-rows="totalItems"
+            :per-page="perPage"
+            :aria-controls="'my-table'"
+            :ellipsis-text="'...'"
+            :prev-text="'<'"
+            :next-text="'>'"
+            :max-size="5"
+            :use-router="true"
+            :router-to="{ name: 'my-table', query: { page: currentPage } }"
+          ></b-pagination>
+        </div>
       </b-colxx>
     </b-row>
   </div>
@@ -101,17 +108,12 @@ export default {
   data() {
     return {
       isLoad: false,
-      sort: "",
-      page: 1,
-      perPage: 12,
-      search: "",
+      currentPage: 1, // current page number
+      perPage: 12, // number of items per page
+      totalItems: 0, // total number of items
+      pageSizes: [12, 18, 25],
       from: 0,
       to: 0,
-      total: 0,
-      lastPage: 0,
-      items: [],
-      selectedItems: [],
-      pageSizes: [12, 18, 25],
       fields: [
         {
           name: "code",
@@ -170,6 +172,8 @@ export default {
   created() {
     this.getCoupons({
       keyword: null,
+      offset: 0,
+      limit: 12,
     });
   },
   methods: {
@@ -177,141 +181,82 @@ export default {
     add_New() {
       this.$router.push(`${adminRoot}/coupon/couponDetails`);
     },
-    makeQueryParams(sortOrder, currentPage, perPage) {
-      this.selectedItems = [];
-      return sortOrder[0]
-        ? {
-            sort: sortOrder[0]
-              ? sortOrder[0].field + "|" + sortOrder[0].direction
-              : "",
-            page: currentPage,
-            per_page: this.perPage,
-            search: this.search,
-          }
-        : {
-            page: currentPage,
-            per_page: this.perPage,
-            search: this.search,
-          };
-    },
-    onRowClass(dataItem, index) {
-      if (this.selectedItems.includes(dataItem.id)) {
-        return "selected";
-      }
-      return "";
-    },
 
-    rowClicked(dataItem, event) {
-      const itemId = dataItem.id;
-      if (event.shiftKey && this.selectedItems.length > 0) {
-        let itemsForToggle = this.items;
-        var start = this.getIndex(itemId, itemsForToggle, "id");
-        var end = this.getIndex(
-          this.selectedItems[this.selectedItems.length - 1],
-          itemsForToggle,
-          "id"
-        );
-        itemsForToggle = itemsForToggle.slice(
-          Math.min(start, end),
-          Math.max(start, end) + 1
-        );
-        this.selectedItems.push(
-          ...itemsForToggle.map((item) => {
-            return item.id;
-          })
-        );
-        this.selectedItems = [...new Set(this.selectedItems)];
-      } else {
-        if (this.selectedItems.includes(itemId)) {
-          this.selectedItems = this.selectedItems.filter((x) => x !== itemId);
-        } else this.selectedItems.push(itemId);
-      }
-    },
-    rightClicked(dataItem, field, event) {
-      event.preventDefault();
-      if (!this.selectedItems.includes(dataItem.id)) {
-        this.selectedItems = [dataItem.id];
-      }
-      this.$refs.contextmenu.show({ top: event.pageY, left: event.pageX });
-    },
-    onPaginationData(paginationData) {
-      this.from = paginationData.from;
-      this.to = paginationData.to;
-      this.total = paginationData.total;
-      this.lastPage = paginationData.last_page;
-      this.items = paginationData.data;
-      this.$refs.pagination.setPaginationData(paginationData);
-    },
-    onChangePage(page) {
-      this.$refs.vuetable.changePage(page);
-    },
     open_details(id) {
       this.$router.push({
         path: `${adminRoot}/coupon/couponDetails`,
         query: { id: id },
       });
     },
+    fetchData() {
+      // fetch the table data using your API or database driver
+      const limit = this.perPage;
+      const offset = (this.currentPage - 1) * this.perPage;
+      this.getCoupons({
+        keyword: null,
+        offset: offset,
+        limit: limit,
+      });
+    },
+    calculation() {
+      this.from = (this.currentPage - 1) * this.perPage;
+      this.to = this.from + this.perPage;
+    },
+
     changePageSize(perPage) {
       this.perPage = perPage;
-      this.$refs.vuetable.refresh();
+    },
+    calculatePagination() {
+      // calculate the number of pages needed
+      const totalPages = Math.ceil(this.totalItems / this.perPage);
+
+      // set the current page number based on the query parameter or default to 1
+      this.currentPage = parseInt(this.$route.query.page) || 1;
+
+      // calculate the start and end page numbers for the pagination control
+      const startPage = Math.max(1, this.currentPage - 2);
+      const endPage = Math.min(totalPages, this.currentPage + 2);
+
+      // calculate the page numbers to display in the pagination control
+      const pages = Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+      );
+
+      // return the pagination properties
+      return {
+        currentPage: this.currentPage,
+        perPage: this.perPage,
+        totalPages: totalPages,
+        totalItems: this.totalItems,
+        pages: pages,
+      };
     },
 
     searchChange(val) {
       this.search = val;
       this.getCoupons({
         keyword: val,
+        offset: null,
+        limit: null,
       });
-    },
-
-    selectAll(isToggle) {
-      if (this.selectedItems.length >= this.items.length) {
-        if (isToggle) this.selectedItems = [];
-      } else {
-        this.selectedItems = this.items.map((x) => x.id);
-      }
-    },
-    keymap(event) {
-      switch (event.srcKey) {
-        case "select":
-          this.selectAll(false);
-          break;
-        case "undo":
-          this.selectedItems = [];
-          break;
-      }
-    },
-    getIndex(value, arr, prop) {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i][prop] === value) {
-          return i;
-        }
-      }
-      return -1;
-    },
-
-    onContextMenuAction(action) {
-      console.log(
-        "context menu item clicked - " + action + ": ",
-        this.selectedItems
-      );
     },
   },
   computed: {
     ...mapGetters(["coupons"]),
-    isSelectedAll() {
-      return this.selectedItems.length >= this.items.length;
-    },
-    isAnyItemSelected() {
-      return (
-        this.selectedItems.length > 0 &&
-        this.selectedItems.length < this.items.length
-      );
-    },
   },
   watch: {
     coupons: function (coup) {
       console.log(coup);
-      this.$refs.vuetable.setData(coup);
+      this.$refs.vuetable.setData(coup.data);
+      this.totalItems = coup.total;
+      this.calculation();
+    },
+    currentPage: function (val) {
+      this.fetchData();
+    },
+    perPage: function (val) {
+      this.fetchData();
     },
   },
 };

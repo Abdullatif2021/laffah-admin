@@ -37,7 +37,7 @@ const getters = {
 
 const mutations = {
   all_deliveries(state, payload) {
-    state.all_delivery = payload.data;
+    state.all_delivery = payload;
     state.delivery_paginations = payload;
   },
   deliveries(state, payload) {
@@ -87,6 +87,8 @@ const actions = {
           order_dir: payload.order_dir,
           keyword: payload.keyword,
           order_by: payload.order_by,
+          offset: payload.offset,
+          limit: payload.limit,
         },
       }
     )

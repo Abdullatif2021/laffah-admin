@@ -80,7 +80,7 @@ const routes = [
         path: "blocks",
         component: () =>
           import(
-            /* webpackChunkName: "dashboards" */ "./views/app/blocks/index"
+            /* webpackChunkName: "second-menu" */ "./views/app/blocks/index"
           ),
         redirect: `${adminRoot}/:slug`,
         meta: {
@@ -233,7 +233,9 @@ const routes = [
       {
         path: "items",
         component: () =>
-          import(/* webpackChunkName: "items" */ "./views/app/items/index"),
+          import(
+            /* webpackChunkName: "second-menu" */ "./views/app/items/index"
+          ),
         redirect: `${adminRoot}/items/items-list`,
         meta: {
           loginRequired: true,
@@ -244,7 +246,7 @@ const routes = [
             path: "item-form/:id",
             component: () =>
               import(
-                /* webpackChunkName: "items" */ "./views/app/items/item_form"
+                /* webpackChunkName: "piaf" */ "./views/app/items/item_form"
               ),
             meta: {
               loginRequired: true,
@@ -259,7 +261,7 @@ const routes = [
             path: "item-form",
             component: () =>
               import(
-                /* webpackChunkName: "items" */ "./views/app/items/item_form"
+                /* webpackChunkName: "piaf" */ "./views/app/items/item_form"
               ),
             meta: { loginRequired: true, roles: [UserRole.superadmin] },
           },
@@ -273,7 +275,7 @@ const routes = [
             path: "items-list",
             component: () =>
               import(
-                /* webpackChunkName: "items" */ "./views/app/items/items-list"
+                /* webpackChunkName: "piaf" */ "./views/app/items/items-list"
               ),
             meta: {
               loginRequired: true,
@@ -287,9 +289,7 @@ const routes = [
           {
             path: "attributes",
             component: () =>
-              import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/index"
-              ),
+              import(/* webpackChunkName: "piaf" */ "./views/app/items/index"),
             redirect: `${adminRoot}/items/attributes/attribute-list`,
             meta: {
               loginRequired: true,
@@ -304,7 +304,7 @@ const routes = [
                 path: "attribute-form",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attributes/attribute-form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attributes/attribute-form"
                   ),
                 meta: { loginRequired: true, roles: [UserRole.superadmin] },
               },
@@ -312,7 +312,7 @@ const routes = [
                 path: "attribute-list",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attributes/attribute-list"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attributes/attribute-list"
                   ),
                 meta: {
                   loginRequired: true,
@@ -327,7 +327,7 @@ const routes = [
                 path: "attribute-form/:id",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attributes/attribute-form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attributes/attribute-form"
                   ),
                 meta: {
                   loginRequired: true,
@@ -343,9 +343,7 @@ const routes = [
           {
             path: "attribute-group",
             component: () =>
-              import(
-                /* webpackChunkName: "dashboards" */ "./views/app/items/index"
-              ),
+              import(/* webpackChunkName: "piaf" */ "./views/app/items/index"),
             redirect: `${adminRoot}/items/attribute-group/attribute-group-list`,
             meta: {
               loginRequired: true,
@@ -360,7 +358,7 @@ const routes = [
                 path: "attribute-group-form",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attribute-group/attribute-group-form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attribute-group/attribute-group-form"
                   ),
                 meta: { loginRequired: true, roles: [UserRole.superadmin] },
               },
@@ -368,7 +366,7 @@ const routes = [
                 path: "attribute-group-list",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attribute-group/attribute-group-list"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attribute-group/attribute-group-list"
                   ),
                 meta: {
                   loginRequired: true,
@@ -383,7 +381,7 @@ const routes = [
                 path: "attribute-group-form/:id",
                 component: () =>
                   import(
-                    /* webpackChunkName: "dashboards" */ "./views/app/items/attribute-group/attribute-group-form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/attribute-group/attribute-group-form"
                   ),
                 meta: {
                   loginRequired: true,
@@ -426,7 +424,7 @@ const routes = [
             path: "customizations",
             component: () =>
               import(
-                /* webpackChunkName: "customizations" */ "./views/app/items/customizations"
+                /* webpackChunkName: "piaf" */ "./views/app/items/customizations"
               ),
             meta: {
               loginRequired: true,
@@ -436,9 +434,7 @@ const routes = [
           {
             path: "categories",
             component: () =>
-              import(
-                /* webpackChunkName: "categories" */ "./views/app/items/index"
-              ),
+              import(/* webpackChunkName: "piaf" */ "./views/app/items/index"),
             redirect: `${adminRoot}/items/categories/list`,
             meta: {
               loginRequired: true,
@@ -453,7 +449,7 @@ const routes = [
                 path: "create-category",
                 component: () =>
                   import(
-                    /* webpackChunkName: "categories" */ "./views/app/items/categories/form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/categories/form"
                   ),
                 meta: { loginRequired: true, roles: [UserRole.superadmin] },
               },
@@ -461,7 +457,7 @@ const routes = [
                 path: "list",
                 component: () =>
                   import(
-                    /* webpackChunkName: "categories" */ "./views/app/items/categories/list"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/categories/list"
                   ),
                 meta: {
                   loginRequired: true,
@@ -476,7 +472,7 @@ const routes = [
                 path: "create-category/:id",
                 component: () =>
                   import(
-                    /* webpackChunkName: "categories" */ "./views/app/items/categories/form"
+                    /* webpackChunkName: "piaf" */ "./views/app/items/categories/form"
                   ),
                 meta: {
                   loginRequired: true,
@@ -495,7 +491,7 @@ const routes = [
         path: "branches",
         component: () =>
           import(
-            /* webpackChunkName: "branches" */ "./views/app/branches/index"
+            /* webpackChunkName: "second-menu" */ "./views/app/branches/index"
           ),
         redirect: `${adminRoot}/branches/branches-list`,
         meta: {
@@ -508,7 +504,7 @@ const routes = [
             path: "branches-form",
             component: () =>
               import(
-                /* webpackChunkName : "branches" */ "./views/app/branches/branches-form"
+                /* webpackChunkName : "piaf" */ "./views/app/branches/branches-form"
               ),
             meta: { loginRequired: true, roles: [UserRole.superadmin] },
           },
@@ -516,7 +512,7 @@ const routes = [
             path: "branches-list",
             component: () =>
               import(
-                /* webpackChunkName : "branches" */ "./views/app/branches/branches-list"
+                /* webpackChunkName : "piaf" */ "./views/app/branches/branches-list"
               ),
             meta: {
               loginRequired: true,
@@ -531,7 +527,7 @@ const routes = [
             path: "branches-form/:id",
             component: () =>
               import(
-                /* webpackChunkName : "product" */ "./views/app/branches/branches-form"
+                /* webpackChunkName : "piaf" */ "./views/app/branches/branches-form"
               ),
             meta: {
               loginRequired: true,
@@ -547,7 +543,9 @@ const routes = [
       {
         path: "users",
         component: () =>
-          import(/* webpackChunkName: "users" */ "./views/app/users/index"),
+          import(
+            /* webpackChunkName: "second-menu" */ "./views/app/users/index"
+          ),
         redirect: `${adminRoot}/users/list`,
         meta: {
           loginRequired: true,
@@ -559,7 +557,7 @@ const routes = [
             path: "users-form",
             component: () =>
               import(
-                /* webpackChunkName : "users" */ "./views/app/users/users-form"
+                /* webpackChunkName : "piaf" */ "./views/app/users/users-form"
               ),
             meta: {
               loginRequired: true,
@@ -573,9 +571,7 @@ const routes = [
           {
             path: "list",
             component: () =>
-              import(
-                /* webpackChunkName : "users" */ "./views/app/users/list2"
-              ),
+              import(/* webpackChunkName : "piaf" */ "./views/app/users/list2"),
             meta: {
               loginRequired: true,
               roles: [
@@ -589,7 +585,7 @@ const routes = [
             path: "users-form/:id",
             component: () =>
               import(
-                /* webpackChunkName : "users" */ "./views/app/users/users-form"
+                /* webpackChunkName : "piaf" */ "./views/app/users/users-form"
               ),
             meta: {
               loginRequired: true,
@@ -606,7 +602,7 @@ const routes = [
         path: "delivery",
         component: () =>
           import(
-            /* webpackChunkName: "delivery" */ "./views/app/delivery/index"
+            /* webpackChunkName: "second-menu" */ "./views/app/delivery/index"
           ),
         redirect: `${adminRoot}/delivery/list`,
         meta: {
@@ -624,7 +620,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "delivery" */ "./views/app/delivery/list"
+                /* webpackChunkName : "piaf" */ "./views/app/delivery/list"
               ),
             meta: {
               loginRequired: true,
@@ -640,7 +636,7 @@ const routes = [
             path: "details/:id",
             component: () =>
               import(
-                /* webpackChunkName: "delivery" */ "./views/app/delivery/details"
+                /* webpackChunkName: "piaf" */ "./views/app/delivery/details"
               ),
             meta: {
               loginRequired: true,
@@ -657,7 +653,9 @@ const routes = [
       {
         path: "orders",
         component: () =>
-          import(/* webpackChunkName: "orders" */ "./views/app/orders/index"),
+          import(
+            /* webpackChunkName: "second-menu" */ "./views/app/orders/index"
+          ),
         redirect: `${adminRoot}/orders/list`,
         meta: {
           loginRequired: true,
@@ -673,9 +671,7 @@ const routes = [
           {
             path: "list",
             component: () =>
-              import(
-                /* webpackChunkName : "orders" */ "./views/app/orders/list"
-              ),
+              import(/* webpackChunkName : "piaf" */ "./views/app/orders/list"),
             meta: {
               loginRequired: true,
               roles: [
@@ -690,7 +686,7 @@ const routes = [
             path: "details/:id",
             component: () =>
               import(
-                /* webpackChunkName: "orders" */ "./views/app/orders/details"
+                /* webpackChunkName: "piaf" */ "./views/app/orders/details"
               ),
             meta: {
               loginRequired: true,
@@ -708,7 +704,7 @@ const routes = [
         path: "waiting-orders",
         component: () =>
           import(
-            /* webpackChunkName: "orders" */ "./views/app/waiting-orders/index"
+            /* webpackChunkName: "second-menu" */ "./views/app/waiting-orders/index"
           ),
         redirect: `${adminRoot}/waiting-orders/list`,
         meta: {
@@ -726,7 +722,7 @@ const routes = [
             path: "list",
             component: () =>
               import(
-                /* webpackChunkName : "orders" */ "./views/app/waiting-orders/list"
+                /* webpackChunkName : "piaf" */ "./views/app/waiting-orders/list"
               ),
             meta: {
               loginRequired: true,
@@ -743,7 +739,9 @@ const routes = [
       {
         path: "coupon",
         component: () =>
-          import(/* webpackChunkName: "coupon" */ "./views/app/coupon/index"),
+          import(
+            /* webpackChunkName: "second-menu" */ "./views/app/coupon/index"
+          ),
         redirect: `${adminRoot}/coupon/list`,
         meta: {
           loginRequired: true,
@@ -754,9 +752,7 @@ const routes = [
           {
             path: "list",
             component: () =>
-              import(
-                /* webpackChunkName : "coupon" */ "./views/app/coupon/list"
-              ),
+              import(/* webpackChunkName : "piaf" */ "./views/app/coupon/list"),
             meta: {
               loginRequired: true,
               roles: [UserRole.superadmin, UserRole.admin],
@@ -766,7 +762,7 @@ const routes = [
             path: "couponDetails",
             component: () =>
               import(
-                /* webpackChunkName: "coupon" */ "./views/app/coupon/coupon"
+                /* webpackChunkName: "piaf" */ "./views/app/coupon/coupon"
               ),
             meta: {
               loginRequired: true,
@@ -923,8 +919,7 @@ const routes = [
 
       {
         path: "areas",
-        component: () =>
-          import(/* webpackChunkName: "areas" */ "./views/app/areas/index"),
+        component: () => import("./views/app/areas/index"),
         redirect: `${adminRoot}/areas/list`,
         meta: {
           loginRequired: true,
@@ -934,10 +929,7 @@ const routes = [
         children: [
           {
             path: "list",
-            component: () =>
-              import(
-                /* webpackChunkName : "areas" */ "./views/app/areas/areas-list"
-              ),
+            component: () => import("./views/app/areas/areas-list"),
             meta: {
               loginRequired: true,
               roles: [
@@ -949,10 +941,7 @@ const routes = [
           },
           {
             path: "list/:slug/:id",
-            component: () =>
-              import(
-                /* webpackChunkName : ":slug/:id" */ "./views/app/areas/areas-list"
-              ),
+            component: () => import("./views/app/areas/areas-list"),
             meta: {
               loginRequired: true,
               roles: [
@@ -964,226 +953,226 @@ const routes = [
           },
         ],
       },
-      {
-        path: "pages",
-        component: () =>
-          import(/* webpackChunkName: "pages" */ "./views/app/pages"),
-        redirect: `${adminRoot}/pages/product`,
-        meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      // {
+      // path: "pages",
+      // component: () =>
+      //   import(/* webpackChunkName: "pages" */ "./views/app/pages"),
+      // redirect: `${adminRoot}/pages/product`,
+      // meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-        children: [
-          {
-            path: "product",
-            component: () =>
-              import(
-                /* webpackChunkName : "product" */ "./views/app/pages/product"
-              ),
-            redirect: `${adminRoot}/pages/product/data-list`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      // children: [
+      //   {
+      //     path: "product",
+      //     component: () =>
+      //       import(
+      //         /* webpackChunkName : "product" */ "./views/app/pages/product"
+      //       ),
+      //     redirect: `${adminRoot}/pages/product/data-list`,
+      //     meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-            children: [
-              {
-                path: "data-list",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "product" */ "./views/app/pages/product/DataList"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "thumb-list",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "product" */ "./views/app/pages/product/ThumbList"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "image-list",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "product" */ "./views/app/pages/product/ImageList"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "details",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "product" */ "./views/app/pages/product/Details"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "details-alt",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "product" */ "./views/app/pages/product/DetailsAlt"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-          {
-            path: "profile",
-            component: () =>
-              import(
-                /* webpackChunkName : "profile" */ "./views/app/pages/profile"
-              ),
-            redirect: `${adminRoot}/pages/profile/social`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     children: [
+      //       {
+      //         path: "data-list",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "product" */ "./views/app/pages/product/DataList"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "thumb-list",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "product" */ "./views/app/pages/product/ThumbList"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "image-list",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "product" */ "./views/app/pages/product/ImageList"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "details",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "product" */ "./views/app/pages/product/Details"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "details-alt",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "product" */ "./views/app/pages/product/DetailsAlt"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     path: "profile",
+      //     component: () =>
+      //       import(
+      //         /* webpackChunkName : "profile" */ "./views/app/pages/profile"
+      //       ),
+      //     redirect: `${adminRoot}/pages/profile/social`,
+      //     meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-            children: [
-              {
-                path: "social",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "profile" */ "./views/app/pages/profile/Social"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "portfolio",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "profile" */ "./views/app/pages/profile/Portfolio"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-          {
-            path: "blog",
-            component: () =>
-              import(/* webpackChunkName : "blog" */ "./views/app/pages/blog"),
-            redirect: `${adminRoot}/pages/blog/blog-list`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     children: [
+      //       {
+      //         path: "social",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "profile" */ "./views/app/pages/profile/Social"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "portfolio",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "profile" */ "./views/app/pages/profile/Portfolio"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     path: "blog",
+      //     component: () =>
+      //       import(/* webpackChunkName : "blog" */ "./views/app/pages/blog"),
+      //     redirect: `${adminRoot}/pages/blog/blog-list`,
+      //     meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-            children: [
-              {
-                path: "blog-list",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "blog" */ "./views/app/pages/blog/BlogList"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "blog-detail",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "blog" */ "./views/app/pages/blog/BlogDetail"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-          {
-            path: "miscellaneous",
-            component: () =>
-              import(
-                /* webpackChunkName : "miscellaneous" */ "./views/app/pages/miscellaneous"
-              ),
-            redirect: `${adminRoot}/pages/miscellaneous/faq`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     children: [
+      //       {
+      //         path: "blog-list",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "blog" */ "./views/app/pages/blog/BlogList"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //       {
+      //         path: "blog-detail",
+      //         component: () =>
+      //           import(
+      //             /* webpackChunkName: "blog" */ "./views/app/pages/blog/BlogDetail"
+      //           ),
+      //         meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //       },
+      //     ],
+      //   },
+      // {
+      //   path: "miscellaneous",
+      //   component: () =>
+      //     import(
+      //       /* webpackChunkName : "miscellaneous" */ "./views/app/pages/miscellaneous"
+      //     ),
+      //   redirect: `${adminRoot}/pages/miscellaneous/faq`,
+      //   meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-            children: [
-              {
-                path: "faq",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Faq"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "knowledge-base",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/KnowledgeBase"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "search",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Search"
-                  ),
-                meta: {
-                  loginRequired: true,
-                  roles: [
-                    UserRole.superadmin,
-                    UserRole.admin,
-                    UserRole.branchadmin,
-                  ],
-                },
-              },
-              {
-                path: "prices",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Prices"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "mailing",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Mailing"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "invoice",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Invoice"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-            // }
-          },
-          {
-            path: "all-orders",
-            component: () =>
-              import(
-                /* webpackChunkName: "branches" */ "./views/app/all-orders/index"
-              ),
-            redirect: `${adminRoot}/all-orders/list`,
-            meta: {
-              loginRequired: true,
-              roles: [
-                UserRole.superadmin,
-                UserRole.admin,
-                UserRole.branchadmin,
-                UserRole.casher,
-              ],
-            },
+      //   children: [
+      //     {
+      //       path: "faq",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Faq"
+      //         ),
+      //       meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     },
+      //     {
+      //       path: "knowledge-base",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/KnowledgeBase"
+      //         ),
+      //       meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     },
+      //     {
+      //       path: "search",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Search"
+      //         ),
+      //       meta: {
+      //         loginRequired: true,
+      //         roles: [
+      //           UserRole.superadmin,
+      //           UserRole.admin,
+      //           UserRole.branchadmin,
+      //         ],
+      //       },
+      //     },
+      //     {
+      //       path: "prices",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Prices"
+      //         ),
+      //       meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     },
+      //     {
+      //       path: "mailing",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Mailing"
+      //         ),
+      //       meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     },
+      //     {
+      //       path: "invoice",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName: "miscellaneous" */ "./views/app/pages/miscellaneous/Invoice"
+      //         ),
+      //       meta: { loginRequired: true, roles: [UserRole.superadmin] },
+      //     },
+      //   ],
+      //   // }
+      // },
+      // {
+      //   path: "all-orders",
+      //   component: () =>
+      //     import(
+      //       /* webpackChunkName: "product" */ "./views/app/all-orders/index"
+      //     ),
+      //   redirect: `${adminRoot}/all-orders/list`,
+      //   meta: {
+      //     loginRequired: true,
+      //     roles: [
+      //       UserRole.superadmin,
+      //       UserRole.admin,
+      //       UserRole.branchadmin,
+      //       UserRole.casher,
+      //     ],
+      //   },
 
-            children: [
-              {
-                path: "list",
-                component: () =>
-                  import(
-                    /* webpackChunkName : "product" */ "./views/app/all-orders/list"
-                  ),
-                meta: {
-                  loginRequired: true,
-                  roles: [
-                    UserRole.superadmin,
-                    UserRole.admin,
-                    UserRole.branchadmin,
-                    UserRole.casher,
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-      },
+      //   children: [
+      //     {
+      //       path: "list",
+      //       component: () =>
+      //         import(
+      //           /* webpackChunkName : "product" */ "./views/app/all-orders/list"
+      //         ),
+      //       meta: {
+      //         loginRequired: true,
+      //         roles: [
+      //           UserRole.superadmin,
+      //           UserRole.admin,
+      //           UserRole.branchadmin,
+      //           UserRole.casher,
+      //         ],
+      //       },
+      //     },
+      //   ],
+      // },
+      // ],
+      // },
       {
         path: "notifications",
         component: () =>
@@ -1323,348 +1312,7 @@ const routes = [
           },
         ],
       },
-      {
-        path: "applications",
-        component: () =>
-          import(
-            /* webpackChunkName: "applications" */ "./views/app/applications"
-          ),
-        redirect: `${adminRoot}/applications/todo`,
-        meta: { loginRequired: true, roles: [UserRole.superadmin] },
 
-        children: [
-          {
-            path: "todo",
-            component: () =>
-              import(
-                /* webpackChunkName: "applications" */ "./views/app/applications/Todo"
-              ),
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-          },
-          {
-            path: "survey",
-            component: () =>
-              import(
-                /* webpackChunkName: "applications" */ "./views/app/applications/Survey"
-              ),
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-          },
-          {
-            path: "survey/:id",
-            component: () =>
-              import(
-                /* webpackChunkName: "applications" */ "./views/app/applications/SurveyDetail"
-              ),
-            props: true,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-          },
-          {
-            path: "chat",
-            component: () =>
-              import(
-                /* webpackChunkName: "applications" */ "./views/app/applications/Chat"
-              ),
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-          },
-        ],
-      },
-      {
-        path: "ui",
-        component: () => import(/* webpackChunkName: "ui" */ "./views/app/ui"),
-        redirect: `${adminRoot}/ui/forms`,
-        meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-        children: [
-          {
-            path: "forms",
-            component: () =>
-              import(/* webpackChunkName : "forms" */ "./views/app/ui/forms"),
-            redirect: `${adminRoot}/ui/forms/layouts`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-            children: [
-              {
-                path: "layouts",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "forms" */ "./views/app/ui/forms/Layouts"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "components",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "forms" */ "./views/app/ui/forms/Components"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "validations",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "forms" */ "./views/app/ui/forms/Validations"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "wizard",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "forms" */ "./views/app/ui/forms/Wizard"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-          {
-            path: "datatables",
-            component: () =>
-              import(
-                /* webpackChunkName : "datatables" */ "./views/app/ui/datatables"
-              ),
-            redirect: `${adminRoot}/ui/datatables/divided-table`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-            children: [
-              {
-                path: "divided-table",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "datatables" */ "./views/app/ui/datatables/DividedTable"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "scrollable",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "datatables" */ "./views/app/ui/datatables/Scrollable"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "default",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "datatables" */ "./views/app/ui/datatables/Default"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-          {
-            path: "components",
-            component: () =>
-              import(
-                /* webpackChunkName : "components" */ "./views/app/ui/components"
-              ),
-            redirect: `${adminRoot}/ui/components/alerts`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-            children: [
-              {
-                path: "alerts",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Alerts"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "badges",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Badges"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "buttons",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Buttons"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "cards",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Cards"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "carousel",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Carousel"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "charts",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Charts"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "collapse",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Collapse"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "dropdowns",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Dropdowns"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "editors",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Editors"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "icons",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Icons"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "input-groups",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/InputGroups"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "jumbotron",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Jumbotron"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "maps",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Maps"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "modal",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Modal"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "navigation",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Navigation"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "popover-tooltip",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/PopoverTooltip"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "sortable",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Sortable"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "tables",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "components" */ "./views/app/ui/components/Tables"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-        ],
-      },
-      {
-        path: "menu",
-        component: () =>
-          import(/* webpackChunkName: "menu" */ "./views/app/menu"),
-        redirect: `${adminRoot}/menu/types`,
-        meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-        children: [
-          {
-            path: "types",
-            component: () =>
-              import(
-                /* webpackChunkName : "menu-types" */ "./views/app/menu/Types"
-              ),
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-          },
-          {
-            path: "levels",
-            component: () =>
-              import(
-                /* webpackChunkName : "menu-levels" */ "./views/app/menu/levels"
-              ),
-            redirect: `${adminRoot}/menu/levels/third-level-1`,
-            meta: { loginRequired: true, roles: [UserRole.superadmin] },
-
-            children: [
-              {
-                path: "third-level-1",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "menu-levels" */ "./views/app/menu/levels/Third-level-1"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "third-level-2",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "menu-levels" */ "./views/app/menu/levels/Third-level-2"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-              {
-                path: "third-level-3",
-                component: () =>
-                  import(
-                    /* webpackChunkName: "menu-levels" */ "./views/app/menu/levels/Third-level-3"
-                  ),
-                meta: { loginRequired: true, roles: [UserRole.superadmin] },
-              },
-            ],
-          },
-        ],
-      },
       {
         path: "blank-page",
         component: () =>

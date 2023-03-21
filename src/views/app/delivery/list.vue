@@ -15,9 +15,9 @@
                 />
               </div>
             </div>
-            <!-- <div class="float-md-right pt-1">
+            <div class="float-md-right pt-1">
               <span class="text-muted text-small mr-1 mb-2"
-                >{{ from }}-{{ to }} of {{ total }}</span
+                >{{ from }}-{{ to }} of {{ totalItems }}</span
               >
               <b-dropdown
                 id="ddown2"
@@ -34,7 +34,7 @@
                   >{{ size }}</b-dropdown-item
                 >
               </b-dropdown>
-            </div> -->
+            </div>
           </b-collapse>
         </div>
         <div class="separator mb-5"></div>
@@ -50,9 +50,6 @@
           :reactive-api-url="true"
           :api-mode="false"
           :fields="fields"
-          :data-manager="dataManager"
-          pagination-path
-          @vuetable:pagination-data="onPaginationData"
         >
           <!-- <template slot="rating" slot-scope="props">
                       <div class="rating">
@@ -122,11 +119,21 @@
             </b-row>
           </template>
         </vuetable>
-        <!-- <vuetable-pagination-bootstrap
-          class="mt-4"
-          ref="pagination"
-          @vuetable-pagination:change-page="onChangePage"
-        /> -->
+        <div class="d-flex justify-content-center">
+          <b-pagination
+            v-if="totalItems > perPage"
+            v-model="currentPage"
+            :total-rows="totalItems"
+            :per-page="perPage"
+            :aria-controls="'my-table'"
+            :ellipsis-text="'...'"
+            :prev-text="'<'"
+            :next-text="'>'"
+            :max-size="5"
+            :use-router="true"
+            :router-to="{ name: 'my-table', query: { page: currentPage } }"
+          ></b-pagination>
+        </div>
       </b-colxx>
     </b-row>
   </div>
@@ -156,17 +163,12 @@ export default {
   data() {
     return {
       isLoad: false,
-      sort: "",
-      page: 1,
-      perPage: 12,
-      search: "",
+      currentPage: 1, // current page number
+      perPage: 12, // number of items per page
+      totalItems: 0, // total number of items
+      pageSizes: [12, 18, 25],
       from: 0,
       to: 0,
-      total: 0,
-      lastPage: 0,
-      items: [],
-      selectedItems: [],
-      pageSizes: [12, 18, 25],
       fields: [
         {
           name: "first_name",
@@ -236,37 +238,14 @@ export default {
     this.get_deliveries({
       order_dir: null,
       keyword: null,
+      offset: 0,
+      limit: 12,
       order_by: null,
     });
   },
   methods: {
     ...mapActions(["get_deliveries", "updateDliveryState"]),
-    rowClicked(dataItem, event) {
-      const itemId = dataItem.id;
-      if (event.shiftKey && this.selectedItems.length > 0) {
-        let itemsForToggle = this.items;
-        var start = this.getIndex(itemId, itemsForToggle, "id");
-        var end = this.getIndex(
-          this.selectedItems[this.selectedItems.length - 1],
-          itemsForToggle,
-          "id"
-        );
-        itemsForToggle = itemsForToggle.slice(
-          Math.min(start, end),
-          Math.max(start, end) + 1
-        );
-        this.selectedItems.push(
-          ...itemsForToggle.map((item) => {
-            return item.id;
-          })
-        );
-        this.selectedItems = [...new Set(this.selectedItems)];
-      } else {
-        if (this.selectedItems.includes(itemId)) {
-          this.selectedItems = this.selectedItems.filter((x) => x !== itemId);
-        } else this.selectedItems.push(itemId);
-      }
-    },
+
     handleSwitchClick(item) {
       console.log(item);
       this.updateDliveryState({
@@ -274,37 +253,53 @@ export default {
         status: item.delivery_status ? 0 : 1,
       });
     },
-
-    onPaginationData(paginationData) {
-      this.from = paginationData.from;
-      this.to = paginationData.to;
-      this.total = paginationData.total;
-      this.lastPage = paginationData.last_page;
-      this.items = paginationData.data;
-      // this.$refs.pagination.setPaginationData(paginationData);
+    fetchData() {
+      // fetch the table data using your API or database driver
+      const limit = this.perPage;
+      const offset = (this.currentPage - 1) * this.perPage;
+      this.get_deliveries({
+        order_dir: null,
+        keyword: null,
+        offset: offset,
+        limit: limit,
+        order_by: null,
+      });
     },
-    onChangePage(page) {
-      this.page = page;
-      this.$refs.vuetable.changePage(page);
+    calculation() {
+      this.from = (this.currentPage - 1) * this.perPage;
+      this.to = this.from + this.perPage;
     },
 
     changePageSize(perPage) {
       this.perPage = perPage;
     },
     calculatePagination() {
-      this.from = (this.page - 1) * this.perPage + 1;
-      let tempTo = this.from + this.perPage - 1;
-      this.to = tempTo <= this.total ? tempTo : this.total;
-      this.lastPage = Number((this.total / this.perPage).toFixed(0));
+      // calculate the number of pages needed
+      const totalPages = Math.ceil(this.totalItems / this.perPage);
+
+      // set the current page number based on the query parameter or default to 1
+      this.currentPage = parseInt(this.$route.query.page) || 1;
+
+      // calculate the start and end page numbers for the pagination control
+      const startPage = Math.max(1, this.currentPage - 2);
+      const endPage = Math.min(totalPages, this.currentPage + 2);
+
+      // calculate the page numbers to display in the pagination control
+      const pages = Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+      );
+
+      // return the pagination properties
+      return {
+        currentPage: this.currentPage,
+        perPage: this.perPage,
+        totalPages: totalPages,
+        totalItems: this.totalItems,
+        pages: pages,
+      };
     },
-    searchChange(val) {
-      this.search = val;
-      this.get_deliveries({
-        order_dir: null,
-        keyword: val,
-        order_by: null,
-      });
-    },
+
     open_details(id) {
       this.$router.push(`details/${id}`);
       // this.$router.push({
@@ -317,66 +312,10 @@ export default {
       this.get_deliveries({
         order_dir: null,
         keyword: val,
+        offset: 0,
+        limit: 12,
         order_by: null,
       });
-    },
-    dataManager(sortOrder, pagination) {
-      // console.log("RRR", this.data)
-      let local = this.data;
-      // console.log(local, 'ddddd')
-      // if (this.search) {
-      //   //console.log(this.search, 'ssssss')
-      //   // the text should be case insensitive
-      //   let txt = new RegExp(this.search, "i");
-      //   let dataFields = this.fieldsNames
-      //     .map(function (el) {
-      //       return el.name;
-      //     })
-      //     .filter(function (e) {
-      //       return e.search("slot") < 0;
-      //     });
-      //   local = _.filter(this.data, function (item) {
-      //     for (let i = 0; i < dataFields.length; i++) {
-      //       if (dataFields[i] != undefined) {
-      //         let x;
-      //         eval("x=item." + dataFields[i]);
-      //         if (x != null && x != 1) {
-      //           try {
-      //             if (x.search(txt) >= 0) {
-      //               // console.log(x)
-      //               return true;
-      //             }
-      //           } catch (err) {}
-      //         }
-      //       }
-      //     }
-      //   });
-      //   // local = _.filter(this.data, function (item) {
-      //   //  console.log(item.locales.en.name.search(txt));
-      //   //   return item.locales.en.name.search(txt) >= 0
-      //   // })
-      // }
-      // sortOrder can be empty, so we have to check for that as well
-      // if (sortOrder.length > 0) {
-      //   // console.log("orderBy:", sortOrder[0].sortField, sortOrder[0].direction);
-      //   local = _.orderBy(
-      //     local,
-      //     sortOrder[0].sortField,
-      //     sortOrder[0].direction
-      //   );
-      // }
-
-      pagination = this.$refs.vuetable.makePagination(
-        local.length,
-        this.perPage
-      );
-      console.log("pagination:", pagination);
-      let from = pagination.from - 1;
-      let to = from + this.perPage;
-      return {
-        pagination: pagination,
-        data: _.slice(local, from, to),
-      };
     },
   },
   computed: {
@@ -385,28 +324,19 @@ export default {
       "_delivery_paginations",
       "_changeDeliveryStatus",
     ]),
-    isSelectedAll() {
-      return this.selectedItems.length >= this.items.length;
-    },
-    isAnyItemSelected() {
-      return (
-        this.selectedItems.length > 0 &&
-        this.selectedItems.length < this.items.length
-      );
-    },
   },
   watch: {
     _all_deliveries: function (val) {
       console.log("all deliveries watcher", val);
-      this.$refs.vuetable.setData(val);
+      this.$refs.vuetable.setData(val.data);
+      this.totalItems = val.total;
+      this.calculation();
     },
-    _delivery_paginations: function (val) {
-      this.perPage = val.per_page;
-      this.from = val.from;
-      this.to = val.to;
-      this.total = val.total;
-      this.calculatePagination();
-      // this.$refs.pagination.setPaginationData(val);
+    currentPage: function (val) {
+      this.fetchData();
+    },
+    perPage: function (val) {
+      this.fetchData();
     },
     _changeDeliveryStatus: function (val) {
       console.log(val, val);

@@ -51,6 +51,8 @@ const actions = {
   getCoupons({ commit, dispatch }, payload) {
     const params = {
       keyword: payload?.keyword,
+      offset: payload.offset,
+      limit: payload.limit,
     };
     return Axios.get(
       `https://api-v2.laffahrestaurants.com/public/api/promocode`,
@@ -60,7 +62,7 @@ const actions = {
         console.log(res);
         if (res.status === 200) {
           console.log("here i am");
-          commit("all_coupons", res.data.data);
+          commit("all_coupons", res.data);
         }
       })
       .catch((error) => {

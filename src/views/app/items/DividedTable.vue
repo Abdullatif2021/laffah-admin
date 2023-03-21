@@ -145,6 +145,7 @@ export default {
     "page_size",
     "apiMode",
     "dataList",
+    "refresh",
     "preSelectedItems",
     "search_change",
     "search_val",
@@ -437,6 +438,10 @@ export default {
     this.selectedItems = [].concat(this.preSelectedItems);
   },
   watch: {
+    refresh: function (val) {
+      console.log("here i am this.$refs.vuetable.refresh();");
+      this.$refs.vuetable.refresh();
+    },
     selectedItems(val) {
       if (this.apiBase.includes("customizations")) {
         this.$store.commit("item/SET_CustomizationGroups", val);

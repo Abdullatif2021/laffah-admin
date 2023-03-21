@@ -76,6 +76,7 @@
               @perPage="set_perPage"
               @total="set_total"
               :search_val="search_val"
+              :refresh="refresh_table"
               :key="i.total"
               :fields="fields"
               :has-modal="activateModal"
@@ -195,6 +196,7 @@ export default {
       page: 1,
       pageSizes: [12, 18, 25],
       search_val: null,
+      refresh_table: false,
       perPage: 12,
       search: "",
       page_size: null,
@@ -471,20 +473,29 @@ export default {
           obj: formData,
         })
           .then((response) => {
+            console.log(
+              "hi from responseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+            );
             selectedItems.splice(selectedItems.indexOf(data.id), 1);
-            let ref = this.statuses[this.tabIndex].title;
-            this.$refs[ref][0].$refs.vuetable.refresh();
+            // let ref = this.statuses[this.tabIndex].title;
+            // this.$refs.vuetable.refresh();
+            this.refresh_table = !this.refresh_table;
             this.loadStatusCount();
           })
           .catch((err) => {
+            console.log(
+              "hi from errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+            );
+
             selectedItems.splice(selectedItems.indexOf(data.id), 1);
-            let ref = this.statuses[this.tabIndex].title;
-            this.$refs[ref][0].$refs.vuetable.refresh();
+            // let ref = this.statuses[this.tabIndex].title;
+            // this.$refs.vuetable.refresh();
+            this.refresh_table = !this.refresh_table;
             this.loadStatusCount();
           });
       }
       this.modalData.title = undefined;
-      this.$bvModal.hide("modalright");
+      this.$bvModal.hide(`status-${data.id}`);
     },
   },
   watch: {

@@ -1807,7 +1807,7 @@ export default {
       this.gridForm.active = +val.active;
       this.gridForm.category = val.category[0];
       this.gridForm.record_order = val.record_order;
-      this.files_form.image = val.image;
+      this.files_form.image = `${val.image_baseurl}/${val.image_webp}`;
       this.lang_form.ar_name = val.locales.ar.name;
       this.lang_form.ar_description = val.locales.ar.description;
       this.lang_form.en_name = val.locales.en.name;

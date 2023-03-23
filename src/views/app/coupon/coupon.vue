@@ -18,8 +18,18 @@
                   <b-colxx v-if="coupon_id" class="code_container" sm="12">
                     <h3 class="code">{{ code }}</h3>
                   </b-colxx>
-                  <b-colxx class="flex" sm="12">
-                    <b-form-group label="Coupon Type" class="error-l-150">
+                  <b-colxx sm="12">
+                    <b-form-group
+                      label="Coupon Type"
+                      label-class="font-weight-bold"
+                      class="error-l-150"
+                      ><b-form-input
+                        type="text"
+                        style="display: none"
+                        v-model.trim="$v.couponType.$model"
+                        :state="!$v.couponType.$error"
+                      />
+
                       <b-form-checkbox-group
                         v-model.trim="$v.couponType.$model"
                       >
@@ -30,14 +40,12 @@
                           >Discount</b-form-checkbox
                         >
                       </b-form-checkbox-group>
-                      <b-form-invalid-feedback
-                        class="d-block"
-                        v-if="!$v.couponType.required && $v.couponType.$dirty"
-                        >Please select Type!</b-form-invalid-feedback
+                      <b-form-invalid-feedback style="margin-top: 10px"
+                        >Please select type!</b-form-invalid-feedback
                       >
                     </b-form-group>
                   </b-colxx>
-                  <b-colxx sm="6">
+                  <b-colxx v-if="couponType != ''" sm="6">
                     <b-form-group class="form-group-label" label="Type Value">
                       <b-input-group
                         class="mb-3"
@@ -48,7 +56,7 @@
                           v-model.trim="$v.discount.$model"
                           :state="!$v.discount.$error"
                         />
-                        <b-form-invalid-feedback
+                        <b-form-invalid-feedback style="margin-top: 30px"
                           >Please enter the value!</b-form-invalid-feedback
                         >
                       </b-input-group>
@@ -57,26 +65,64 @@
 
                   <b-colxx v-if="couponType == 'percent'" sm="6">
                     <b-form-group class="form-group-label" label="Max Discount">
-                      <b-form-input
-                        type="number"
-                        v-model.trim="$v.max_discount.$model"
-                      />
+                      <b-input-group class="mb-3" append="AED">
+                        <b-form-input
+                          type="number"
+                          v-model.trim="$v.max_discount.$model"
+                        />
+                      </b-input-group>
                     </b-form-group>
                   </b-colxx>
-                </b-row> </b-form
-            ></b-card>
+                  <b-colxx v-if="!coupon_id" sm="12">
+                    <b-form-group
+                      class="form-group-label"
+                      label="Code"
+                      label-class="font-weight-bold"
+                    >
+                      <b-form-checkbox-group v-model.trim="$v.codeType.$model">
+                        <b-form-checkbox value="auto"
+                          >Auto generate</b-form-checkbox
+                        >
+                        <b-form-checkbox value="enter"
+                          >Enter Code</b-form-checkbox
+                        >
+                      </b-form-checkbox-group>
+                    </b-form-group>
+                    <b-form-group
+                      v-if="codeType === 'enter'"
+                      class="form-group-label"
+                      label="ُEnter the code"
+                    >
+                      <b-form-input
+                        type="text"
+                        :disabled="codeType === 'auto'"
+                        v-model.trim="$v.code.$model"
+                        :state="!$v.code.$error"
+                      />
+                      <b-form-invalid-feedback
+                        >Please enter the value!</b-form-invalid-feedback
+                      >
+                    </b-form-group>
+                  </b-colxx>
+                </b-row>
+              </b-form></b-card
+            >
           </b-colxx>
           <b-colxx xxs="6">
             <b-card class="mb-4 auction_card" title="DATE">
               <b-form>
-                <b-row style="height: 155px">
+                <b-row style="height: 131px">
                   <b-colxx sm="6">
-                    <b-form-group class="form-group-label" label="Start Date">
+                    <b-form-group
+                      class="form-group-label"
+                      label-class="font-weight-bold"
+                      label="Start Date"
+                    >
                       <datepicker
                         style="width: 100%"
-                        type="datetime"
+                        type="date"
                         :disabled-date="disableDate"
-                        value-type="YYYY-MM-DD HH:mm:ss"
+                        value-type="YYYY-MM-DD"
                         v-model="$v.start_date.$model"
                         @change="selectedDate('start')"
                       ></datepicker>
@@ -93,12 +139,16 @@
                     </b-form-group>
                   </b-colxx>
                   <b-colxx sm="6">
-                    <b-form-group class="form-group-label" label="Expired Date">
+                    <b-form-group
+                      class="form-group-label"
+                      label-class="font-weight-bold"
+                      label="Expired Date"
+                    >
                       <datepicker
                         style="width: 100%"
-                        type="datetime"
+                        type="date"
                         :disabled-date="disableDate"
-                        value-type="YYYY-MM-DD HH:mm:ss"
+                        value-type="YYYY-MM-DD"
                         v-model="$v.end_date.$model"
                         @change="selectedDate('end')"
                       >
@@ -126,10 +176,11 @@
                 <b-row>
                   <b-colxx sm="12">
                     <b-row>
-                      <b-colxx class="flex" sm="12">
+                      <b-colxx sm="12">
                         <b-form-group
-                          label="Couponable Type(not required)"
+                          label="Couponable Type"
                           class="error-l-150"
+                          label-class="font-weight-bold"
                         >
                           <b-form-checkbox-group
                             v-model.trim="$v.couponableType.$model"
@@ -150,7 +201,7 @@
                         </b-form-group>
                       </b-colxx>
 
-                      <b-colxx sm="12">
+                      <b-colxx v-if="couponableType != null" sm="12">
                         <b-form-group
                           class="form-group-label"
                           :label="
@@ -159,6 +210,13 @@
                               : 'Choose Item'
                           "
                         >
+                          <b-form-input
+                            type="number"
+                            style="display: none"
+                            v-model.trim="$v.couponable.$model"
+                            :state="!$v.couponable.$error"
+                          />
+
                           <v-select
                             label="name"
                             :filterable="false"
@@ -168,7 +226,7 @@
                           >
                             <template slot="no-options">{{
                               couponableType === "category"
-                                ? "type to search Category List..y"
+                                ? "type to search Category List.."
                                 : "type to search Item List.."
                             }}</template>
 
@@ -188,21 +246,19 @@
                               ></div>
                             </template>
                           </v-select>
+                          <b-form-invalid-feedback
+                            >Please choose the value!</b-form-invalid-feedback
+                          >
                         </b-form-group>
                       </b-colxx>
                     </b-row>
                   </b-colxx>
-
                   <b-colxx sm="12">
-                    <b-form-group class="form-group-label" label="Usages Left">
-                      <b-form-input
-                        type="number"
-                        v-model.trim="$v.usages_left.$model"
-                      />
-                    </b-form-group>
-                  </b-colxx>
-                  <b-colxx sm="12">
-                    <b-form-group class="form-group-label" label="Choose user">
+                    <b-form-group
+                      class="form-group-label"
+                      label-class="font-weight-bold"
+                      label="User"
+                    >
                       <v-select
                         label="name"
                         :filterable="false"
@@ -218,7 +274,8 @@
                           <div class="selected d-center">
                             Name: {{ option.first_name }}
                             {{ option.last_name }}, Email: {{ option.email }},
-                            phone number: {{ option.phone_number }}
+                            phone number:
+                            {{ option.phone_number }}
                           </div>
                         </template>
                         <template slot="spinner" slot-scope="spinner">
@@ -228,6 +285,38 @@
                           ></div>
                         </template>
                       </v-select>
+                    </b-form-group>
+                  </b-colxx>
+                  <b-colxx sm="12">
+                    <b-form-group
+                      class="form-group-label"
+                      label="Usage limit"
+                      label-class="font-weight-bold"
+                    >
+                      <b-form-checkbox-group
+                        v-model.trim="$v.usage_type.$model"
+                      >
+                        <b-form-checkbox value="manual"
+                          >Enter value</b-form-checkbox
+                        >
+                        <b-form-checkbox value="unlimited"
+                          >Unlimited</b-form-checkbox
+                        >
+                      </b-form-checkbox-group>
+                    </b-form-group>
+                    <b-form-group
+                      v-if="usage_type === 'manual'"
+                      class="form-group-label"
+                      label="ُEnter Limit"
+                    >
+                      <b-form-input
+                        type="number"
+                        v-model.trim="$v.usages_left.$model"
+                        :state="!$v.usages_left.$error"
+                      />
+                      <b-form-invalid-feedback
+                        >Please enter the value!</b-form-invalid-feedback
+                      >
                     </b-form-group>
                   </b-colxx>
                 </b-row>
@@ -360,7 +449,7 @@ import Axios from "axios";
 import { adminRoot } from "../../../constants/config";
 import category from "../../../store/modules/category";
 
-const { required } = require("vuelidate/lib/validators");
+const { required, requiredIf } = require("vuelidate/lib/validators");
 export default {
   components: {
     datepicker: DatePicker,
@@ -402,6 +491,8 @@ export default {
       enablevalidateForm1: false,
       discount: "",
       select: "",
+      usage_type: "unlimited",
+      codeType: "enter",
       selected_user: "",
       start_date: null,
       end_date: null,
@@ -411,10 +502,10 @@ export default {
       show_user: true,
       detail: "",
       customRadio: "",
-      usages_left: "",
-      couponType: "percent",
-      couponableType: "item",
-      couponable: null,
+      usages_left: 1,
+      couponType: "",
+      couponableType: null,
+      couponable: {},
     };
   },
   mixins: [validationMixin],
@@ -431,18 +522,32 @@ export default {
     detail: {
       required,
     },
+    code: {
+      required: requiredIf(function () {
+        return this.isOptional;
+      }),
+    },
     customRadio: {
       required,
     },
+    usage_type: {},
     max_discount: {},
-    usages_left: {},
+    codeType: {},
+    usages_left: {
+      required: requiredIf(function () {
+        return this.usages_left_isOptional;
+      }),
+    },
     couponType: {
       required,
     },
     couponableType: {},
-    end_date: {
-      required,
+    couponable: {
+      required: requiredIf(function () {
+        return this.couponable_isOptional;
+      }),
     },
+    end_date: {},
     start_date: {
       required,
     },
@@ -452,6 +557,12 @@ export default {
     this.coupon_id = this.$route.query.id;
     console.log(this.coupon_id);
     this.coupon_id ? this.getCoupon({ coupon_id: this.$route.query.id }) : "";
+    if (!this.coupon_id) {
+      const start_date = new Date();
+      const start_dateStr = start_date.toISOString().slice(0, 10);
+      this.start_date = `${start_dateStr}`;
+      console.log("the date of today", new Date(), this.start_date);
+    }
   },
   methods: {
     ...mapActions([
@@ -464,47 +575,63 @@ export default {
     onValitadeFormSubmit() {
       this.$v.$touch();
       this.date_check();
-      if (this.enablevalidateForm1) {
-        if (this.coupon_id) {
-          if (this.start_date < new Date()) {
-            this.$notify(
-              "error",
-              "You Cannot update this coupon anymore",
-              "because it has started working",
-              { duration: 4000, permanent: false }
-            );
+      if (
+        !this.$v.couponType.$invalid &&
+        !this.$v.usages_left.$invalid &&
+        !this.$v.code.$invalid &&
+        !this.$v.discount.$invalid &&
+        !this.$v.couponable.$invalid &&
+        !this.$v.start_date.$invalid
+      ) {
+        if (this.enablevalidateForm1) {
+          if (this.coupon_id) {
+            if (this.start_date < new Date()) {
+              this.$notify(
+                "error",
+                "You Cannot update this coupon anymore",
+                "because it has started working",
+                { duration: 4000, permanent: false }
+              );
+            } else {
+              this.enable_submit = true;
+
+              this.updateCoupon({
+                coupon_id: this.coupon_id,
+                discount: this.discount,
+                max_discount: this.max_discount,
+                user_id: this.user?.id,
+                couponable_type: this.couponableType
+                  ? this.couponableType === "item"
+                    ? `App\\Models\\Item`
+                    : `App\\Models\\Category`
+                  : null,
+                couponable_id: this.couponable?.id,
+                usages_left: this.usages_left,
+                type: this.couponType,
+                expire_date: this.end_date,
+                start_date: this.start_date,
+              });
+            }
           } else {
-            this.updateCoupon({
-              coupon_id: this.coupon_id,
+            this.enable_submit = true;
+
+            this.createCoupon({
               discount: this.discount,
               max_discount: this.max_discount,
               user_id: this.user?.id,
-              couponable_type:
-                this.couponableType === "item"
-                  ? `App\\Models\\Item`
-                  : `App\\Models\\Category`,
-              couponable_id: this.couponable?.id,
+              code: this.code,
               usages_left: this.usages_left,
               type: this.couponType,
+              couponable_type: this.couponableType
+                ? this.couponableType === "item"
+                  ? `App\\Models\\Item`
+                  : `App\\Models\\Category`
+                : null,
+              couponable_id: this.couponable?.id,
               expire_date: this.end_date,
               start_date: this.start_date,
             });
           }
-        } else {
-          this.createCoupon({
-            discount: this.discount,
-            max_discount: this.max_discount,
-            user_id: this.user?.id,
-            usages_left: this.usages_left,
-            type: this.couponType,
-            couponable_type:
-              this.couponableType === "item"
-                ? `App\\Models\\Item`
-                : `App\\Models\\Category`,
-            couponable_id: this.couponable?.id,
-            expire_date: this.end_date,
-            start_date: this.start_date,
-          });
         }
       }
     },
@@ -513,19 +640,23 @@ export default {
       // Perform active action here
     },
     date_check() {
-      this.date1 = new Date(this.start_date);
-      this.date2 = new Date(this.end_date);
+      if (this.end_date) {
+        this.date1 = new Date(this.start_date);
+        this.date2 = new Date(this.end_date);
 
-      if (this.date2.getTime() < this.date1.getTime()) {
-        this.start_date = null;
-        this.end_date = null;
+        if (this.date2.getTime() < this.date1.getTime()) {
+          this.start_date = null;
+          this.end_date = null;
 
-        this.$notify(
-          "error",
-          "Something went wrong",
-          "the end date must be a date after start date.",
-          { duration: 4000, permanent: false }
-        );
+          this.$notify(
+            "error",
+            "Something went wrong",
+            "the end date must be a date after start date.",
+            { duration: 4000, permanent: false }
+          );
+        } else {
+          this.enablevalidateForm1 = true;
+        }
       } else {
         this.enablevalidateForm1 = true;
       }
@@ -557,11 +688,14 @@ export default {
           `https://api-v2.laffahrestaurants.com/public/api/users?role=user&keyword=${search}`
         ).then((res) => {
           console.log(res);
-          this.user = res.data.data[0];
+          // this.user = res.data.data[0];
           this.enable_submit = false;
           this.vueSelectOptions = res.data.data.map((x) => {
             return {
               name: `${x.first_name} ${x.last_name} `,
+
+              first_name: `${x.first_name}`,
+              last_name: `${x.last_name}`,
               email: x.email,
               phone_number: x.phone_number,
               id: x.id,
@@ -623,14 +757,23 @@ export default {
       "_coupon",
       "_categories",
     ]),
+    isOptional() {
+      return this.codeType === "enter"; // some conditional logic here...
+    },
+    usages_left_isOptional() {
+      return this.usage_type === "manual";
+    },
+    couponable_isOptional() {
+      return this.couponableType != null;
+    },
   },
   watch: {
-    couponType: function (val) {
+    user: function (val) {
       console.log(val);
     },
     couponableType: function (val) {
       if (val === "category") {
-        this.fetchOptions();
+        // this.fetchOptions();
         // this.getCategories();
         // this.couponableOptions = _categories.map((x) => {
         //   return {
@@ -642,35 +785,49 @@ export default {
     },
     _coupon: function (val) {
       // assign start date ........
+      this.code = val.code;
+      this.user = val.user ? val.user : null;
       const start_date = new Date(val.start_date);
       const start_dateStr = start_date.toISOString().slice(0, 10);
       const start_timeStr = start_date.toISOString().slice(11, 19);
-      this.start_date = `${start_dateStr} ${start_timeStr}`;
+      this.start_date = `${start_dateStr}`;
       // assign end date ........
       const date = new Date(val.expired_at);
       const dateStr = date.toISOString().slice(0, 10);
       const timeStr = date.toISOString().slice(11, 19);
-      this.end_date = `${dateStr} ${timeStr}`;
+      this.end_date = `${dateStr}`;
       // rest ..........
       this.discount = val.details.discount;
       console.log(this.discount);
       this.max_discount = val.details.max_discount;
-      this.usages_left = val.usages_left;
+      if (val.usages_left) {
+        this.usages_left = val.usages_left;
+        this.usage_type = "manual";
+        console.log(this.usages_left);
+      }
       this.couponType = val.type;
       this.couponableType = val.couponable_type
         ? val.couponable_type === "App\\Models\\Item"
           ? "item"
           : "category"
         : null;
-      this.couponable =
-        val.couponable_type === "App\\Models\\Item"
-          ? { name: val.item.locales[this.$i18n.locale].name, id: val.item.id }
-          : {
-              name: val.category.locales[this.$i18n.locale].title,
-              id: val.category.id,
-            };
-      this.code = val.code;
-      this.user = val.user;
+      if (val.couponable_type.length != 0) {
+        if (val.couponable_type === "App\\Models\\Item") {
+          console.log("here i ammmmmmm");
+
+          Object.assign(this.couponable, {
+            name: val.item.locales[this.$i18n.locale].name,
+            id: val.item.id,
+          });
+        } else {
+          Object.assign(this.couponable, {
+            name: val.category.locales[this.$i18n.locale].title,
+            id: val.item.id,
+          });
+        }
+      }
+
+      console.log(this.couponable, " this.couponable");
     },
     _createCoupon: function (val) {
       this.$router.push(`${adminRoot}/coupon`);
@@ -691,7 +848,7 @@ export default {
       this.$notify(
         "error",
         "You cannot update the coupon ",
-        "because it has started working",
+        "Because it has started to work",
         {
           duration: 5000,
           permanent: false,
@@ -710,7 +867,13 @@ export default {
       console.log(val, "userrrrrrrrrrrrrrrrrrrrrrrrrrr");
     },
     couponType: function (val) {
-      this.discount = "";
+      console.log(val, "coupon tuype");
+      if (!val) {
+        this.couponType = "";
+      }
+      if (!this.coupon_id) {
+        this.discount = "";
+      }
     },
   },
 };
@@ -718,12 +881,16 @@ export default {
 <style scoped>
 .auction_card {
   border-radius: 24px;
-  background: linear-gradient(
+  /* background: linear-gradient(
     109.6deg,
     rgb(255, 255, 255) 30.1%,
     rgb(243, 244, 248) 100.2%
-  );
-  /* // box-shadow: 3px 3px rgb(79, 78, 78), 3px 3px rgb(84, 84, 84); */
+  ); */
+  /* box-shadow: 3px 3px rgb(79, 78, 78), 3px 3px rgb(84, 84, 84); */
+}
+.code_label {
+  font-size: 15px;
+  font-weight: 800;
 }
 .flex {
   display: flex;

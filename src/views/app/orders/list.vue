@@ -247,7 +247,7 @@ export default {
           titleClass: "px-1",
           dataClass: "px-1",
           width: "12%",
-          // callback: this.nameFriendly,
+          callback: (value) => this.contact_name(value),
         },
         {
           name: "payment_method",
@@ -413,6 +413,13 @@ export default {
             options
           )
         : o.format(today);
+    },
+    contact_name(val) {
+      return val
+        ? val
+        : `<p class='font-weight-bold color-theme-1'>
+   Guest User
+   </p>`;
     },
     getFormatNum(num, digits) {
       let Num = Number(num);

@@ -41,7 +41,7 @@
               :src="
                 order_index !== undefined
                   ? props.rowData.item.image
-                  : props.rowData.image
+                  : `${props.rowData.image_baseurl}/${props.rowData.image_webp}`
               "
               class-name=""
             />

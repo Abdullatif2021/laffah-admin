@@ -139,10 +139,10 @@ const actions = {
     )
       .then((res) => {
         console.log("you cannot update", res);
-        if (res.data.status === 200) {
-          commit("createCouponSuccessfuly", res);
+        if (res.data.status == 200) {
+          commit("updateCouponSuccessfuly", res);
         }
-        if (res.data.status === 422) {
+        if (res.data.status == 422) {
           commit("cannotUpdateCoupon", res);
           console.log("you cannot update");
         }

@@ -60,6 +60,31 @@
           :reactive-api-url="true"
           :fields="fields"
         >
+          <template slot="code" slot-scope="props">
+            <div class="d-flex" style="gap: 24px">
+              {{ props.rowData.code }}
+              <i
+                @click="copyToClipboard(props.rowData.code)"
+                class="iconsminds-file-copy"
+                style="
+                  border: 1px solid #898383;
+                  border-radius: 3px;
+                  background: #eee;
+                "
+              />
+              <!-- <button @click="copyToClipboard(props.rowData.code)"></button>
+              <span v-if="showTooltip" class="tooltip">Copied!</span> -->
+            </div>
+          </template>
+          <template slot="discount" slot-scope="props">
+            <b-badge pill variant="outline-primary">
+              <span>{{
+                `${props.rowData.details.discount}  ${
+                  props.rowData.type === "percent" ? "%" : $t("pages.aed")
+                }`
+              }}</span>
+            </b-badge>
+          </template>
           <template slot="actions" slot-scope="props">
             <b-row align-h="around" class="pr-1 align-items-center">
               <b-link v-if="props.rowData">
@@ -67,7 +92,7 @@
                   @click.prevent="open_details(props.rowData.id)"
                   font-scale="2"
                   aria-hidden="true"
-                  animation="spin"
+                  animation="pulse"
                 />
               </b-link>
             </b-row>
@@ -113,10 +138,11 @@ export default {
       totalItems: 0, // total number of items
       pageSizes: [12, 18, 25],
       from: 0,
+      showTooltip: false,
       to: 0,
       fields: [
         {
-          name: "code",
+          name: "__slot:code",
           title: "Code",
           titleClass: "",
           dataClass: "list-item-heading",
@@ -143,13 +169,20 @@ export default {
             return `${value.first_name} ${value.last_name}`;
           },
         },
+        // {
+        //   name: "type",
+        //   // sortField: "type",
+        //   title: "Type",
+        //   titleClass: "",
+        //   dataClass: "text-muted",
+        //   width: "15%",
+        // },
         {
-          name: "type",
-          // sortField: "type",
-          title: "Type",
-          titleClass: "",
-          dataClass: "text-muted",
-          width: "15%",
+          name: "__slot:discount",
+          title: `Value`,
+          titleClass: "px-1",
+          dataClass: "px-1",
+          width: "13%",
         },
         {
           name: "usages_left",
@@ -232,7 +265,24 @@ export default {
         pages: pages,
       };
     },
-
+    copyToClipboard(code) {
+      navigator.clipboard
+        .writeText(code)
+        .then(() => {
+          console.log("Text copied to clipboard");
+          this.$notify("success", "CODE COPIED!", "", {
+            duration: 1000,
+            permanent: false,
+          });
+          // this.showTooltip = true;
+          // setTimeout(() => {
+          //   this.showTooltip = false;
+          // }, 30000);
+        })
+        .catch((error) => {
+          console.error("Error copying text: ", error);
+        });
+    },
     searchChange(val) {
       this.search = val;
       this.getCoupons({
@@ -261,3 +311,32 @@ export default {
   },
 };
 </script>
+<style scoped>
+.tooltip {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+</style>

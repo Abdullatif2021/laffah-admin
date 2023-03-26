@@ -140,11 +140,15 @@ export default {
       console.log({ val });
       this.updateLocalStorage(val, false);
     },
+    _changeOrderStatus: function (val) {
+      this.fetchOrders();
+    },
   },
   computed: {
     ...mapGetters({
       menuType: "getMenuType",
       queue: "_queueCount",
+      _changeOrderStatus: "_changeOrderStatus",
     }),
     pendingOrders: ({ orders }) => {
       if (Array.isArray(orders) && orders.length > 0) {

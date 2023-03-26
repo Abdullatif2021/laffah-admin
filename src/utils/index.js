@@ -12,6 +12,7 @@ import invoice from "@/containers/orders/invoice";
 export const printInvoice = (order) => {
   // Get HTML to print from element
   const prtHtml = document.getElementById("invoice-" + order.id).innerHTML;
+  console.log(prtHtml);
   // Get all stylesheets HTML
   let stylesHtml = "";
   for (const node of [

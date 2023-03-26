@@ -61,7 +61,7 @@
                   @click.prevent="updateFormModel(props.rowData)"
                   font-scale="2"
                   aria-hidden="true"
-                  animation="spin"
+                  animation="pulse"
                 />
               </b-link>
               <b-link>

@@ -3,7 +3,16 @@
     <b-row>
       <b-colxx xxs="12">
         <h1 class="text-uppercase font-weight-bold">{{ title }}</h1>
-
+        <div class="top-right-button-container">
+          <b-button
+            variant="primary"
+            class="top-right-button"
+            @click="waiting_orders()"
+          >
+            <i class="iconsminds-sand-watch-2"></i>
+            waiting orders
+          </b-button>
+        </div>
         <piaf-breadcrumb />
         <div class="mb-2 mt-2">
           <b-button
@@ -170,6 +179,7 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import DividedTable from "@/views/app/items/DividedTable";
 import UpdateOrderStatus from "@/views/app/orders/UpdateOrderStatus";
+import { adminRoot } from "../../../constants/config";
 import {
   BIconExclamationCircleFill,
   BIconGearFill,
@@ -428,6 +438,9 @@ export default {
     updateFormModel(rawData) {
       this.$bvModal.show(`status-${rawData.rowData.id}`);
     },
+    waiting_orders() {
+      this.$router.push(`${adminRoot}/waiting-orders`);
+    },
     searchChange(val) {
       this.search_val = val;
     },
@@ -568,9 +581,5 @@ export default {
 
 /deep/ .xx-small {
   font-size: xx-small !important;
-}
-
-/deep/ .top-right-button-container {
-  display: none;
 }
 </style>

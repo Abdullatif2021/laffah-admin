@@ -140,23 +140,51 @@
             <b-card-text
               v-if="order.subtotal !== null"
               class="list-item-heading mb-1 truncate d-flex justify-content-between"
-              >{{ $t("pages.subTotal") }}: <b> {{ order.total_before_vat }}</b>
+              >{{ $t("pages.subTotal") }}: <b> {{ order.subtotal }}</b>
             </b-card-text>
+            <!-- <small class="text-muted font-weight-lighter" style="
+    display: block;
+    margin-top: -5px;
+    margin-bottom: 10px;
+"
+              >sub total before vat</small
+            > -->
             <b-card-text
-              v-if="order.discount_value !== null"
+              v-if="order.discount_value !== null && order.discount_value !== 0"
               class="list-item-heading mb-1 truncate d-flex justify-content-between"
-              >{{ $t("pages.discount_value") }}:
-              <b> {{ order.discount_value }}</b>
+              >{{ $t("pages.discount_value") }}
+              {{
+                order.points_discounts
+                  ? "(points)"
+                  : order.promocode_discounts
+                  ? "(coupon)"
+                  : ""
+              }}:
+              <b> - {{ order.discount_value }}</b>
             </b-card-text>
             <b-card-text
               v-if="order.vat_value !== null"
               class="list-item-heading mb-1 truncate d-flex justify-content-between"
               >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
             </b-card-text>
+            <div
+              class="d-flex justify-content-between"
+              style="margin-bottom: 10px; font-size: 1rem"
+            >
+              {{ $t("pages.delivery_cost") }}:
+              <b> {{ order.delivery_cost }}</b>
+            </div>
+            <small
+              class="text-muted font-weight-lighter"
+              style="display: block; margin-top: -11px; margin-bottom: 10px"
+              >{{ order.salik_fee !== null ? $t("pages.salik") : "" }}</small
+            >
+
             <br />
-            <b-card-text
+            <!-- <b-card-text
               v-if="order.delivery_cost !== null"
               class="list-item-heading mb-1 text-nowrap"
+
             >
               <b-form-group
                 v-if="order.status === '-1'"
@@ -188,14 +216,11 @@
                   </b-input-group-append>
                 </b-input-group>
               </b-form-group>
-              <div class="d-flex justify-content-between">
-                {{ $t("pages.delivery_cost") }}:
-                <b> {{ order.delivery_cost }}</b>
-              </div>
+
               <small class="text-muted font-weight-lighter">{{
                 order.salik_fee !== null ? $t("pages.salik") : ""
               }}</small>
-            </b-card-text>
+            </b-card-text> -->
           </b-card>
           <!--          payment-->
           <b-card header-tag="header" :title="order.contact_name">

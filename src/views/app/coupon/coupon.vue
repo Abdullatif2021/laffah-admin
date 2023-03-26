@@ -606,7 +606,8 @@ export default {
                     : `App\\Models\\Category`
                   : null,
                 couponable_id: this.couponable?.id,
-                usages_left: this.usages_left,
+                usages_left:
+                  this.usage_type === "manual" ? this.usages_left : null,
                 type: this.couponType,
                 expire_date: this.end_date,
                 start_date: this.start_date,
@@ -772,7 +773,9 @@ export default {
       console.log(val);
     },
     couponableType: function (val) {
-      if (val === "category") {
+      console.log(val);
+      if (!val) {
+        this.couponableType = null;
         // this.fetchOptions();
         // this.getCategories();
         // this.couponableOptions = _categories.map((x) => {

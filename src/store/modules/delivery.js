@@ -261,7 +261,7 @@ const actions = {
       });
   },
   changeQueueCount({ commit }, payload) {
-    console.log(payload);
+    console.log("changeQueueCount", payload);
     commit("changeQueueCount", payload.data);
   },
 };

@@ -68,20 +68,27 @@
               v-if="order.subtotal !== null"
               class="list-item-heading mb-1 px-2 truncate d-flex justify-content-between"
               >{{ $t("pages.subTotal") }}:
-              <b> {{ order.total_before_vat }}</b>
+              <b> {{ order.subtotal }}</b>
+            </b-card-text>
+
+            <b-card-text
+              v-if="order.discount_value !== null && order.discount_value !== 0"
+              class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
+              >{{
+                `Discount(${
+                  order.points_discounts
+                    ? "points"
+                    : order.promocode_discounts
+                    ? "coupon"
+                    : ""
+                }):`
+              }}
+              <b> {{ order.discount_value }}</b>
             </b-card-text>
             <b-card-text
               v-if="order.vat_value !== null"
               class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
               >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
-            </b-card-text>
-            <b-card-text
-              v-if="order.discount_value !== 0"
-              class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
-              >{{
-                `Discount(${order.points_discounts ? "points" : "coupon"}):`
-              }}
-              <b> {{ order.discount_value }}</b>
             </b-card-text>
             <br />
             <b-card-text>
@@ -117,8 +124,7 @@
           <b-card
             v-for="(detail, detailIndex) in order.order_details"
             :key="detailIndex"
-            :img-src="webpImage((detail || {}).item || {})"
-            :img-alt="((detail || {}).item || {}).slug || ''"
+            :img-src="webpImage(detail.item)"
             img-top
             style="min-width: 12rem; max-width: 15rem"
             class="text-center h-100 listing-card-container p-3 mx-1"
@@ -133,7 +139,7 @@
               #{{ detail.qty }}
             </b-badge>
             <b-card-title class="mb-0 red-text">
-              {{ detail.item.locales[$i18n.locale].name }}
+              {{ detail.item?.locales[$i18n.locale].name }}
             </b-card-title>
             <b-card-sub-title class="text-small text-muted">
               <span>{{ $t("pages.price") }}: {{ detail.batch_price }}</span>
@@ -327,6 +333,8 @@ import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import { validationMixin } from "vuelidate";
+import default_image from "@/assets/img/default_image.jpg";
+
 const { required } = require("vuelidate/lib/validators");
 export default {
   name: "queueItem",
@@ -350,6 +358,7 @@ export default {
       printOrder: null,
       visible: true,
       disable_btn: false,
+      print_status: false,
       choosenType: "delivery",
       delivery_options: [],
       selectedOption: null,
@@ -375,14 +384,23 @@ export default {
         Object.assign(this.data, newValue);
       },
     },
-    webpImage: function () {
-      return (item) =>
-        _.isEmpty(item)
-          ? `${(item || {}).image_baseurl || image}${
-              (item || {}).image_webp || ""
-            }`
-          : (item || {}).image || "";
-    },
+    // webpImage: function (item) {
+    //   if (item) {
+    //     if (item.image_webp) {
+    //       return `${item.image_baseurl}/${item.image_webp}`;
+    //     } else {
+    //       return `${item.image}`;
+    //     }
+    //   } else {
+    //     return "";
+    //   }
+    //   // return (item) =>
+    //   //   _.isEmpty(item)
+    //   //     ? `${(item || {}).image_baseurl || image}${
+    //   //         (item || {}).image_webp || ""
+    //   //       }`
+    //   //     : (item || {}).image || "";
+    // },
   },
   methods: {
     ...mapActions([
@@ -394,7 +412,17 @@ export default {
     myFunction() {
       document.getElementById("myDropdown").classList.toggle("show");
     },
-
+    webpImage(item) {
+      if (item) {
+        if (item.image_webp) {
+          return `${item.image_baseurl}/${item.image_webp}`;
+        } else {
+          return `${item.image}`;
+        }
+      } else {
+        return default_image;
+      }
+    },
     filterFunction() {
       var input, filter, ul, li, a, i;
       input = document.getElementById("myInput");
@@ -462,14 +490,11 @@ export default {
     askForPrint() {},
     acceptOrder(val) {
       this.disable_btn = false;
+      this.print_status = val;
       if (this.choosenType === "delivery" && val) {
         this.assignToDelivery({
           user_id: this.selectedOption.id,
           order_id: this.processed_order.id,
-        });
-        this.changeOrderStatus({
-          order_id: this.processed_order.id,
-          status: 3,
         });
       }
       if (this.choosenType === "delivery" && !val) {
@@ -477,10 +502,10 @@ export default {
           user_id: this.selectedOption.id,
           order_id: this.processed_order.id,
         });
-        this.changeOrderStatus({
-          order_id: this.processed_order.id,
-          status: 2,
-        });
+        // this.changeOrderStatus({
+        //   order_id: this.processed_order.id,
+        //   status: 2,
+        // });
       }
       if (this.choosenType === "non_delivery" && !val) {
         this.changeOrderStatus({
@@ -507,8 +532,8 @@ export default {
         }
         this.showMsgOk(order);
       } else {
-        this.getDeliveries({ branch_id: order.branch_id });
         this.processed_order = null;
+        this.getDeliveries({ branch_id: order.branch_id });
         this.open_delivery_popup(order);
       }
       printInvoice(order);
@@ -526,6 +551,7 @@ export default {
       }
     },
     removeOrderFromQueue(order) {
+      console.log("removeOrderFromQueue", order);
       const localData = JSON.parse(localStorage.getItem("currentOrders"));
       const orderIndex = localData.findIndex((i) => i.id == order.id);
       this.visible = false;
@@ -597,9 +623,20 @@ export default {
       });
       this.$refs["delivery_popup"].hide();
       console.log(this.processed_order);
-      this.removeOrderFromQueue(this.processed_order);
-      this.changeQueueCount({ data: this.processed_order });
-      this.processed_order = null;
+      if (this.print_status) {
+        this.changeOrderStatus({
+          order_id: this.processed_order.id,
+          status: 3,
+        });
+      }
+      if (!this.print_status) {
+        this.changeOrderStatus({
+          order_id: this.processed_order.id,
+          status: 2,
+        });
+      }
+
+      // this.processed_order = null;
     },
     _changeOrderStatus: function (val) {
       this.$notify(
@@ -608,6 +645,9 @@ export default {
         null,
         { duration: 5000, permanent: false }
       );
+      console.log("_changeOrderStatus", this.processed_order);
+      this.removeOrderFromQueue(this.processed_order);
+      this.changeQueueCount({ data: this.processed_order });
       // this.assignToDelivery({
       //   user_id: this.selectedOption.id,
       //   order_id: this.processed_order.id,

@@ -5,11 +5,11 @@
         <b-colxx xxs="12">
           <b-card class="mb-4 auction_card">
             <b-form>
-              <b-row style="margin: 42px">
+              <b-row style="margin: 87px">
                 <b-colxx
                   style="
                     position: absolute;
-                    top: -104px;
+                    top: -60px;
                     left: 1px;
                     padding: 0px;
                   "
@@ -109,23 +109,12 @@
 
                 <div style="width: 100%">
                   <b-button
-                    :disabled="disabledFormStep1 || !editable"
                     type="submit"
-                    @click="onForm1Submited()"
-                    :variant="disabledFormStep1 ? 'light' : 'primary'"
+                    @click="setData()"
+                    variant="primary"
                     class="mt-4"
                     >Save</b-button
                   >
-                  <!-- <b-button
-                  :disabled="disabledFormStep1 || !editable"
-                  v-b-modal.deleteItem
-                  style="float: right"
-                  :variant="
-                    disabledFormStep1 ? 'light' : 'outline-theme-6'
-                  "
-                  class="mt-4"
-                  >Delete</b-button
-                > -->
                 </div>
               </b-row>
             </b-form>
@@ -183,40 +172,26 @@
                 </b-colxx>
                 <b-colxx xxs="12">
                   <b-form-group
-                    :label="$t('forms.choose-role')"
+                    label="Role"
                     :class="`has-float-label mb-4 ${toggleShadow}`"
                   >
-                    <v-select
-                      :reduce="(label) => label.code"
-                      label="label"
-                      :disabled="toggleState"
-                      v-model="$v.usersForm.role.$model"
-                      :state="!$v.usersForm.role.$error"
-                      :options="roles"
+                    <b-form-input
+                      readonly
+                      type="text"
+                      v-model.trim="user_role"
                       :dir="direction"
                     />
-                    <b-form-invalid-feedback
-                      :class="{
-                        'd-block invalid-feedback': usersForm.role == '',
-                      }"
-                      v-if="!$v.usersForm.role.required"
-                      >{{
-                        `${$t("forms.role")}
-              ${$t("validations.required")}`
-                      }}
-                    </b-form-invalid-feedback>
                   </b-form-group>
                 </b-colxx>
 
                 <div style="width: 100%">
-                  <b-button
-                    :disabled="disabledFormStep1 || !editable"
+                  <!-- <b-button
                     type="submit"
                     @click="onForm1Submited()"
-                    :variant="disabledFormStep1 ? 'light' : 'primary'"
+                    variant="primary"
                     class="mt-4"
                     >Save</b-button
-                  >
+                  > -->
                   <!-- <b-button
                   :disabled="disabledFormStep1 || !editable"
                   v-b-modal.deleteItem
@@ -513,6 +488,19 @@
                 </b-form-invalid-feedback>
               </b-form-group>
               <b-form-group
+                v-if="user_type"
+                label="Role"
+                :class="`has-float-label mb-4 ${toggleShadow}`"
+              >
+                <b-form-input
+                  required
+                  readonly
+                  type="text"
+                  v-model.trim="user_type"
+                />
+              </b-form-group>
+              <b-form-group
+                v-else
                 :label="$t('forms.choose-role')"
                 :class="`has-float-label mb-4 ${toggleShadow}`"
               >
@@ -534,7 +522,42 @@
                   }}
                 </b-form-invalid-feedback>
               </b-form-group>
+
               <b-form-group
+                v-if="
+                  user_type === 'casher' ||
+                  user_type === 'branchAdmin' ||
+                  user_type === 'delivery' ||
+                  usersForm.role === 6 ||
+                  usersForm.role === 7 ||
+                  usersForm.role === 4
+                "
+                :label="$t('forms.choose-branches')"
+                :class="`has-float-label mb-4 ${toggleShadow}`"
+              >
+                <b-form-input
+                  type="number"
+                  style="display: none"
+                  v-model.trim="$v.delivery_branch.$model"
+                  :state="!$v.delivery_branch.$error"
+                />
+                <v-select
+                  :reduce="(label) => label.code"
+                  label="label"
+                  :disabled="toggleState"
+                  v-model="delivery_branch"
+                  :options="branches"
+                  :dir="direction"
+                />
+                <b-form-invalid-feedback
+                  :class="{ 'd-block invalid-feedback': usersForm.role == '' }"
+                  v-if="!$v.delivery_branch.required"
+                  >Please Choose a Branch!
+                </b-form-invalid-feedback>
+              </b-form-group>
+
+              <!-- <b-form-group
+                v-else
                 :label="$t('forms.choose-branches')"
                 label-class="font-weight-bold"
                 class="mb-3"
@@ -551,7 +574,7 @@
                   text-field="label"
                 >
                 </b-form-checkbox-group>
-              </b-form-group>
+              </b-form-group> -->
               <b-form-group>
                 <div
                   v-if="itemid !== undefined"
@@ -614,7 +637,12 @@ import Switches from "vue-switches";
 import { mapGetters, mapActions } from "vuex";
 import { adminRoot } from "../../constants/config";
 
-const { required, maxLength, integer } = require("vuelidate/lib/validators");
+const {
+  required,
+  requiredIf,
+  maxLength,
+  integer,
+} = require("vuelidate/lib/validators");
 export default {
   components: {
     "v-select": vSelect,
@@ -623,9 +651,15 @@ export default {
     ThumbnailImage,
     Switches,
   },
-  props: ["itemid", "apiBase"],
+  props: ["itemid", "apiBase", "user_type"],
   mixins: [validationMixin],
   validations: {
+    delivery_branch: {
+      required: requiredIf(function () {
+        // console.log("this.isOptional", this.isOptional);
+        return this.isOptional;
+      }),
+    },
     usersForm: {
       first_name: {
         required,
@@ -656,6 +690,7 @@ export default {
       disableSubmit: false,
       required: null,
       isfile: false,
+      user_role: null,
       currentPage: 1,
       adminRoot: adminRoot,
       totalPage: 4,
@@ -667,6 +702,7 @@ export default {
       isLoad: false,
       direction: getDirection().direction,
       dataresult: null,
+      delivery_branch: null,
       newBranches: [],
       newRoles: [],
       usersForm: {
@@ -700,6 +736,10 @@ export default {
     };
   },
   created() {
+    // if (this.user_type === "delivery") {
+    //   console.log("user_type delivery");
+    //   this.usersForm.role = "delivery";
+    // }
     if (this.itemid == undefined || this.itemid == null || true) {
       this.visibleState = "invisible";
       this.toggleState = false;
@@ -708,6 +748,7 @@ export default {
     } else {
       this.customDisabled = true;
     }
+    console.log("this.rolesssssssssssss", this.getRoles);
   },
   watch: {
     editable(val) {
@@ -719,9 +760,13 @@ export default {
         this.toggleShadow = "";
       }
     },
+
     _userPoints: function (val) {
       console.log("point: ", val);
       this.points = val;
+    },
+    delivery_branch: function (val) {
+      console.log(val);
     },
   },
   computed: {
@@ -737,6 +782,13 @@ export default {
       if (userRole == 2) {
         return true;
       } else return false;
+    },
+    isOptional() {
+      return (
+        this.user_type === "branchAdmin" ||
+        this.user_type === "casher" ||
+        this.user_type === "delivery"
+      ); // some conditional logic here...
     },
     authorBranchAdmin() {
       const userRole = decrypt(localStorage.getItem("userRole"));
@@ -772,9 +824,9 @@ export default {
             case "admin":
               role = this.$t("menu.admin");
               break;
-            case "user":
-              role = this.$t("menu.user");
-              break;
+            // case "user":
+            //   role = this.$t("menu.user");
+            //   break;
             case "guest":
               role = this.$t("menu.guest");
               break;
@@ -795,6 +847,7 @@ export default {
             code: x.id,
           };
         });
+        this.newRoles = this.newRoles.filter((x) => x.code != 3);
         if (this.authorAdmin) {
           this.newRoles = this.newRoles.filter(
             (x) => x.code != 1 && x.code != 2 && x.code != 3 && x.code != 5
@@ -806,6 +859,7 @@ export default {
         if (this.authorBranchAdmin) {
           this.newRoles = this.newRoles.filter((x) => x.code == 6);
         }
+        console.log(this.newRoles);
         return this.newRoles;
       } catch (err) {
         return this.newRoles;
@@ -822,6 +876,15 @@ export default {
           this.fileUrl = e.target.result;
         };
         reader.readAsDataURL(input.files[0]);
+      }
+    },
+    getUserRole() {
+      if (this.user_type != "user") {
+        console.log("this.roles", this.getRoles);
+        const test = this.getRoles.find((x) => x.name == this.user_type).id;
+        console.log("this is test", test);
+        this.$v.usersForm.role.$model = test;
+        console.log("this.usersForm.role", this.$v.usersForm.role.$model);
       }
     },
     onEditorBlur(editor) {
@@ -864,7 +927,12 @@ export default {
             this.$v.usersForm.role.$model = this.getRoles.find(
               (x) => x.name == this.dataresult.role[0]
             ).id;
-            if (this.usersForm.role == 3) {
+            console.log(
+              this.$v.usersForm.role.$model,
+              " this.$v.usersForm.role this.$v.usersForm.role"
+            );
+            if (this.usersForm.role === 3) {
+              this.user_role = "User";
               this.get_user_points(this.dataresult.id);
             }
             this.active = this.dataresult.active == "1" ? true : false;
@@ -876,6 +944,8 @@ export default {
               this.usersForm.branch = this.dataresult.branches.map((x) => {
                 return x.branch_id;
               });
+              this.delivery_branch = this.dataresult.branches[0]?.branch_id;
+              console.log(this.usersForm.branch, this.delivery_branch);
             }
             this.fileUrl = this.dataresult.image;
             this.isLoad = true;
@@ -897,185 +967,202 @@ export default {
       }
     },
     setData() {
+      console.log(this.delivery_branch);
       this.$v.usersForm.$touch();
-      //if (!this.$v.usersForm.$anyError) {
-      //if (this.authorSuperadmin || this.authorAdmin) {
-      this.isLoad = false;
-      this.disableSubmit = true;
-      this.formData = new FormData();
-      this.formData.append("first_name", this.usersForm.first_name);
-      this.formData.append("last_name", this.usersForm.last_name);
-      this.formData.append("phone_number", this.usersForm.phone_number);
-      this.formData.append("email", this.usersForm.email);
-      this.formData.append("user_country", this.usersForm.user_country);
-      this.formData.append("user_job_title", this.usersForm.user_job_title);
-      this.formData.append("reputation", this.usersForm.reputation);
-      this.formData.append("role", this.usersForm.role);
-      if (this.usersForm.branch != "") {
-        this.usersForm.branch.forEach((b, index) => {
-          this.formData.append("branches[]", b);
-        });
-      }
-      if (this.itemid !== undefined) {
-        this.formData.append("active", this.active == true ? 1 : 0);
-      }
-      if (this.itemid == undefined) {
-        this.formData.append("password", this.usersForm.password);
-      }
-      if (this.itemid != null) {
-        this.formData.append("_method", "PUT");
-        axios //PUT method
-          .post(this.apiBase + "/" + this.itemid, this.formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((res) => {
-            this.disableSubmit = false;
-
-            this.dataresult = res;
-            if (this.dataresult.data.success == true) {
-              // window.location.href = '../../';
-              this.$router.push("../list");
-              this.$notify(
-                "success",
-                "User has been Updated Successfully",
-                null,
-                { duration: 5000, permanent: false }
-              );
-            } else if (this.dataresult == undefined) {
-              this.$notify(
-                "warning",
-                "User was not Updated",
-                "please try again Later",
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
-              this.disableSubmit = false;
-              //  window.location.href = '../../';
-            } else {
-              this.$notify(
-                "warning",
-                "User was not Updated",
-                "please try again Later",
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
-              this.disableSubmit = false;
-            }
-          })
-          .catch((error) => {
-            if (error.response.data.message == "Validation Error") {
-              //  for(msg in error.response.data)
-              this.$notify(
-                "error",
-                "User was not Updated",
-                JSON.stringify(error.response.data.data)
-                  .replaceAll("{", "")
-                  .replaceAll("}", ""),
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
-            } else {
-              this.$notify(
-                "error",
-                "User was not Updated",
-                "Network Error",
-                null,
-                { duration: 5000, permanent: false }
-              );
-            }
-            this.disableSubmit = false;
-            this.isLoad = true;
-          });
-      } else {
-        axios ///POST method
-          .post(this.apiBase, this.formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((res) => {
-            // this.disableSubmit = false
-            this.dataresult = res;
-            console.log("res : " + this.dataresult);
-            if (this.dataresult.data.success == true) {
-              this.$router.push("list");
-              this.$notify(
-                "success",
-                "Users has been Added Successfully",
-                null,
-                { duration: 5000, permanent: false }
-              );
-              // window.location.href = '../../';
-            } else if (this.dataresult == undefined) {
-              this.$notify(
-                "warning",
-                "Users was not Added",
-                "please try again Later",
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
+      this.$v.$touch();
+      if (!this.$v.delivery_branch.$invalid) {
+        //if (!this.$v.usersForm.$anyError) {
+        //if (this.authorSuperadmin || this.authorAdmin) {
+        this.isLoad = false;
+        this.disableSubmit = true;
+        this.formData = new FormData();
+        this.formData.append("first_name", this.usersForm.first_name);
+        this.formData.append("last_name", this.usersForm.last_name);
+        this.formData.append("phone_number", this.usersForm.phone_number);
+        this.formData.append("email", this.usersForm.email);
+        this.formData.append("user_country", this.usersForm.user_country);
+        this.formData.append("user_job_title", this.usersForm.user_job_title);
+        this.formData.append("reputation", this.usersForm.reputation);
+        this.formData.append("role", this.usersForm.role);
+        if (this.user_type === "user") {
+          this.formData.append("role", 3);
+        }
+        if (
+          this.user_type === "branchAdmin" ||
+          this.user_type === "casher" ||
+          this.user_type === "delivery" ||
+          this.usersForm.role === 6 ||
+          this.usersForm.role === 7 ||
+          this.usersForm.role === 4
+        ) {
+          this.formData.append("branches[]", this.delivery_branch);
+        }
+        // if (this.usersForm.branch != "") {
+        //   this.usersForm.branch.forEach((b, index) => {
+        //     this.formData.append("branches[]", b);
+        //   });
+        // }
+        if (this.itemid !== undefined) {
+          this.formData.append("active", this.active == true ? 1 : 0);
+        }
+        if (this.itemid == undefined) {
+          this.formData.append("password", this.usersForm.password);
+        }
+        if (this.itemid != null) {
+          this.formData.append("_method", "PUT");
+          axios //PUT method
+            .post(this.apiBase + "/" + this.itemid, this.formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then((res) => {
               this.disableSubmit = false;
 
-              //  window.location.href = '../../';
-            } else {
-              this.$notify(
-                "warning",
-                "Users was not Added",
-                "please try again Later",
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
+              this.dataresult = res;
+              if (this.dataresult.data.success == true) {
+                // window.location.href = '../../';
+                this.$router.push("../list");
+                this.$notify(
+                  "success",
+                  "User has been Updated Successfully",
+                  null,
+                  { duration: 5000, permanent: false }
+                );
+              } else if (this.dataresult == undefined) {
+                this.$notify(
+                  "warning",
+                  "User was not Updated",
+                  "please try again Later",
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+                this.disableSubmit = false;
+                //  window.location.href = '../../';
+              } else {
+                this.$notify(
+                  "warning",
+                  "User was not Updated",
+                  "please try again Later",
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+                this.disableSubmit = false;
+              }
+            })
+            .catch((error) => {
+              if (error.response.data.message == "Validation Error") {
+                //  for(msg in error.response.data)
+                this.$notify(
+                  "error",
+                  "User was not Updated",
+                  JSON.stringify(error.response.data.data)
+                    .replaceAll("{", "")
+                    .replaceAll("}", ""),
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+              } else {
+                this.$notify(
+                  "error",
+                  "User was not Updated",
+                  "Network Error",
+                  null,
+                  { duration: 5000, permanent: false }
+                );
+              }
               this.disableSubmit = false;
-            }
-          })
-          .catch((error) => {
-            if (error.response.data.message == "Validation Error") {
-              //  for(msg in error.response.data)
-              this.$notify(
-                "error",
-                "Users was not Added",
-                JSON.stringify(error.response.data.data)
-                  .replaceAll("{", "")
-                  .replaceAll("}", ""),
-                null,
-                {
-                  duration: 5000,
-                  permanent: false,
-                }
-              );
-            } else {
-              this.$notify(
-                "error",
-                "Users was not Added",
-                "Network Error",
-                null,
-                { duration: 5000, permanent: false }
-              );
-            }
-            // this.disableSubmit = false
-            console.log(error);
-            this.isLoad = true;
-            this.disableSubmit = false;
-          });
-        // }
-        // }
+              this.isLoad = true;
+            });
+        } else {
+          axios ///POST method
+            .post(this.apiBase, this.formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then((res) => {
+              // this.disableSubmit = false
+              this.dataresult = res;
+              console.log("res : " + this.dataresult);
+              if (this.dataresult.data.success == true) {
+                this.$router.push("list");
+                this.$notify(
+                  "success",
+                  "Users has been Added Successfully",
+                  null,
+                  { duration: 5000, permanent: false }
+                );
+                // window.location.href = '../../';
+              } else if (this.dataresult == undefined) {
+                this.$notify(
+                  "warning",
+                  "Users was not Added",
+                  "please try again Later",
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+                this.disableSubmit = false;
+
+                //  window.location.href = '../../';
+              } else {
+                this.$notify(
+                  "warning",
+                  "Users was not Added",
+                  "please try again Later",
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+                this.disableSubmit = false;
+              }
+            })
+            .catch((error) => {
+              if (error.response.data.message == "Validation Error") {
+                //  for(msg in error.response.data)
+                this.$notify(
+                  "error",
+                  "Users was not Added",
+                  JSON.stringify(error.response.data.data)
+                    .replaceAll("{", "")
+                    .replaceAll("}", ""),
+                  null,
+                  {
+                    duration: 5000,
+                    permanent: false,
+                  }
+                );
+              } else {
+                this.$notify(
+                  "error",
+                  "Users was not Added",
+                  "Network Error",
+                  null,
+                  { duration: 5000, permanent: false }
+                );
+              }
+              // this.disableSubmit = false
+              console.log(error);
+              this.isLoad = true;
+              this.disableSubmit = false;
+            });
+          // }
+          // }
+        }
       }
     },
     get_user_points(id) {
@@ -1087,6 +1174,7 @@ export default {
     await this.fetchRoles();
     await this.fetchBranches();
     await this.getData();
+    await this.getUserRole();
   },
 };
 </script>

@@ -3,13 +3,12 @@
     <b-colxx xxs="12">
       <h1>USERS</h1>
       <div class="top-right-button-container">
-        <router-link
-          ref="link"
-          to="users-form"
-          class="btn top-right-button btn-primary btn-lg"
-        >
-          {{ $t("pages.add-new") }}
-        </router-link>
+        <b-button
+          variant="primary"
+          class="top-right-button"
+          @click="add_new()"
+          >{{ $t("pages.add-new") }}
+        </b-button>
       </div>
       <piaf-breadcrumb />
       <div class="mb-2 mt-2">
@@ -174,6 +173,7 @@ export default {
       totalItems: 0, // total number of items
       pageSizes: [12, 18, 25],
       from: 0,
+      isDelivery: false,
       to: 0,
       fields: [
         {
@@ -256,21 +256,36 @@ export default {
     this.calculatePagination(); // calculate the pagination properties
   },
   methods: {
-    async fetchData() {
+    async fetchData(val) {
       // fetch the table data using your API or database driver
       const role = this.current_role;
       const limit = this.perPage;
       const offset = (this.currentPage - 1) * this.perPage;
-      const response = await axios.get(
-        `/users?role=${role}&offset=${offset}&limit=${limit}&title=&name=&order_key=&orderBy[]=updated_at&orderBy[]=DESC`
-      );
+      if(val){
 
-      this.items = response.data.data;
-      console.log(this.items);
-      this.isLoad = true;
-      //   this.$refs.vuetable.setData(this.items);
-      this.totalItems = response.data.total;
-      this.calculation();
+        const response = await axios.get(
+          `/users?role=${role}&offset=${offset}&keyword=${val}&limit=${limit}&title=&name=&order_key=&orderBy[]=updated_at&orderBy[]=DESC`
+        );
+        
+        this.items = response.data.data;
+              console.log(this.items);
+              this.isLoad = true;
+              //   this.$refs.vuetable.setData(this.items);
+              this.totalItems = response.data.total;
+              this.calculation();
+      }else {
+
+        const response = await axios.get(
+          `/users?role=${role}&offset=${offset}&limit=${limit}&title=&name=&order_key=&orderBy[]=updated_at&orderBy[]=DESC`
+        );
+        
+              this.items = response.data.data;
+              console.log(this.items);
+              this.isLoad = true;
+              //   this.$refs.vuetable.setData(this.items);
+              this.totalItems = response.data.total;
+              this.calculation();
+      }
     },
     calculatePagination() {
       // calculate the number of pages needed
@@ -305,7 +320,23 @@ export default {
       this.from = (this.currentPage - 1) * this.perPage;
       this.to = this.from + this.perPage;
     },
+    searchChange(val){
+      this.fetchData(val)
+    },
+    add_new(){
+      this.isDelivery = true;
+      this.$router.push
+      ({
+          path: `users-form`,
+          query: { type: this.current_role }
+        });
+    },
     changeTab(val) {
+      console.log(val);
+      if(val === 'delivery')
+      {
+        this.isDelivery = true;
+      }
       this.isLoad = false;
       this.current_role = val;
       this.fetchData();
@@ -313,6 +344,9 @@ export default {
     changePageSize(perPage) {
       this.perPage = perPage;
       this.fetchData();
+    },
+    hideModal(refname) {
+      this.$refs[refname].hide();
     },
     deleteItem(id) {
         return axios

@@ -56,6 +56,7 @@
           ref="vuetable"
           class="table-divided order-with-arrow"
           :api-mode="false"
+          :data-manager="dataManager"
           :per-page="perPage"
           :reactive-api-url="true"
           :fields="fields"
@@ -76,6 +77,17 @@
               <span v-if="showTooltip" class="tooltip">Copied!</span> -->
             </div>
           </template>
+          <template slot="user" slot-scope="props">
+            <span
+              :class="props.rowData.user ? 'usage_left_class' : 'usage_limit'"
+            >
+              {{
+                props.rowData.user
+                  ? `${props.rowData.user.first_name} ${props.rowData.user.last_name}`
+                  : "undefined"
+              }}
+            </span>
+          </template>
           <template slot="discount" slot-scope="props">
             <b-badge pill variant="outline-primary">
               <span>{{
@@ -84,6 +96,21 @@
                 }`
               }}</span>
             </b-badge>
+          </template>
+          <template slot="usage" slot-scope="props">
+            <span
+              :class="
+                props.rowData.usages_left === -1
+                  ? 'usage_limit'
+                  : 'usage_left_class'
+              "
+            >
+              {{
+                props.rowData.usages_left === -1
+                  ? "unlimited"
+                  : props.rowData.usages_left
+              }}
+            </span>
           </template>
           <template slot="actions" slot-scope="props">
             <b-row align-h="around" class="pr-1 align-items-center">
@@ -139,6 +166,8 @@ export default {
       pageSizes: [12, 18, 25],
       from: 0,
       showTooltip: false,
+      dir: null,
+      order_by: null,
       to: 0,
       fields: [
         {
@@ -148,26 +177,26 @@ export default {
           dataClass: "list-item-heading",
           width: "20%",
         },
+        // {
+        //   name: "details",
+        //   sortField: "discount",
+        //   title: "Discount",
+        //   titleClass: "",
+        //   dataClass: "text-muted",
+        //   width: "20%",
+        //   callback: (value) => {
+        //     return value.discount;
+        //   },
+        // },
         {
-          name: "details",
-          // sortField: "discount",
-          title: "Discount",
-          titleClass: "",
-          dataClass: "text-muted",
-          width: "20%",
-          callback: (value) => {
-            return value.discount;
-          },
-        },
-        {
-          name: "user",
+          name: "__slot:user",
           title: "User",
           titleClass: "",
           dataClass: "text-muted",
           width: "20%",
-          callback: (value) => {
-            return `${value.first_name} ${value.last_name}`;
-          },
+          // callback: (value) => {
+          //   return value ? `${value.first_name} ${value.last_name}` ;
+          // },
         },
         // {
         //   name: "type",
@@ -179,15 +208,17 @@ export default {
         // },
         {
           name: "__slot:discount",
-          title: `Value`,
+          // sortField: "discount",
+          title: "Discount",
           titleClass: "px-1",
           dataClass: "px-1",
           width: "13%",
         },
         {
-          name: "usages_left",
-          // sortField: "usages_left",
+          name: "__slot:usage",
+          sortField: "usages_left",
           title: "Usage left",
+
           titleClass: "",
           dataClass: "text-muted",
           width: "10%",
@@ -205,6 +236,8 @@ export default {
   created() {
     this.getCoupons({
       keyword: null,
+      dir: null,
+      order_by: null,
       offset: 0,
       limit: 12,
     });
@@ -227,6 +260,8 @@ export default {
       const offset = (this.currentPage - 1) * this.perPage;
       this.getCoupons({
         keyword: null,
+        dir: this.dir,
+        order_by: this.order_by,
         offset: offset,
         limit: limit,
       });
@@ -235,7 +270,35 @@ export default {
       this.from = (this.currentPage - 1) * this.perPage;
       this.to = this.from + this.perPage;
     },
+    dataManager(sortOrder, pagination) {
+      const limit = this.perPage;
+      const offset = (this.currentPage - 1) * this.perPage;
+      if (sortOrder.length > 0) {
+        if (sortOrder[0].direction == "asc") {
+          this.order_by = sortOrder[0].sortField;
+          this.dir = "ASC";
+          this.getCoupons({
+            keyword: null,
+            offset: offset,
+            limit: limit,
+            dir: this.dir,
+            order_by: this.order_by,
+          });
+        }
+        if (sortOrder[0].direction == "desc") {
+          this.order_by = sortOrder[0].sortField;
+          this.dir = "DESC";
 
+          this.getCoupons({
+            keyword: null,
+            dir: this.dir,
+            order_by: this.order_by,
+            offset: offset,
+            limit: limit,
+          });
+        }
+      }
+    },
     changePageSize(perPage) {
       this.perPage = perPage;
     },
@@ -288,6 +351,8 @@ export default {
       this.getCoupons({
         keyword: val,
         offset: null,
+        dir: null,
+        order_by: null,
         limit: null,
       });
     },
@@ -324,7 +389,14 @@ export default {
   opacity: 0;
   transition: opacity 0.3s;
 }
-
+.usage_limit {
+  font-weight: bold;
+  color: #c1160f;
+}
+.usage_left_class {
+  font-weight: bold;
+  color: #000;
+}
 .tooltip::before {
   content: "";
   position: absolute;

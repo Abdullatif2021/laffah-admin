@@ -67,26 +67,7 @@ export default {
           width: "10%",
           callback: this.viewCategory,
         },
-        {
-          name: "",
-          title: `${this.$t("tables.online-state")}`,
-          titleClass: "",
-          dataClass: "list-item-heading",
-          width: "10%",
-          callback: (value) => {
-            return `<b-button class="${
-              value.is_published === "1"
-                ? `toggle_btn_on_en`
-                : `toggle_btn_off_en`
-            }" variant="primary">
-              <span class="${
-                value.is_published === "1"
-                  ? `toggle_span_on_en`
-                  : `toggle_span_off_en`
-              }"></span>
-              </b-button>`;
-          },
-        },
+
         {
           name: "__slot:price",
           title: `${this.$t("tables.price")}`,

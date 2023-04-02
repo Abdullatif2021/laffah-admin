@@ -32,6 +32,10 @@
         <tr class="information">
           <td colspan="3" dir="rtl" align="right">
             فاتورة#: {{ order.order_key }}<br />
+            العنوان المسجل : محل رقم 21 ملك وقف محمد عبدالله الكاز, ديرة, هور
+            العنز, دبي ديرة, دبي, الإمارات العربية المتحدة,<br />
+            الرقم الضريبي: {{ tax_num }}<br />
+
             طُلب: {{ formatDateTime(order.entry_date, true) }}<br />
             تسليم: {{ order.delivery_time }}<br />
             الزبون: {{ order.contact_name }}<br />
@@ -158,19 +162,18 @@
           <td></td>
         </tr>
 
-        <tr class="total">
-          <td align="left">{{ (order || {}).vat_value }}</td>
-
-          <td dir="rtl" align="center">الضريبة :</td>
-          <td></td>
-        </tr>
         <tr v-if="order.delivery_cost !== null" class="total">
           <td align="left">{{ (order || {}).delivery_cost }}</td>
 
           <td dir="rtl" align="center">التوصيل :</td>
           <td></td>
         </tr>
+        <tr class="total">
+          <td align="left">{{ (order || {}).vat_value }}</td>
 
+          <td dir="rtl" align="center">الضريبة :</td>
+          <td></td>
+        </tr>
         <tr class="total">
           <td align="left">د.إ {{ (order || {}).total }}</td>
 
@@ -201,6 +204,7 @@ export default {
     return {
       output: null,
       products: this.order.order_details,
+      tax_num: localStorage.getItem("Tax Registration Number"),
       branch: {},
       fields: [
         {

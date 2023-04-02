@@ -206,7 +206,8 @@ export default {
     this.fetchTopSelling();
     this.fetchOrders();
     this.getRatingInfo();
-
+    this.getTaxRegistration();
+    console.log("herre i am");
     // this.timer = setInterval(this.fetchOrders, 300000000)
   },
   methods: {
@@ -250,6 +251,18 @@ export default {
           this.doughnut_data.datasets[0]["data"].push(
             res.data.data.rating_four_five
           );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getTaxRegistration() {
+      return axios
+        .get("https://api-v2.laffahrestaurants.com/public/api/setting")
+        .then((res) => res.data)
+        .then((res) => {
+          const tax = res.data.find((x) => x.id == 9);
+          localStorage.setItem("Tax Registration Number", tax.value);
         })
         .catch((error) => {
           console.log(error);

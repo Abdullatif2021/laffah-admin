@@ -25,6 +25,7 @@
   },
   "menu": {
     "reports": "Reports",
+    "send": "Send",
     "recipes": "Recipes",
     "send-notification": "Send Notification",
     "delivery": "Delivery",

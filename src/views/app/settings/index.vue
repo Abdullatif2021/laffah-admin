@@ -6,14 +6,7 @@
     </b-colxx>
     <template v-if="!isLoadSettings">
       <b-colxx xxs="6" v-for="item in settings_list" :key="item.id">
-        <b-card
-          class="mb-4 auction_card"
-          :title="
-            item.key == 'OrderCreated'
-              ? 'when order created then earns points'
-              : item.key
-          "
-        >
+        <b-card class="mb-4 auction_card" :title="item.key">
           <b-form>
             <b-row>
               <b-colxx xxs="12">
@@ -95,7 +88,7 @@ export default {
     settings: function (val) {
       this.settings_list = val.map((el) => {
         return {
-          key: el.key == 20 ? "Every 20 points equals: " : el.key,
+          key: el.label,
           value: el.value,
           id: el.id,
         };

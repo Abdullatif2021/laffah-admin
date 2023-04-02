@@ -41,7 +41,9 @@
               :src="
                 order_index !== undefined
                   ? props.rowData.item.image
-                  : `${props.rowData.image_baseurl}/${props.rowData.image_webp}`
+                  : props.rowData.image_webp
+                  ? `${props.rowData.image_baseurl}/small/${props.rowData.image_webp}`
+                  : props.rowData.image
               "
               class-name=""
             />
@@ -72,6 +74,17 @@
                 } ${$t("pages.aed")}`
               }}</span>
             </b-badge>
+          </template>
+          <template slot="state" slot-scope="props">
+            <div @click="item_activate(props.rowData.active)">
+              <switches
+                v-model="props.rowData.active"
+                theme="custom"
+                color="primary"
+                class="vue-switcher-small"
+              ></switches>
+              <!-- <b class="text-info">{{ get_active_view(data.value)}}</b> -->
+            </div>
           </template>
           <template slot="price2" slot-scope="props">
             <b-badge pill variant="outline-primary">
@@ -446,6 +459,7 @@ import UpdateOrderStatus from "../../views/app/orders/UpdateOrderStatus";
 import index_cjs, { mapGetters, mapActions } from "vuex";
 import { apiUrl } from "@/constants/config";
 import { decrypt } from "@/utils";
+import Switches from "vue-switches";
 
 export default {
   props: {
@@ -517,6 +531,8 @@ export default {
     "b-icon-pencil": BIconPencil,
     "b-icon-link45deg": BIconLink45deg,
     "b-icon-shop": BIconShop,
+    switches: Switches,
+
     ThumbnailImage,
     UpdateOrderStatus,
   },
@@ -753,7 +769,9 @@ export default {
       this.perPage = perPage;
       this.$refs.vuetable.refresh();
     },
-
+    item_activate(val) {
+      console.log(val);
+    },
     searchChange(val) {
       this.search = val;
       this.dataManager2(0, 1);
@@ -799,6 +817,8 @@ export default {
               `/${this.apiBase}${this.type}&orderBy[]=created_at&orderBy[]=desc&offset=0&limit=12`
             )
             .then((response) => {
+              console.log("i am herwwwwwwwwwwwwwwwwwwwe", this.apiBase);
+
               this.data = response.data.data;
               this.total = response.data.total;
               this.calculatePagination();
@@ -819,7 +839,10 @@ export default {
                   : `${this.apiBase}/${this.id}?&orderBy[]=created_at&orderBy[]=desc`
               )
               .then((response) => {
-                //console.log("image attach: "+JSON.stringify(response.data.data));
+                console.log(
+                  "image attawwwwwwwwwwwch: " +
+                    JSON.stringify(response.data.data)
+                );
                 this.data = response.data.data;
                 this.total = response.data.total;
                 this.calculatePagination();
@@ -832,31 +855,91 @@ export default {
               });
           } else {
             // console.log(this.apiBase, 'this.apiBase')
-            axios
-              .get(`${this.apiBase}?orderBy[]=created_at&orderBy[]=desc`)
-              .then((response) => {
-                console.log(response.data);
-                // console.log("response.data type : ", response.data.data.type);
-                if (this.apiBase.includes("areas")) {
-                  let result = response.data.data;
-                  // console.log(result[1], 'fff')
-                  for (let i = 0; i < result.length; i++) {
-                    const minVal = result[i].areaMinimumOrders[0];
-                    result[i].min_orders = minVal;
+            if (this.apiBase === "categories") {
+              axios
+                .get(
+                  `${this.apiBase}?parent_id=0&orderBy[]=created_at&orderBy[]=desc`
+                )
+                .then((response) => {
+                  console.log(response.data);
+                  // console.log("response.data type : ", response.data.data.type);
+                  if (this.apiBase.includes("areas")) {
+                    let result = response.data.data;
+                    // console.log(result[1], 'fff')
+                    for (let i = 0; i < result.length; i++) {
+                      const minVal = result[i].areaMinimumOrders[0];
+                      result[i].min_orders = minVal;
+                    }
+                    // console.log('areas', result)
                   }
-                  // console.log('areas', result)
-                }
-                this.data = response.data.data;
-                //  console.log("data orders: " + JSON.stringify(this.data))
-                this.total = response.data.total;
-                this.calculatePagination();
-                this.isLoad = true;
-              })
-              .catch((error) => {
-                console.log(error);
-                this.calculatePagination();
-                this.isLoad = true;
-              });
+                  if (this.apiBase === "categories") {
+                    console.log("i am here");
+                    this.data = response.data.data.filter(
+                      (item) => (item.parent_id = 0)
+                    );
+                    console.log("i am here", this.data);
+                    this.total = response.data.total;
+                    this.calculatePagination();
+                    this.isLoad = true;
+                  } else {
+                    this.data = response.data.data;
+                    this.total = response.data.total;
+                    this.calculatePagination();
+                    this.isLoad = true;
+                  }
+                  this.data = response.data.data;
+                  //  console.log("data orders: " + JSON.stringify(this.data))
+                  this.total = response.data.total;
+                  this.calculatePagination();
+                  this.isLoad = true;
+                })
+                .catch((error) => {
+                  console.log(error);
+                  this.calculatePagination();
+                  this.isLoad = true;
+                });
+            } else {
+              axios
+                .get(`${this.apiBase}?orderBy[]=created_at&orderBy[]=desc`)
+                .then((response) => {
+                  console.log(response.data);
+                  // console.log("response.data type : ", response.data.data.type);
+                  if (this.apiBase.includes("areas")) {
+                    let result = response.data.data;
+                    // console.log(result[1], 'fff')
+                    for (let i = 0; i < result.length; i++) {
+                      const minVal = result[i].areaMinimumOrders[0];
+                      result[i].min_orders = minVal;
+                    }
+                    // console.log('areas', result)
+                  }
+                  if (this.apiBase === "categories") {
+                    console.log("i am here");
+                    this.data = response.data.data.filter(
+                      (item) => (item.parent_id = 0)
+                    );
+                    console.log("i am here", this.data);
+                    this.total = response.data.total;
+                    this.calculatePagination();
+                    this.isLoad = true;
+                  } else {
+                    this.data = response.data.data;
+                    this.total = response.data.total;
+                    this.calculatePagination();
+                    this.isLoad = true;
+                  }
+                  this.data = response.data.data;
+                  //  console.log("data orders: " + JSON.stringify(this.data))
+                  this.total = response.data.total;
+                  this.calculatePagination();
+                  this.isLoad = true;
+                })
+                .catch((error) => {
+                  console.log(error);
+                  this.calculatePagination();
+                  this.isLoad = true;
+                });
+            }
           }
         }
       }

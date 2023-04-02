@@ -162,11 +162,7 @@
               }}:
               <b> - {{ order.discount_value }}</b>
             </b-card-text>
-            <b-card-text
-              v-if="order.vat_value !== null"
-              class="list-item-heading mb-1 truncate d-flex justify-content-between"
-              >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
-            </b-card-text>
+
             <div
               class="d-flex justify-content-between"
               style="margin-bottom: 10px; font-size: 1rem"
@@ -181,6 +177,11 @@
             >
 
             <br />
+            <b-card-text
+              v-if="order.vat_value !== null"
+              class="list-item-heading mb-1 truncate d-flex justify-content-between"
+              >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
+            </b-card-text>
             <!-- <b-card-text
               v-if="order.delivery_cost !== null"
               class="list-item-heading mb-1 text-nowrap"
@@ -323,7 +324,7 @@
           </b-card>
           <!-- Discount -->
           <b-card
-            v-if="order.status === 6"
+            v-if="order.status === 6 && order.discount_value"
             header-tag="header"
             body-class="body_class"
           >
@@ -335,6 +336,8 @@
 
             <discount
               :value="order.discount_value ? order.discount_value : 0"
+              :points="order.points_discounts ? order.points : null"
+              :coupon="order.promocode_discounts ? order.promocode : null"
             />
           </b-card>
           <!--          delivery address-->
@@ -469,7 +472,11 @@
                     <thumbnail-image
                       small
                       rounded
-                      :src="row.item.item.image"
+                      :src="
+                        row.item.item.image_webp === ''
+                          ? row.item.item.image
+                          : `${row.item.item.image_baseurl}/small/${row.item.item.image_webp}`
+                      "
                       class-name="h-25"
                       :alt="
                         (

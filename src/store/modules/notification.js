@@ -221,13 +221,15 @@ const actions = {
         {}
       )
       .then((res) => {
-        if (res.data.status === 201) {
+        if (res.status === 201) {
           commit("send_notif_success", res.data);
         } else {
           commit("send_notif_error", res.data);
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        commit("send_notif_error", res.data);
+      });
   },
 };
 

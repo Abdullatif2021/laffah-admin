@@ -50,6 +50,8 @@ const mutations = {
 const actions = {
   getCoupons({ commit, dispatch }, payload) {
     const params = {
+      order_dir: payload.dir,
+      order_by: payload.order_by,
       keyword: payload?.keyword,
       offset: payload.offset,
       limit: payload.limit,
@@ -125,6 +127,7 @@ const actions = {
   updateCoupon({ commit }, payload) {
     const id = payload.coupon_id;
     const formData = new FormData();
+    formData.append("_method", "PUT");
     Object.entries(payload).forEach((entry) => {
       const [key, value] = entry;
       if (value != null) {
@@ -132,7 +135,7 @@ const actions = {
       }
     });
 
-    return Axios.put(
+    return Axios.post(
       `https://api-v2.laffahrestaurants.com/public/api/promocode/${id}`,
       formData,
       {}

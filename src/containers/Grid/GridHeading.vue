@@ -22,7 +22,7 @@
           "
           class="btn top-right-button btn-primary btn-lg"
         >
-          {{ $t("pages.add-new") }} {{ addRow }}
+          {{ $t("pages.add-new") }}
         </router-link>
         <add-new-modal
           v-if="addNew && apiBase.includes('customization')"

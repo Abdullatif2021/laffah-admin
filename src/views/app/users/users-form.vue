@@ -7,34 +7,34 @@
       </b-colxx>
     </b-row>
     <b-row>
-      <b-colxx
-        sm="12"
-        md="12"
-        class="mb-4">
+      <b-colxx sm="12" md="12" class="mb-4">
         <UsersForm
           :apiBase="apiBase"
-          :itemid="$route.params.id"></UsersForm>
+          :itemid="$route.params.id"
+          :user_type="$route.query.type"
+        ></UsersForm>
       </b-colxx>
-
     </b-row>
   </div>
 </template>
 
 <script>
-import UsersForm from "../../../containers/users/UsersForm"
+import UsersForm from "../../../containers/users/UsersForm";
 export default {
   name: "users-form",
   components: {
-    UsersForm
+    UsersForm,
   },
   data() {
     return {
-      apiBase: "users"
-    }
-  }
-}
+      apiBase: "users",
+    };
+  },
+  created() {
+    console.log(this.$route.params.id);
+    console.log(this.$route.query.type);
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -9,188 +9,198 @@
       </b-colxx>
     </b-row>
     <b-row>
-      <b-colxx xxs="12">
-        <b-row>
-          <b-colxx xxs="6">
-            <b-card class="mb-4 auction_card" title="TYPE">
-              <b-form>
-                <b-row>
-                  <b-colxx v-if="coupon_id" class="code_container" sm="12">
-                    <h3 class="code">{{ code }}</h3>
-                  </b-colxx>
-                  <b-colxx sm="12">
-                    <b-form-group
-                      label="Coupon Type"
-                      label-class="font-weight-bold"
-                      class="error-l-150"
-                      ><b-form-input
-                        type="text"
-                        style="display: none"
-                        v-model.trim="$v.couponType.$model"
-                        :state="!$v.couponType.$error"
-                      />
+      <template v-if="isLoad">
+        <b-colxx xxs="12">
+          <b-row>
+            <b-colxx xxs="6">
+              <b-card class="mb-4 auction_card" title="TYPE">
+                <b-form>
+                  <b-row>
+                    <b-colxx v-if="coupon_id" class="code_container" sm="12">
+                      <h3 class="code">{{ code }}</h3>
+                    </b-colxx>
+                    <b-colxx sm="12">
+                      <b-form-group
+                        label="Coupon Type"
+                        label-class="font-weight-bold"
+                        class="error-l-150"
+                        ><b-form-input
+                          type="text"
+                          style="display: none"
+                          v-model.trim="$v.couponType.$model"
+                          :state="!$v.couponType.$error"
+                        />
 
-                      <b-form-checkbox-group
-                        v-model.trim="$v.couponType.$model"
-                      >
-                        <b-form-checkbox value="percent"
-                          >Percentage</b-form-checkbox
+                        <b-form-checkbox-group
+                          v-model.trim="$v.couponType.$model"
                         >
-                        <b-form-checkbox value="fixprice"
-                          >Discount</b-form-checkbox
+                          <b-form-checkbox value="percent"
+                            >Percentage</b-form-checkbox
+                          >
+                          <b-form-checkbox value="fixprice"
+                            >Discount</b-form-checkbox
+                          >
+                        </b-form-checkbox-group>
+                        <b-form-invalid-feedback style="margin-top: 10px"
+                          >Please select type!</b-form-invalid-feedback
                         >
-                      </b-form-checkbox-group>
-                      <b-form-invalid-feedback style="margin-top: 10px"
-                        >Please select type!</b-form-invalid-feedback
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx v-if="couponType != ''" sm="6">
+                      <b-form-group class="form-group-label" label="Type Value">
+                        <b-input-group
+                          class="mb-3"
+                          :append="couponType == 'fixprice' ? '$' : '%'"
+                        >
+                          <b-form-input
+                            type="number"
+                            v-model.trim="$v.discount.$model"
+                            :state="!$v.discount.$error"
+                          />
+                          <b-form-invalid-feedback style="margin-top: 30px"
+                            >Please enter the value!</b-form-invalid-feedback
+                          >
+                        </b-input-group>
+                      </b-form-group>
+                    </b-colxx>
+
+                    <b-colxx v-if="couponType == 'percent'" sm="6">
+                      <b-form-group
+                        class="form-group-label"
+                        label="Max Discount"
                       >
-                    </b-form-group>
-                  </b-colxx>
-                  <b-colxx v-if="couponType != ''" sm="6">
-                    <b-form-group class="form-group-label" label="Type Value">
-                      <b-input-group
-                        class="mb-3"
-                        :append="couponType == 'fixprice' ? '$' : '%'"
+                        <b-input-group class="mb-3" append="AED">
+                          <b-form-input
+                            type="number"
+                            v-model.trim="$v.max_discount.$model"
+                          />
+                        </b-input-group>
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx v-if="!coupon_id" sm="12">
+                      <b-form-group
+                        class="form-group-label"
+                        label="Code"
+                        label-class="font-weight-bold"
+                      >
+                        <b-form-checkbox-group
+                          v-model.trim="$v.codeType.$model"
+                        >
+                          <b-form-checkbox value="auto"
+                            >Auto generate</b-form-checkbox
+                          >
+                          <b-form-checkbox value="enter"
+                            >Enter Code</b-form-checkbox
+                          >
+                        </b-form-checkbox-group>
+                      </b-form-group>
+                      <b-form-group
+                        v-if="codeType === 'enter'"
+                        class="form-group-label"
+                        label="ُEnter the code"
                       >
                         <b-form-input
-                          type="number"
-                          v-model.trim="$v.discount.$model"
-                          :state="!$v.discount.$error"
+                          required
+                          type="text"
+                          :disabled="codeType === 'auto'"
+                          v-model.trim="$v.code.$model"
+                          :state="!$v.code.$error"
                         />
-                        <b-form-invalid-feedback style="margin-top: 30px"
+                        <b-form-invalid-feedback
                           >Please enter the value!</b-form-invalid-feedback
                         >
-                      </b-input-group>
-                    </b-form-group>
-                  </b-colxx>
+                      </b-form-group>
+                    </b-colxx>
+                  </b-row>
+                </b-form></b-card
+              >
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-card class="mb-4 auction_card" title="DATE">
+                <b-form>
+                  <b-row style="height: 131px">
+                    <b-colxx sm="6">
+                      <b-form-group
+                        class="form-group-label"
+                        label-class="font-weight-bold"
+                        label="Start Date"
+                      >
+                        <datepicker
+                          style="width: 100%"
+                          type="date"
+                          :disabled-date="disableDate"
+                          value-type="YYYY-MM-DD"
+                          v-model="$v.start_date.$model"
+                          @change="selectedDate('start')"
+                        ></datepicker>
 
-                  <b-colxx v-if="couponType == 'percent'" sm="6">
-                    <b-form-group class="form-group-label" label="Max Discount">
-                      <b-input-group class="mb-3" append="AED">
-                        <b-form-input
-                          type="number"
-                          v-model.trim="$v.max_discount.$model"
-                        />
-                      </b-input-group>
-                    </b-form-group>
-                  </b-colxx>
-                  <b-colxx v-if="!coupon_id" sm="12">
-                    <b-form-group
-                      class="form-group-label"
-                      label="Code"
-                      label-class="font-weight-bold"
-                    >
-                      <b-form-checkbox-group v-model.trim="$v.codeType.$model">
-                        <b-form-checkbox value="auto"
-                          >Auto generate</b-form-checkbox
+                        <div
+                          :class="{
+                            'invalid-feedback': true,
+                            'd-block':
+                              $v.start_date.$error && !$v.start_date.required,
+                          }"
                         >
-                        <b-form-checkbox value="enter"
-                          >Enter Code</b-form-checkbox
+                          Start Date is required
+                        </div>
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx sm="6">
+                      <b-form-group
+                        class="form-group-label"
+                        label-class="font-weight-bold"
+                        label="Expired Date"
+                      >
+                        <datepicker
+                          style="width: 100%"
+                          type="date"
+                          :disabled-date="disableDate"
+                          value-type="YYYY-MM-DD"
+                          v-model="$v.end_date.$model"
+                          @change="selectedDate('end')"
                         >
-                      </b-form-checkbox-group>
-                    </b-form-group>
-                    <b-form-group
-                      v-if="codeType === 'enter'"
-                      class="form-group-label"
-                      label="ُEnter the code"
-                    >
-                      <b-form-input
-                        type="text"
-                        :disabled="codeType === 'auto'"
-                        v-model.trim="$v.code.$model"
-                        :state="!$v.code.$error"
-                      />
-                      <b-form-invalid-feedback
-                        >Please enter the value!</b-form-invalid-feedback
-                      >
-                    </b-form-group>
-                  </b-colxx>
-                </b-row>
-              </b-form></b-card
-            >
-          </b-colxx>
-          <b-colxx xxs="6">
-            <b-card class="mb-4 auction_card" title="DATE">
-              <b-form>
-                <b-row style="height: 131px">
-                  <b-colxx sm="6">
-                    <b-form-group
-                      class="form-group-label"
-                      label-class="font-weight-bold"
-                      label="Start Date"
-                    >
-                      <datepicker
-                        style="width: 100%"
-                        type="date"
-                        :disabled-date="disableDate"
-                        value-type="YYYY-MM-DD"
-                        v-model="$v.start_date.$model"
-                        @change="selectedDate('start')"
-                      ></datepicker>
-
-                      <div
-                        :class="{
-                          'invalid-feedback': true,
-                          'd-block':
-                            $v.start_date.$error && !$v.start_date.required,
-                        }"
-                      >
-                        Start Date is required
-                      </div>
-                    </b-form-group>
-                  </b-colxx>
-                  <b-colxx sm="6">
-                    <b-form-group
-                      class="form-group-label"
-                      label-class="font-weight-bold"
-                      label="Expired Date"
-                    >
-                      <datepicker
-                        style="width: 100%"
-                        type="date"
-                        :disabled-date="disableDate"
-                        value-type="YYYY-MM-DD"
-                        v-model="$v.end_date.$model"
-                        @change="selectedDate('end')"
-                      >
-                      </datepicker>
-                      <div
-                        :class="{
-                          'invalid-feedback': true,
-                          'd-block':
-                            $v.end_date.$error && !$v.end_date.required,
-                        }"
-                      >
-                        End Date is required
-                      </div>
-                    </b-form-group>
-                  </b-colxx>
-                </b-row>
-              </b-form>
-            </b-card>
-          </b-colxx>
-        </b-row>
-        <b-row>
-          <b-colxx xxs="8">
-            <b-card class="mb-4 auction_card" title="USAGE">
-              <b-form>
-                <b-row>
-                  <b-colxx sm="12">
-                    <b-row>
-                      <b-colxx sm="12">
-                        <b-form-group
-                          label="Couponable Type"
-                          class="error-l-150"
-                          label-class="font-weight-bold"
+                        </datepicker>
+                        <div
+                          :class="{
+                            'invalid-feedback': true,
+                            'd-block':
+                              $v.end_date.$error && !$v.end_date.required,
+                          }"
                         >
-                          <b-form-checkbox-group
-                            v-model.trim="$v.couponableType.$model"
+                          End Date is required
+                        </div>
+                      </b-form-group>
+                    </b-colxx>
+                  </b-row>
+                </b-form>
+              </b-card>
+            </b-colxx>
+          </b-row>
+          <b-row>
+            <b-colxx xxs="8">
+              <b-card class="mb-4 auction_card" title="USAGE">
+                <b-form>
+                  <b-row>
+                    <b-colxx sm="12">
+                      <b-row>
+                        <b-colxx sm="12">
+                          <b-form-group
+                            label="Couponable Type"
+                            class="error-l-150"
+                            label-class="font-weight-bold"
                           >
-                            <b-form-checkbox value="item">Item</b-form-checkbox>
-                            <b-form-checkbox value="category"
-                              >Category</b-form-checkbox
+                            <b-form-checkbox-group
+                              @change="handleCheckboxChange"
+                              v-model.trim="$v.couponableType.$model"
                             >
-                          </b-form-checkbox-group>
-                          <!-- <b-form-invalid-feedback
+                              <b-form-checkbox value="item"
+                                >Item</b-form-checkbox
+                              >
+                              <b-form-checkbox value="category"
+                                >Category</b-form-checkbox
+                              >
+                            </b-form-checkbox-group>
+                            <!-- <b-form-invalid-feedback
                             class="d-block"
                             v-if="
                               !$v.couponableType.required &&
@@ -198,242 +208,248 @@
                             "
                             >Please select Type!</b-form-invalid-feedback
                           > -->
-                        </b-form-group>
-                      </b-colxx>
+                          </b-form-group>
+                        </b-colxx>
 
-                      <b-colxx v-if="couponableType != null" sm="12">
-                        <b-form-group
-                          class="form-group-label"
-                          :label="
-                            couponableType === 'category'
-                              ? 'Choose Category'
-                              : 'Choose Item'
-                          "
-                        >
-                          <b-form-input
-                            type="number"
-                            style="display: none"
-                            v-model.trim="$v.couponable.$model"
-                            :state="!$v.couponable.$error"
-                          />
-
-                          <v-select
-                            label="name"
-                            :filterable="false"
-                            :options="couponableOptions"
-                            @search="fetchcouponableOptions"
-                            v-model="couponable"
+                        <b-colxx v-if="couponableType != null" sm="12">
+                          <b-form-group
+                            class="form-group-label"
+                            :label="
+                              couponableType === 'category'
+                                ? 'Choose Category'
+                                : 'Choose Item'
+                            "
                           >
-                            <template slot="no-options">{{
-                              couponableType === "category"
-                                ? "type to search Category List.."
-                                : "type to search Item List.."
-                            }}</template>
+                            <b-form-input
+                              type="number"
+                              style="display: none"
+                              v-model.trim="$v.couponable.$model"
+                              :state="!$v.couponable.$error"
+                            />
 
-                            <template
-                              slot="selected-option"
-                              slot-scope="option"
+                            <v-select
+                              label="name"
+                              :filterable="false"
+                              :options="couponableOptions"
+                              @search="fetchcouponableOptions"
+                              v-model="couponable"
                             >
-                              <div class="selected d-center">
-                                Name:
-                                {{ option.name }}
-                              </div>
-                            </template>
-                            <template slot="spinner" slot-scope="spinner">
-                              <div
-                                class="spinner-border text-primary"
-                                v-show="spinner"
-                              ></div>
-                            </template>
-                          </v-select>
-                          <b-form-invalid-feedback
-                            >Please choose the value!</b-form-invalid-feedback
-                          >
-                        </b-form-group>
-                      </b-colxx>
-                    </b-row>
-                  </b-colxx>
-                  <b-colxx sm="12">
-                    <b-form-group
-                      class="form-group-label"
-                      label-class="font-weight-bold"
-                      label="User"
-                    >
-                      <v-select
-                        label="name"
-                        :filterable="false"
-                        :options="vueSelectOptions"
-                        @search="fetchOptions"
-                        v-model="user"
-                      >
-                        <template slot="no-options"
-                          >type to search users List..</template
-                        >
+                              <template slot="no-options">{{
+                                couponableType === "category"
+                                  ? "type to search Category List.."
+                                  : "type to search Item List.."
+                              }}</template>
 
-                        <template slot="selected-option" slot-scope="option">
-                          <div class="selected d-center">
-                            Name: {{ option.first_name }}
-                            {{ option.last_name }}, Email: {{ option.email }},
-                            phone number:
-                            {{ option.phone_number }}
-                          </div>
-                        </template>
-                        <template slot="spinner" slot-scope="spinner">
-                          <div
-                            class="spinner-border text-primary"
-                            v-show="spinner"
-                          ></div>
-                        </template>
-                      </v-select>
-                    </b-form-group>
-                  </b-colxx>
-                  <b-colxx sm="12">
-                    <b-form-group
-                      class="form-group-label"
-                      label="Usage limit"
-                      label-class="font-weight-bold"
-                    >
-                      <b-form-checkbox-group
-                        v-model.trim="$v.usage_type.$model"
-                      >
-                        <b-form-checkbox value="manual"
-                          >Enter value</b-form-checkbox
-                        >
-                        <b-form-checkbox value="unlimited"
-                          >Unlimited</b-form-checkbox
-                        >
-                      </b-form-checkbox-group>
-                    </b-form-group>
-                    <b-form-group
-                      v-if="usage_type === 'manual'"
-                      class="form-group-label"
-                      label="ُEnter Limit"
-                    >
-                      <b-form-input
-                        type="number"
-                        v-model.trim="$v.usages_left.$model"
-                        :state="!$v.usages_left.$error"
-                      />
-                      <b-form-invalid-feedback
-                        >Please enter the value!</b-form-invalid-feedback
-                      >
-                    </b-form-group>
-                  </b-colxx>
-                </b-row>
-              </b-form>
-            </b-card>
-          </b-colxx>
-          <b-colxx xxs="4">
-            <b-card class="mb-4 auction_card" title="USER">
-              <template v-if="user">
-                <b-form>
-                  <b-row>
-                    <b-colxx sm="6">
-                      <h3
-                        style="
-                          color: #303030;
-                          font-size: 18px;
-                          line-height: 1.6;
-                          font-weight: 500;
-                        "
-                      >
-                        Full name
-                      </h3>
-                      <p
-                        style="
-                          background-color: #f1f1f1;
-                          padding: 8px 15px;
-                          border-radius: 50px;
-                          display: inline-block;
-                          margin-bottom: 20px;
-                          font-size: 14px;
-                          line-height: 1.4;
-                          font-family: Courier New, Courier, monospace;
-                          margin-top: 0;
-                        "
-                      >
-                        {{ user.first_name }} {{ user.last_name }}
-                      </p>
+                              <template
+                                slot="selected-option"
+                                slot-scope="option"
+                              >
+                                <div class="selected d-center">
+                                  {{ option.name }}
+                                </div>
+                              </template>
+                              <template slot="spinner" slot-scope="spinner">
+                                <div
+                                  class="spinner-border text-primary"
+                                  v-show="spinner"
+                                ></div>
+                              </template>
+                            </v-select>
+                            <b-form-invalid-feedback
+                              >Please choose the value!</b-form-invalid-feedback
+                            >
+                          </b-form-group>
+                        </b-colxx>
+                      </b-row>
                     </b-colxx>
-                    <b-colxx sm="6">
-                      <h3
-                        style="
-                          color: #303030;
-                          font-size: 18px;
-                          line-height: 1.6;
-                          font-weight: 500;
-                        "
-                      >
-                        Phone Number
-                      </h3>
-                      <p
-                        style="
-                          background-color: #f1f1f1;
-                          padding: 8px 15px;
-                          border-radius: 50px;
-                          display: inline-block;
-                          margin-bottom: 20px;
-                          font-size: 14px;
-                          line-height: 1.4;
-                          font-family: Courier New, Courier, monospace;
-                          margin-top: 0;
-                        "
-                      >
-                        {{ user.phone_number }}
-                      </p>
-                    </b-colxx>
-                  </b-row>
-                  <b-row>
                     <b-colxx sm="12">
-                      <h3
-                        style="
-                          color: #303030;
-                          font-size: 18px;
-                          line-height: 1.6;
-                          font-weight: 500;
-                        "
+                      <b-form-group
+                        class="form-group-label"
+                        label-class="font-weight-bold"
+                        label="User"
                       >
-                        Email
-                      </h3>
-                      <p
-                        style="
-                          background-color: #f1f1f1;
-                          padding: 8px 15px;
-                          border-radius: 50px;
-                          display: inline-block;
-                          margin-bottom: 20px;
-                          font-size: 14px;
-                          line-height: 1.4;
-                          font-family: Courier New, Courier, monospace;
-                          margin-top: 0;
-                        "
+                        <v-select
+                          label="name"
+                          :filterable="false"
+                          :options="vueSelectOptions"
+                          @search="fetchOptions"
+                          v-model="user"
+                        >
+                          <template slot="no-options"
+                            >type to search users List..</template
+                          >
+
+                          <template slot="selected-option" slot-scope="option">
+                            <div class="selected d-center">
+                              Name: {{ option.first_name }}
+                              {{ option.last_name }}, Email: {{ option.email }},
+                              phone number:
+                              {{ option.phone_number }}
+                            </div>
+                          </template>
+                          <template slot="spinner" slot-scope="spinner">
+                            <div
+                              class="spinner-border text-primary"
+                              v-show="spinner"
+                            ></div>
+                          </template>
+                        </v-select>
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx sm="12">
+                      <b-form-group
+                        class="form-group-label"
+                        label="Usage limit"
+                        label-class="font-weight-bold"
                       >
-                        {{ user.email }}
-                      </p>
+                        <b-form-checkbox-group
+                          v-model.trim="$v.usage_type.$model"
+                        >
+                          <b-form-checkbox value="manual"
+                            >Enter value</b-form-checkbox
+                          >
+                          <b-form-checkbox value="unlimited"
+                            >Unlimited</b-form-checkbox
+                          >
+                        </b-form-checkbox-group>
+                      </b-form-group>
+                      <b-form-group
+                        v-if="usage_type === 'manual'"
+                        class="form-group-label"
+                        label="ُEnter Limit"
+                      >
+                        <b-form-input
+                          type="number"
+                          v-model.trim="$v.usages_left.$model"
+                          :state="!$v.usages_left.$error"
+                        />
+                        <b-form-invalid-feedback
+                          >Please enter the value!</b-form-invalid-feedback
+                        >
+                      </b-form-group>
                     </b-colxx>
                   </b-row>
                 </b-form>
-              </template>
-              <template v-else>
-                <div class="spinner-border text-primary" v-show="spinner"></div>
-              </template>
-            </b-card>
-          </b-colxx>
-        </b-row>
+              </b-card>
+            </b-colxx>
+            <b-colxx xxs="4">
+              <b-card class="mb-4 auction_card" title="USER">
+                <template v-if="user">
+                  <b-form>
+                    <b-row>
+                      <b-colxx sm="6">
+                        <h3
+                          style="
+                            color: #303030;
+                            font-size: 18px;
+                            line-height: 1.6;
+                            font-weight: 500;
+                          "
+                        >
+                          Full name
+                        </h3>
+                        <p
+                          style="
+                            background-color: #f1f1f1;
+                            padding: 8px 15px;
+                            border-radius: 50px;
+                            display: inline-block;
+                            margin-bottom: 20px;
+                            font-size: 14px;
+                            line-height: 1.4;
+                            font-family: Courier New, Courier, monospace;
+                            margin-top: 0;
+                          "
+                        >
+                          {{ user.first_name }} {{ user.last_name }}
+                        </p>
+                      </b-colxx>
+                      <b-colxx sm="6">
+                        <h3
+                          style="
+                            color: #303030;
+                            font-size: 18px;
+                            line-height: 1.6;
+                            font-weight: 500;
+                          "
+                        >
+                          Phone Number
+                        </h3>
+                        <p
+                          style="
+                            background-color: #f1f1f1;
+                            padding: 8px 15px;
+                            border-radius: 50px;
+                            display: inline-block;
+                            margin-bottom: 20px;
+                            font-size: 14px;
+                            line-height: 1.4;
+                            font-family: Courier New, Courier, monospace;
+                            margin-top: 0;
+                          "
+                        >
+                          {{ user.phone_number }}
+                        </p>
+                      </b-colxx>
+                    </b-row>
+                    <b-row>
+                      <b-colxx sm="12">
+                        <h3
+                          style="
+                            color: #303030;
+                            font-size: 18px;
+                            line-height: 1.6;
+                            font-weight: 500;
+                          "
+                        >
+                          Email
+                        </h3>
+                        <p
+                          style="
+                            background-color: #f1f1f1;
+                            padding: 8px 15px;
+                            border-radius: 50px;
+                            display: inline-block;
+                            margin-bottom: 20px;
+                            font-size: 14px;
+                            line-height: 1.4;
+                            font-family: Courier New, Courier, monospace;
+                            margin-top: 0;
+                          "
+                        >
+                          {{ user.email }}
+                        </p>
+                      </b-colxx>
+                    </b-row>
+                  </b-form>
+                </template>
+                <template v-else>
+                  <div
+                    class="spinner-border text-primary"
+                    v-show="spinner"
+                  ></div>
+                </template>
+              </b-card>
+            </b-colxx>
+          </b-row>
 
-        <b-card class="auction_card">
-          <b-card-body class="justify-content-center d-flex">
-            <b-button
-              @click="onValitadeFormSubmit"
-              type="submit"
-              :disabled="enable_submit"
-              variant="primary"
-              class=""
-              >{{ $t("forms.submit") }}</b-button
-            >
-          </b-card-body>
-        </b-card>
-      </b-colxx>
+          <b-card class="auction_card">
+            <b-card-body class="justify-content-center d-flex">
+              <b-button
+                @click="onValitadeFormSubmit"
+                type="submit"
+                :disabled="enable_submit"
+                variant="primary"
+                class=""
+                >{{ $t("forms.submit") }}</b-button
+              >
+            </b-card-body>
+          </b-card>
+        </b-colxx>
+      </template>
+      <template v-else>
+        <div class="loading"></div>
+      </template>
     </b-row>
   </div>
 </template>
@@ -472,6 +488,7 @@ export default {
         multiple: [],
       },
       user: null,
+      isLoad: false,
       isActive: false,
       leftText: "Item",
       rightText: "Category",
@@ -556,7 +573,9 @@ export default {
     this.getUserList();
     this.coupon_id = this.$route.query.id;
     console.log(this.coupon_id);
-    this.coupon_id ? this.getCoupon({ coupon_id: this.$route.query.id }) : "";
+    this.coupon_id
+      ? this.getCoupon({ coupon_id: this.$route.query.id })
+      : (this.isLoad = true);
     if (!this.coupon_id) {
       const start_date = new Date();
       const start_dateStr = start_date.toISOString().slice(0, 10);
@@ -609,7 +628,7 @@ export default {
                 usages_left:
                   this.usage_type === "manual" ? this.usages_left : null,
                 type: this.couponType,
-                expire_date: this.end_date,
+                expired_at: this.end_date,
                 start_date: this.start_date,
               });
             }
@@ -621,7 +640,8 @@ export default {
               max_discount: this.max_discount,
               user_id: this.user?.id,
               code: this.code,
-              usages_left: this.usages_left,
+              usages_left:
+                this.usage_type === "manual" ? this.usages_left : null,
               type: this.couponType,
               couponable_type: this.couponableType
                 ? this.couponableType === "item"
@@ -629,7 +649,7 @@ export default {
                   : `App\\Models\\Category`
                 : null,
               couponable_id: this.couponable?.id,
-              expire_date: this.end_date,
+              expired_at: this.end_date,
               start_date: this.start_date,
             });
           }
@@ -684,28 +704,33 @@ export default {
       loading(true);
       this.enable_submit = true;
       this.show_user = false;
-      setTimeout(() => {
-        return Axios.get(
-          `https://api-v2.laffahrestaurants.com/public/api/users?role=user&keyword=${search}`
-        ).then((res) => {
-          console.log(res);
-          // this.user = res.data.data[0];
-          this.enable_submit = false;
-          this.vueSelectOptions = res.data.data.map((x) => {
-            return {
-              name: `${x.first_name} ${x.last_name} `,
+      // setTimeout(() => {
+      return Axios.get(
+        `https://api-v2.laffahrestaurants.com/public/api/users?role=user&keyword=${search}`
+      ).then((res) => {
+        console.log(res);
+        // this.user = res.data.data[0];
+        this.enable_submit = false;
+        this.vueSelectOptions = res.data.data.map((x) => {
+          return {
+            name: `${x.first_name} ${x.last_name} `,
 
-              first_name: `${x.first_name}`,
-              last_name: `${x.last_name}`,
-              email: x.email,
-              phone_number: x.phone_number,
-              id: x.id,
-            };
-          });
-
-          loading(false);
+            first_name: `${x.first_name}`,
+            last_name: `${x.last_name}`,
+            email: x.email,
+            phone_number: x.phone_number,
+            id: x.id,
+          };
         });
-      }, 1000);
+
+        loading(false);
+      });
+      // }, 1500);
+    },
+    handleCheckboxChange() {
+      console.log("Loading");
+      this.couponable = {};
+      this.couponableOptions = [];
     },
     fetchcouponableOptions(search, loading) {
       console.log("Loading", loading);
@@ -746,7 +771,7 @@ export default {
             loading(false);
           });
         }
-      }, 1000);
+      }, 3000);
     },
   },
   computed: {
@@ -787,6 +812,7 @@ export default {
       }
     },
     _coupon: function (val) {
+      this.isLoad = true;
       // assign start date ........
       this.code = val.code;
       this.user = val.user ? val.user : null;
@@ -795,18 +821,24 @@ export default {
       const start_timeStr = start_date.toISOString().slice(11, 19);
       this.start_date = `${start_dateStr}`;
       // assign end date ........
-      const date = new Date(val.expired_at);
-      const dateStr = date.toISOString().slice(0, 10);
-      const timeStr = date.toISOString().slice(11, 19);
-      this.end_date = `${dateStr}`;
+      if (val.expired_at) {
+        const date = new Date(val.expired_at);
+        const dateStr = date.toISOString().slice(0, 10);
+        const timeStr = date.toISOString().slice(11, 19);
+        this.end_date = `${dateStr}`;
+      }
       // rest ..........
       this.discount = val.details.discount;
       console.log(this.discount);
       this.max_discount = val.details.max_discount;
       if (val.usages_left) {
-        this.usages_left = val.usages_left;
-        this.usage_type = "manual";
-        console.log(this.usages_left);
+        if (val.usages_left === -1) {
+          this.usage_type = "unlimited";
+        } else {
+          this.usages_left = val.usages_left;
+          this.usage_type = "manual";
+          console.log(this.usages_left);
+        }
       }
       this.couponType = val.type;
       this.couponableType = val.couponable_type
@@ -816,8 +848,6 @@ export default {
         : null;
       if (val.couponable_type.length != 0) {
         if (val.couponable_type === "App\\Models\\Item") {
-          console.log("here i ammmmmmm");
-
           Object.assign(this.couponable, {
             name: val.item.locales[this.$i18n.locale].name,
             id: val.item.id,
@@ -825,7 +855,7 @@ export default {
         } else {
           Object.assign(this.couponable, {
             name: val.category.locales[this.$i18n.locale].title,
-            id: val.item.id,
+            id: val.category.id,
           });
         }
       }

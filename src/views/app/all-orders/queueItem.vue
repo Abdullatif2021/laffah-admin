@@ -85,12 +85,7 @@
               }}
               <b> {{ order.discount_value }}</b>
             </b-card-text>
-            <b-card-text
-              v-if="order.vat_value !== null"
-              class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
-              >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
-            </b-card-text>
-            <br />
+
             <b-card-text>
               <div class="d-flex justify-content-between px-2">
                 {{ $t("pages.delivery_cost") }}:
@@ -102,6 +97,12 @@
                   order.salik_fee !== null ? "*" + $t("pages.salik") : ""
                 }}</small
               >
+            </b-card-text>
+            <br />
+            <b-card-text
+              v-if="order.vat_value !== null"
+              class="list-item-heading mb-1 truncate px-2 d-flex justify-content-between"
+              >{{ $t("pages.vat") }}: <b> {{ order.vat_value }}</b>
             </b-card-text>
             <!--            <div class="w-100 d-flex align-items-center">-->
 
@@ -367,6 +368,9 @@ export default {
       collapseToggleList: [],
     };
   },
+  created() {
+    // localStorage.setItem("Tax Registration Number", 100331289700003);
+  },
   computed: {
     ...mapGetters([
       "_deliveries",
@@ -415,7 +419,7 @@ export default {
     webpImage(item) {
       if (item) {
         if (item.image_webp) {
-          return `${item.image_baseurl}/${item.image_webp}`;
+          return `${item.image_baseurl}/small/${item.image_webp}`;
         } else {
           return `${item.image}`;
         }

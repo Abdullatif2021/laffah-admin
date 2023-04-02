@@ -22,7 +22,7 @@
       >⏰ {{ formatDateTime(order.delivery_time) }}
     </b-card-text>
     <div
-      v-if="order.is_pickup === 1"
+      v-if="order.is_pickup === '1'"
       class="d-flex text-danger text-center font-weight-bolder justify-content-center gap-4"
     >
       <!-- <i class="iconsminds-men"></i> -->

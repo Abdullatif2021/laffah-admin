@@ -381,7 +381,7 @@ export default {
         sts.splice(7, 1);
         // const test = sts.splice(3, 2)
         // console.log('statussssssssssssss', test);
-        sts.shift();
+        sts.splice(0, 2);
       }
       return sts;
     },

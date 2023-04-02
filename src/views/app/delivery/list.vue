@@ -47,6 +47,7 @@
           ref="vuetable"
           class="table-divided order-with-arrow"
           :per-page="perPage"
+          :data-manager="dataManager"
           :reactive-api-url="true"
           :api-mode="false"
           :fields="fields"
@@ -71,7 +72,10 @@
             </div>
           </template>
           <template slot="rating" slot-scope="props">
-            <rating :value="4" :ewwe="props.rowData.id"></rating>
+            <rating
+              :value="props.rowData.rate ? props.rowData.rate : 0"
+              :ewwe="props.rowData.id"
+            ></rating>
           </template>
           <template slot="status" slot-scope="props">
             <div
@@ -93,7 +97,6 @@
                   @click.prevent="open_details(props.rowData.id)"
                   font-scale="2"
                   aria-hidden="true"
-                  animation="spin"
                 />
               </b-link>
               <!-- <b-icon-exclamation-circle-fill
@@ -163,6 +166,8 @@ export default {
   data() {
     return {
       isLoad: false,
+      order_by: null,
+      dir: null,
       currentPage: 1, // current page number
       perPage: 12, // number of items per page
       totalItems: 0, // total number of items
@@ -203,7 +208,7 @@ export default {
         {
           name: "__slot:pending",
           title: "Pending Orders",
-          sortField: "pending",
+          sortField: "pending_delivery_orders_count",
           titleClass: "center aligned text-left",
           dataClass: "center aligned text-left",
           width: "15%",
@@ -211,7 +216,7 @@ export default {
         {
           name: "__slot:status",
           title: "Status",
-          sortField: "status",
+          sortField: "delivery_status",
           titleClass: "center aligned text-left",
           dataClass: "center aligned text-left",
           width: "10%",
@@ -219,7 +224,7 @@ export default {
         {
           name: "__slot:rating",
           title: "Rating",
-          sortField: "rating",
+          sortField: "rate",
           titleClass: "center aligned text-left",
           dataClass: "center aligned text-left",
           width: "15%",
@@ -306,6 +311,35 @@ export default {
       // path: `${adminRoot}/delivery/details/${id}`,
       // // query: { id: id }
       // });
+    },
+    dataManager(sortOrder, pagination) {
+      const limit = this.perPage;
+      const offset = (this.currentPage - 1) * this.perPage;
+      if (sortOrder.length > 0) {
+        if (sortOrder[0].direction == "asc") {
+          this.order_by = sortOrder[0].sortField;
+          this.dir = "ASC";
+          this.get_deliveries({
+            order_dir: this.dir,
+            keyword: null,
+            offset: offset,
+            limit: limit,
+            order_by: this.order_by,
+          });
+        }
+        if (sortOrder[0].direction == "desc") {
+          this.order_by = sortOrder[0].sortField;
+          this.dir = "DESC";
+
+          this.get_deliveries({
+            order_dir: this.dir,
+            keyword: null,
+            offset: offset,
+            limit: limit,
+            order_by: this.order_by,
+          });
+        }
+      }
     },
     searchChange(val) {
       this.search = val;

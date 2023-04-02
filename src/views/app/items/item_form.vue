@@ -899,7 +899,7 @@
         </div>
         <div v-else class="wizard-basic-step">
           <b-row class="add_container">
-            <b-colxx sm="12">
+            <b-colxx v-if="branchOptions.length > 0" sm="12">
               <b-form-group label="Branches" class="form-group-label">
                 <b-form-input
                   style="display: none"
@@ -917,6 +917,9 @@
                 >
               </b-form-group>
             </b-colxx>
+            <div class="branch_message" v-else>
+              <h4>There are no more branches All have been added</h4>
+            </div>
           </b-row>
           <div class="branch_container" v-if="selectedBranch">
             <b-form-row>
@@ -1331,7 +1334,7 @@ export default {
     this.enable_edit = this.$route.params.id;
     this.item_id = this.$route.params.id;
     this.loadCategoriesList();
-    this.loadAttributesList();
+    // this.loadAttributesList();
     this.getCustomizationGroups();
     this.item_id
       ? this.getItem({ id: this.item_id })
@@ -1437,11 +1440,14 @@ export default {
       if (!this.$v.gridForm.$invalid) {
         this.disabledFormStep1 = true;
         this.updateItem({
-          additional: this.gridForm,
           id: this.item_id,
-          notes: null,
+          additional: this.gridForm,
+          customization_groups: this.gridForm.customizations.map((x) => ({
+            id: x.value,
+          })),
+          notes: this.gridForm.notes,
           image: null,
-          langs: null,
+          langs: this.lang_form,
         });
       }
     },
@@ -1464,9 +1470,12 @@ export default {
       if (!this.$v.lang_form.$invalid) {
         this.disabledFormStep2 = true;
         this.updateItem({
-          info: null,
           id: this.item_id,
-          notes: null,
+          additional: this.gridForm,
+          customization_groups: this.gridForm.customizations.map((x) => ({
+            id: x.value,
+          })),
+          notes: this.gridForm.notes,
           image: null,
           langs: this.lang_form,
         });
@@ -1475,43 +1484,39 @@ export default {
     onForm3Submited() {
       this.disabledFormStep3 = true;
       this.updateItem({
-        info: null,
+        id: this.item_id,
+        additional: this.gridForm,
         customization_groups: this.gridForm.customizations.map((x) => ({
           id: x.value,
         })),
         notes: this.gridForm.notes,
-        id: this.item_id,
         image: null,
-        langs: null,
+        langs: this.lang_form,
       });
     },
     previousTab() {
       this.saveBtn = "Next";
     },
     getAssighedBranch(val) {
-      console.log(val);
-      this.oldBranches = [];
-      this.batch_id = null;
-      this.main_price = null;
-      this.oldBranches = val.prices.map((x) => ({
-        branch_id: x,
-        price: this.main_price,
-        active: true,
-      }));
-      this.batch_id = val.id;
-      this.main_price = val.prices[0].price;
+      // console.log(val);
+      // this.oldBranches = [];
+      // this.batch_id = null;
+      // this.main_price = null;
+      // this.oldBranches = val.prices.map((x) => ({
+      //   branch_id: x,
+      //   price: this.main_price,
+      //   active: true,
+      // }));
+      // this.batch_id = val.id;
+      // this.main_price = val.prices[0].price;
       this.checkboxOptions = [];
-      let branch_ids = [];
-      branch_ids = val.prices.map((el) => el.branch_id);
-      this.branchOptions.map((item) => {
-        this.checkboxOptions.push(
-          new Object({
-            name: item.text,
-            item: item.value.id,
-            selected: branch_ids.includes(item.value.id),
-          })
-        );
-      });
+      let old_branches = this.branchOptions;
+      let idsToRemove = [];
+      idsToRemove = val.map((el) => el.branch_id);
+      this.branchOptions = old_branches.filter(
+        (item) => !idsToRemove.includes(item.value.id)
+      );
+      console.log("this.branchOptions", this.branchOptions);
     },
     async getItemBatches() {
       await this.getBranches();
@@ -1577,6 +1582,8 @@ export default {
       this.model_button = true;
       this.updateItem({
         info: null,
+        additional: null,
+
         id: this.item_id,
         image: this.mainImage ? this.mainImage[0] : null,
         langs: null,
@@ -1807,7 +1814,7 @@ export default {
       this.gridForm.active = +val.active;
       this.gridForm.category = val.category[0];
       this.gridForm.record_order = val.record_order;
-      this.files_form.image = `${val.image_baseurl}/${val.image_webp}`;
+      this.files_form.image = `${val.image_baseurl}/small/${val.image_webp}`;
       this.lang_form.ar_name = val.locales.ar.name;
       this.lang_form.ar_description = val.locales.ar.description;
       this.lang_form.en_name = val.locales.en.name;
@@ -1881,32 +1888,35 @@ export default {
       this.batch_modify = false;
       this.checkboxOptions = [];
     },
-    _batches: function (val) {
+    _batches: async function (val) {
       this.records = val;
       this.loadBatchTab = true;
-      this.loadAttributesList();
+      await this.getBranches();
+      this.getAssighedBranch(val);
+      // this.loadAttributesList();
     },
     create_Batch: function (val) {
       this.getBatches({ item_id: this.item_id });
+      this.selected_Branch_array = [];
       this.checkboxOptions = [];
       this.batch_id = val.id;
-      this.main_price = val.prices[0].price;
+      console.log(val, "for prices");
+      this.main_price = val.price;
       let branch_ids = [];
 
       this.batch_form.name = null;
-      this.selected_Branch_array = [];
       this.selectedBranch.price = null;
       this.selectedBranch = null;
       this.selected_value = [];
       this.$v.$reset();
-      branch_ids = val.prices.map((el) => el.branch_id);
-      this.checkboxOptions = this.branchOptions.map((item) => {
-        return {
-          name: item.text,
-          item: item.value.id,
-          selected: branch_ids.includes(item.value.id),
-        };
-      });
+      // branch_ids = val.prices.map((el) => el.branch_id);
+      // this.checkboxOptions = this.branchOptions.map((item) => {
+      //   return {
+      //     name: item.text,
+      //     item: item.value.id,
+      //     selected: branch_ids.includes(item.value.id),
+      //   };
+      // });
     },
     mainImage: function (val) {
       if (val) {
@@ -1943,7 +1953,7 @@ export default {
         { duration: 4000, permanent: false }
       );
       this.getBranches();
-      this.loadAttributesList();
+      // this.loadAttributesList();
     },
     load_batches: function (val) {
       this.$refs["modalright"].hide();

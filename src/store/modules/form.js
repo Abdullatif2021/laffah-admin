@@ -220,6 +220,9 @@ const actions = {
       formData.append(`itemCategory[category_id]`, payload.additional.category);
       formData.append(`record_order`, payload.additional.record_order);
     }
+    if (payload.active) {
+      formData.append(`active`, payload.active ? 1 : 0);
+    }
     if (payload.notes) {
       formData.append(`notes`, payload.notes);
     }

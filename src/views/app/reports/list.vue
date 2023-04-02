@@ -1,35 +1,24 @@
 <template>
   <div>
-    <div v-if="tabs.length===0" class="loading"></div>
+    <div v-if="tabs.length === 0" class="loading"></div>
     <b-row align-h="between">
       <b-colxx xxs="6">
         <h1 class="text-uppercase font-weight-bold">{{ title }}</h1>
-        <piaf-breadcrumb/>
+        <piaf-breadcrumb />
       </b-colxx>
     </b-row>
     <b-row>
       <b-colxx xxs="12">
         <b-row>
-          <b-colxx
-            xxs="12"
-            xs="12"
-            lg="12"
-            class="mb-3">
-            <b-card
-              class="mb-4"
-              no-body>
-              <b-tabs
-                v-model="tabIndex"
-                card
-                fade
-                vertical
-                lazy
-              >
+          <b-colxx xxs="12" xs="12" lg="12" class="mb-3">
+            <b-card class="mb-4" no-body>
+              <b-tabs v-model="tabIndex" card fade vertical lazy>
                 <b-tab
-                  v-for="(i,index) in tabs"
+                  v-for="(i, index) in tabs"
                   v-show="!notAuthorAdmin(index)"
                   v-if="!notAuthorAdmin(index)"
-                  :key="'tab-' +index "
+                  :key="'tab-' + index"
+                  @click="change_tab(i)"
                   lazy
                 >
                   <template #title>
@@ -43,10 +32,11 @@
                       :model="model"
                       :options="formOptions"
                       :isNewModel="true"
-                      @model-updated="updateModel"/>
+                      @model-updated="updateModel"
+                    />
                     <div class="d-flex justify-content-end mt-3 pr-4">
                       <b-button type="submit" size="lg">
-                        {{ 'Download Report' }}
+                        {{ "Download Report" }}
                       </b-button>
                     </div>
                   </form>
@@ -61,53 +51,53 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import {mapGetters, mapActions} from 'vuex';
+import Vue from "vue";
+import { mapGetters, mapActions } from "vuex";
 import VueFormGenerator from "vue-form-generator";
-import 'vue-form-generator/dist/vfg.css'
+import "vue-form-generator/dist/vfg.css";
 import fieldVueDatetime from "@/containers/fields/fieldVueDatetime";
 import axios from "axios";
-import {apiUrl} from "@/constants/config";
-import {decrypt} from "@/utils";
+import { apiUrl } from "@/constants/config";
+import { decrypt } from "@/utils";
 
 Vue.component("fieldVueDatetime", fieldVueDatetime);
 export default {
-  name: 'Reports',
+  name: "Reports",
   components: {
     "vue-form-generator": VueFormGenerator.component,
-    "fieldVueDatetime": fieldVueDatetime
+    fieldVueDatetime: fieldVueDatetime,
   },
   data() {
     return {
       isLoad: false,
       tabIndex: 1,
       model: {
-        date_from: '',
-        date_to: '',
+        date_from: "",
+        date_to: "",
         item: null,
         branch: null,
         withCode: false,
         byProduct: false,
         byBranch: false,
-        code: null
+        code: null,
       },
       url: apiUrl,
       params: {},
-      apiBase: 'orders?order_by=created_at&order_dir=DESC',
-      title: this.$t('menu.reports'),
+      apiBase: "orders?order_by=created_at&order_dir=DESC",
+      title: this.$t("menu.reports"),
       formOptions: {
         validateAfterLoad: false,
         validateAfterChanged: true,
-        validateAsync: false
-      }
+        validateAsync: false,
+      },
     };
   },
   computed: {
     ...mapGetters({
-      items: 'item/getItemsList'
+      items: "item/getItemsList",
     }),
     ...mapGetters({
-      branches: 'getBranches'
+      branches: "getBranches",
     }),
     /*urlStr: ({tabIndex, model, url, params}) => {
       params = {}
@@ -139,15 +129,11 @@ export default {
       })
       return url
     },*/
-    tabs: () => [
-      'financial',
-      'order',
-      'user'
-    ],
-    schema: function ({items, branches, tabIndex}) {
-      let lang = this.$i18n.locale
-      let values = []
-      let fields = []
+    tabs: () => ["financial", "order", "user"],
+    schema: function ({ items, branches, tabIndex }) {
+      let lang = this.$i18n.locale;
+      let values = [];
+      let fields = [];
       let groups = {
         groups: [
           {
@@ -166,29 +152,28 @@ export default {
                 label: "to",
                 model: "date_to",
                 clearButton: true,
-              }
-            ]
-          }
-        ]
-      }
+              },
+            ],
+          },
+        ],
+      };
       switch (tabIndex) {
         case 2:
           if (items.length > 0) {
-            values = items
-              .map((itm, i) => {
-                // console.log(itm.id, (itm.locales[this.$i18n.locale] || {}).name || '');
-                return {
-                  name: (itm.locales[this.$i18n.locale] || {}).name || 'noName',
-                  id: itm.id
-                }
-              })
+            values = items.map((itm, i) => {
+              // console.log(itm.id, (itm.locales[this.$i18n.locale] || {}).name || '');
+              return {
+                name: (itm.locales[this.$i18n.locale] || {}).name || "noName",
+                id: itm.id,
+              };
+            });
           }
           fields.push(
             {
               type: "checkbox",
               label: "Check for report with specific Product",
               model: "byProduct",
-              default: true
+              default: true,
             },
             {
               type: "vueMultiSelect",
@@ -206,41 +191,44 @@ export default {
               selectOptions: {
                 multiple: false,
                 key: "id",
-                trackBy: 'id',
+                trackBy: "id",
                 label: `name`,
                 taggable: true,
                 searchable: true,
                 closeOnSelect: true,
-                allowEmpty: false
+                allowEmpty: false,
               },
               onChanged: function (model, newVal, oldVal, field) {
                 // if (newVal[newVal.length - 1].type === 'Value') {
                 //   console.log('@tag:Value ', newVal);
                 // }
-                console.log('model: ', model);
+                console.log("model: ", model);
                 // console.log('oldVal: ', oldVal);
                 // console.log('field: ', field);
               },
-              values: values
-            })
-          break
+              values: values,
+            }
+          );
+          break;
         case 0:
         case 1:
-          if (branches.length > 0 && decrypt(localStorage.getItem('userRole')) <= 2) {
-            values = branches
-              .map((brn, i) => {
-                // console.log(brn.id, (brn.locales[this.$i18n.locale] || {}).name || '');
-                return {
-                  name: (brn.locales[this.$i18n.locale] || {}).name || 'noName',
-                  id: brn.id
-                }
-              })
+          if (
+            branches.length > 0 &&
+            decrypt(localStorage.getItem("userRole")) <= 2
+          ) {
+            values = branches.map((brn, i) => {
+              // console.log(brn.id, (brn.locales[this.$i18n.locale] || {}).name || '');
+              return {
+                name: (brn.locales[this.$i18n.locale] || {}).name || "noName",
+                id: brn.id,
+              };
+            });
             fields.push(
               {
                 type: "checkbox",
                 label: "Check for report with specific Branch",
                 model: "byBranch",
-                default: true
+                default: true,
               },
               {
                 type: "vueMultiSelect",
@@ -258,25 +246,26 @@ export default {
                 selectOptions: {
                   multiple: false,
                   key: "id",
-                  trackBy: 'id',
+                  trackBy: "id",
                   label: `name`,
                   taggable: true,
                   searchable: true,
                   closeOnSelect: true,
-                  allowEmpty: false
+                  allowEmpty: false,
                 },
                 onChanged: function (model, newVal, oldVal, field) {
                   // if (newVal[newVal.length - 1].type === 'Value') {
                   //   console.log('@tag:Value ', newVal);
                   // }
-                  console.log('model: ', model);
+                  console.log("model: ", model);
                   // console.log('oldVal: ', oldVal);
                   // console.log('field: ', field);
                 },
-                values: values
-              })
+                values: values,
+              }
+            );
           }
-          break
+          break;
         /*case 2:
            fields = [
              {
@@ -306,144 +295,180 @@ export default {
       if (Array.isArray(fields) && fields.length > 0) {
         groups.groups.push({
           legend: "Advanced",
-          fields: fields
-        })
+          fields: fields,
+        });
       }
-      return groups
+      return groups;
     },
   },
   methods: {
-    ...mapActions('orders', ['loadStatusCount']),
-    ...mapActions('item', ['loadItemsList']),
-    ...mapActions(['handleSubmit', 'fetchBranches']),
+    ...mapActions("orders", ["loadStatusCount"]),
+    ...mapActions("item", ["loadItemsList"]),
+    ...mapActions(["handleSubmit", "fetchBranches"]),
     notAuthorAdmin(index) {
-      const userRole = decrypt(localStorage.getItem('userRole'))
-      return userRole > 2 && index !== this.tabs.indexOf('financial');
+      const userRole = decrypt(localStorage.getItem("userRole"));
+      return userRole > 2 && index !== this.tabs.indexOf("financial");
     },
     updateModel(newVal, schema) {
       this.$emit("model-updated", newVal, schema);
     },
+    change_tab(i) {
+      this.model.date_from = "";
+      this.model.date_to = "";
+    },
     formatDateTime(date, withDay = false) {
-      if (isNaN(Date.parse(date.replace(/-/g, '/')))) {
-        return null
+      if (isNaN(Date.parse(date.replace(/-/g, "/")))) {
+        return null;
       }
-      let options = {weekday: 'short', year: '2-digit', month: 'short', day: 'numeric'};
-      let today = new Date(date.replace(/-/g, '/'));
-      let o = new Intl.DateTimeFormat("en", {timeStyle: "short", dateStyle: "short", hour12: false});
-      return withDay ? today.toLocaleDateString(this.$i18n.locale === 'en' ? "en-US" : 'ar-EG', options) :
-        o.format(today)
+      let options = {
+        weekday: "short",
+        year: "2-digit",
+        month: "short",
+        day: "numeric",
+      };
+      let today = new Date(date.replace(/-/g, "/"));
+      let o = new Intl.DateTimeFormat("en", {
+        timeStyle: "short",
+        dateStyle: "short",
+        hour12: false,
+      });
+      return withDay
+        ? today.toLocaleDateString(
+            this.$i18n.locale === "en" ? "en-US" : "ar-EG",
+            options
+          )
+        : o.format(today);
     },
     getFormatNum(num, digits) {
-      let Num = Number(num)
-      return Num.toFixed(digits)
+      let Num = Number(num);
+      return Num.toFixed(digits);
     },
     initData(data) {
       let order = {
-        id: '',
-        status: ''
-      }
+        id: "",
+        status: "",
+      };
       if (data) {
-        order = data
+        order = data;
       }
-      this.modalData.isNewModel = true
-      this.order = order
+      this.modalData.isNewModel = true;
+      this.order = order;
     },
     formatParams(params) {
-      return "?" + Object
-        .keys(params)
-        .map(function (key) {
-          return key + "=" + encodeURIComponent(params[key])
-        })
-        .join("&")
+      return (
+        "?" +
+        Object.keys(params)
+          .map(function (key) {
+            return key + "=" + encodeURIComponent(params[key]);
+          })
+          .join("&")
+      );
     },
     onFormSubmit: async function () {
-      let {isLoad, model, tabIndex} = this
-      isLoad = true
-      let params = {}
-      model.date_from !== '' ? params.date_from = model.date_from : null;
-      model.date_to !== '' ? params.date_to = model.date_to : null;
-      let url = 'reports/export-excel'
+      let { isLoad, model, tabIndex } = this;
+      isLoad = true;
+      let params = {};
+      model.date_from !== "" ? (params.date_from = model.date_from) : null;
+      model.date_to !== "" ? (params.date_to = model.date_to) : null;
+      let url = "reports/export-excel";
       switch (tabIndex) {
         case 2:
           if (model.byProduct) {
-            url += '/users-info-by-product'
+            url += "/users-info-by-product";
             params.item_id = model.item.id;
           } else {
-            url += '/users-info'
+            url += "/users-info";
           }
-          break
+          break;
         case 0:
-          url += '/get-orders-financial'
+          url += "/get-orders-financial";
           if (model.byBranch) {
             params.branch_id = model.branch.id;
           }
-          break
+          break;
         case 1:
-          url += '/get-orders'
+          url += "/get-orders";
           if (model.byBranch) {
             params.branch_id = model.branch.id;
           }
-          break
+          break;
       }
       if (Date.parse(this.model.date_to) < Date.parse(this.model.date_from)) {
         //start is less or equal than End
-        this.$notify("error", 'To Date Error', '<em><strong>From</strong></em> date grater than <em><strong>To</strong></em> to date will be <strong>Reset</strong>', {duration: 7000, permanent: false});
-        params.date_to = ''
-        this.model.date_to = ''
+        this.$notify(
+          "error",
+          "To Date Error",
+          "<em><strong>From</strong></em> date grater than <em><strong>To</strong></em> to date will be <strong>Reset</strong>",
+          { duration: 7000, permanent: false }
+        );
+        params.date_to = "";
+        this.model.date_to = "";
         return null;
       }
-      return await axios.get(url, {params, responseType: 'blob'})
-        .then(response => {
-          if (response.data instanceof Blob && response.data.type !== 'application/json') {
-            const blob = new Blob([response.data], {type: response.data.type})
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = response.headers["content-disposition"].split(
-              "filename="
-            )[1];
-            link.click()
+      return await axios
+        .get(url, { params, responseType: "blob" })
+        .then((response) => {
+          if (
+            response.data instanceof Blob &&
+            response.data.type !== "application/json"
+          ) {
+            const blob = new Blob([response.data], {
+              type: response.data.type,
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download =
+              response.headers["content-disposition"].split("filename=")[1];
+            link.click();
             setTimeout(function () {
-              URL.revokeObjectURL(link.href)
+              URL.revokeObjectURL(link.href);
             }, 1500);
           } else {
-            let self = this
+            let self = this;
             let fr = new FileReader();
-            let res = ''
+            let res = "";
             fr.onload = function () {
               // console.log(JSON.parse(this.result))
-              res = JSON.parse(this.result)
-              self.$notify("info", res.message, 'Export file', {duration: 7000, permanent: false});
+              res = JSON.parse(this.result);
+              self.$notify("info", res.message, "Export file", {
+                duration: 7000,
+                permanent: false,
+              });
             };
             fr.readAsText(response.data);
-
           }
-          isLoad = false
-        }).catch(console.error)
-    }
+          isLoad = false;
+        })
+        .catch(console.error);
+    },
   },
   async mounted() {
-    await this.loadItemsList()
-    await this.fetchBranches()
+    await this.loadItemsList();
+    await this.fetchBranches();
   },
   watch: {
-    'model.date_to': {
+    "model.date_to": {
       handler: function (date_to) {
         if (Date.parse(this.model.date_to) < Date.parse(this.model.date_from)) {
           //start is less or equal than End
-          this.$notify("error", 'To Date Error', '<em><strong>From</strong></em> date grater than <em><strong>To</strong></em> ', {duration: 7000, permanent: false});
-          params.date_to = ''
-          this.model.date_to = ''
+          this.$notify(
+            "error",
+            "To Date Error",
+            "<em><strong>From</strong></em> date grater than <em><strong>To</strong></em> ",
+            { duration: 7000, permanent: false }
+          );
+          params.date_to = "";
+          this.model.date_to = "";
         }
       },
       deep: true,
-      immediate: true
+      immediate: true,
     },
-  }
+  },
 };
 </script>
 <style scoped>
-/deep/ .nav-tabs
-.nav-link.active::before,
+/deep/ .nav-tabs .nav-link.active::before,
 .nav-tabs .nav-item.show .nav-link::before {
   left: unset;
   width: 5px;

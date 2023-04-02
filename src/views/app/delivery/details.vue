@@ -84,7 +84,7 @@
                                   </b-link>
                                 </div>
                               </template>
-                              <b-dropdown-item
+                              <!-- <b-dropdown-item
                                 title="Delete Item"
                                 class=""
                                 @click="
@@ -99,7 +99,7 @@
                               >
                                 <i class="iconsminds-scooter" />
                                 <span class="mx-1">Change Delivery</span>
-                              </b-dropdown-item>
+                              </b-dropdown-item>-->
                             </b-dropdown>
                           </b>
                         </template>

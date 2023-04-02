@@ -1,6 +1,7 @@
 <template>
   <div class="rating">
-    <span class="points">{{ value }}</span> <span class="text">Point</span>
+    <span class="points">{{ points ? points.point : coupon.code }}</span>
+    <span class="text">{{ points ? "points" : "" }}</span>
   </div>
 </template>
 
@@ -11,6 +12,8 @@ export default {
       type: Number,
       default: 0,
     },
+    points: {},
+    coupon: {},
   },
   data() {
     return {};

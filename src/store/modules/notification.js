@@ -210,9 +210,15 @@ const actions = {
   },
   sendNotification({ commit }, payload) {
     const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("body", payload.details);
-    formData.append("image", payload.image[0]);
+    Object.entries(payload.info).forEach((entry) => {
+      const [key, value] = entry;
+      if (value != null) {
+        formData.append(key, value);
+      }
+    });
+    if (payload.image) {
+      formData.append("image", payload.image[0]);
+    }
 
     return axios
       .post(

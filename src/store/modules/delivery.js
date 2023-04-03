@@ -80,16 +80,20 @@ const mutations = {
 
 const actions = {
   get_deliveries({ commit, dispatch }, payload) {
+    const params = {
+      order_dir: payload.order_dir,
+      keyword: payload.keyword,
+      pending_delivery_orders_count: payload.pending_delivery_orders_count,
+      rate: payload.rate,
+      order_by: payload.order_by,
+      offset: payload.offset,
+      limit: payload.limit,
+    };
+
     return Axios.get(
       `https://api-v2.laffahrestaurants.com/public/api/users?role=delivery`,
       {
-        params: {
-          order_dir: payload.order_dir,
-          keyword: payload.keyword,
-          order_by: payload.order_by,
-          offset: payload.offset,
-          limit: payload.limit,
-        },
+        params,
       }
     )
       .then((res) => {

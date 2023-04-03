@@ -319,9 +319,30 @@ export default {
         if (sortOrder[0].direction == "asc") {
           this.order_by = sortOrder[0].sortField;
           this.dir = "ASC";
+          if (sortOrder[0].sortField == "pending_delivery_orders_count") {
+            this.get_deliveries({
+              order_dir: this.dir,
+              keyword: null,
+              pending_delivery_orders_count: 1,
+              offset: offset,
+              limit: limit,
+              order_by: this.order_by,
+            });
+          }
+          if (sortOrder[0].sortField == "rate") {
+            this.get_deliveries({
+              order_dir: this.dir,
+              keyword: null,
+              rate: 1,
+              offset: offset,
+              limit: limit,
+              order_by: this.order_by,
+            });
+          }
           this.get_deliveries({
             order_dir: this.dir,
             keyword: null,
+
             offset: offset,
             limit: limit,
             order_by: this.order_by,
@@ -330,7 +351,26 @@ export default {
         if (sortOrder[0].direction == "desc") {
           this.order_by = sortOrder[0].sortField;
           this.dir = "DESC";
-
+          if (sortOrder[0].sortField == "pending_delivery_orders_count") {
+            this.get_deliveries({
+              order_dir: this.dir,
+              keyword: null,
+              pending_delivery_orders_count: 1,
+              offset: offset,
+              limit: limit,
+              order_by: this.order_by,
+            });
+          }
+          if (sortOrder[0].sortField == "rate") {
+            this.get_deliveries({
+              order_dir: this.dir,
+              keyword: null,
+              rate: 1,
+              offset: offset,
+              limit: limit,
+              order_by: this.order_by,
+            });
+          }
           this.get_deliveries({
             order_dir: this.dir,
             keyword: null,

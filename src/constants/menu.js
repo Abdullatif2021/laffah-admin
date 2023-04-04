@@ -159,7 +159,7 @@ const data = [
     id: "noification",
     icon: "simple-icon-cursor",
     label: "menu.send-notification",
-    to: `${adminRoot}/notifications/send`,
+    to: `${adminRoot}/send-notification`,
     roles: [UserRole.superadmin, UserRole.admin],
   },
 

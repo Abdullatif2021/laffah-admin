@@ -1218,6 +1218,50 @@ const routes = [
         ],
       },
       {
+        path: "send-notification",
+        component: () =>
+          import(
+            /* webpackChunkName: "send-notification" */ "./views/app/send-notification/index"
+          ),
+        redirect: `${adminRoot}/send-notification/send-list`,
+        meta: {
+          loginRequired: true,
+          roles: [UserRole.superadmin, UserRole.admin, UserRole.branchadmin],
+        },
+        children: [
+          {
+            path: "send-list",
+            component: () =>
+              import(
+                /* webpackChunkName : "send-notification" */ "./views/app/send-notification/send-list"
+              ),
+            meta: {
+              loginRequired: true,
+              roles: [
+                UserRole.superadmin,
+                UserRole.admin,
+                UserRole.branchadmin,
+              ],
+            },
+          },
+          {
+            path: "send",
+            component: () =>
+              import(
+                /* webpackChunkName : "send-notification" */ "./views/app/send-notification/send"
+              ),
+            meta: {
+              loginRequired: true,
+              roles: [
+                UserRole.superadmin,
+                UserRole.admin,
+                UserRole.branchadmin,
+              ],
+            },
+          },
+        ],
+      },
+      {
         path: "reports",
         component: () =>
           import(/* webpackChunkName: "reports" */ "./views/app/reports/index"),

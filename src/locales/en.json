@@ -26,6 +26,7 @@
   "menu": {
     "reports": "Reports",
     "send": "Send",
+    "send-list": "List",
     "recipes": "Recipes",
     "send-notification": "Send Notification",
     "delivery": "Delivery",

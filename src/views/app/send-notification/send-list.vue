@@ -2,14 +2,14 @@
   <div>
     <b-row>
       <b-colxx xxs="12">
-        <h1 class="text-uppercase font-weight-bold">Coupons</h1>
+        <h1 class="text-uppercase font-weight-bold">Send Notification</h1>
         <div class="top-right-button-container">
           <b-button
             variant="primary"
             size="lg"
             class="top-right-button"
             @click="add_New()"
-            >Add New Coupon</b-button
+            >Send Notification</b-button
           >
         </div>
         <piaf-breadcrumb />
@@ -61,68 +61,89 @@
           :reactive-api-url="true"
           :fields="fields"
         >
-          <template slot="code" slot-scope="props">
-            <div class="d-flex" style="gap: 24px">
-              {{ props.rowData.code }}
-              <i
-                @click="copyToClipboard(props.rowData.code)"
-                class="iconsminds-file-copy"
-                style="
-                  border: 1px solid #898383;
-                  border-radius: 3px;
-                  background: #eee;
-                "
-              />
-              <!-- <button @click="copyToClipboard(props.rowData.code)"></button>
-                <span v-if="showTooltip" class="tooltip">Copied!</span> -->
+          <template slot="image" slot-scope="props">
+            <ThumbnailImage
+              rounded
+              small
+              :src="
+                props.rowData.image_webp === ''
+                  ? props.rowData.image
+                  : `${props.rowData.image_baseurl}/small/${props.rowData.image_webp}`
+              "
+              class-name=""
+            />
+          </template>
+          <template slot="active" slot-scope="props">
+            <div @click="change_active(props.rowData)">
+              <switches
+                v-model="props.rowData.active"
+                theme="custom"
+                color="primary"
+                class="vue-switcher-small"
+              ></switches>
             </div>
           </template>
-          <template slot="user" slot-scope="props">
-            <span
-              :class="props.rowData.user ? 'usage_left_class' : 'usage_limit'"
+          <template slot="action" slot-scope="props">
+            <b-dropdown
+              id="ddown2"
+              size="xs"
+              html=" "
+              split
+              split-class="p-0"
+              class=""
+              variant="secondary"
             >
-              {{
-                props.rowData.user
-                  ? `${props.rowData.user.first_name} ${props.rowData.user.last_name}`
-                  : "undefined"
-              }}
-            </span>
-          </template>
-          <template slot="discount" slot-scope="props">
-            <b-badge pill variant="outline-primary">
-              <span>{{
-                `${props.rowData.details.discount}  ${
-                  props.rowData.type === "percent" ? "%" : $t("pages.aed")
-                }`
-              }}</span>
-            </b-badge>
-          </template>
-          <template slot="usage" slot-scope="props">
-            <span
-              :class="
-                props.rowData.usages_left === -1
-                  ? 'usage_limit'
-                  : 'usage_left_class'
-              "
+              <template #button-content>
+                <div class="py-0">
+                  <b-link
+                    id="edit"
+                    class="d-flex align-items-center text-white px-2"
+                    v-b-modal.modalright
+                  >
+                    <i
+                      style="font-size: 20px"
+                      class="iconsminds-gear-2 d-flex"
+                    ></i>
+                    <span for="edit" class="p-2 font-weight-bold">Show</span>
+                  </b-link>
+                </div>
+              </template>
+
+              <b-dropdown-item
+                title="Delete Item"
+                class=""
+                v-b-modal="`delete${props.rowData.id}`"
+                scale="1.1"
+              >
+                <i class="simple-icon-trash" />
+                <span class="mx-1">{{ $t("delete") }}</span>
+              </b-dropdown-item>
+            </b-dropdown>
+
+            <!-- modal for delete row -->
+            <b-modal
+              :id="`delete${props.rowData.id}`"
+              ref="modallg"
+              size="sm"
+              hide-header
             >
-              {{
-                props.rowData.usages_left === -1
-                  ? "unlimited"
-                  : props.rowData.usages_left
-              }}
-            </span>
-          </template>
-          <template slot="actions" slot-scope="props">
-            <b-row align-h="around" class="pr-1 align-items-center">
-              <b-link v-if="props.rowData">
-                <b-icon-gear-fill
-                  @click.prevent="open_details(props.rowData.id)"
-                  font-scale="2"
-                  aria-hidden="true"
-                  animation="pulse"
-                />
-              </b-link>
-            </b-row>
+              <h3>{{ $t("are-you-sure-delete") }}</h3>
+              <template slot="modal-footer">
+                <b-button
+                  size="xs"
+                  variant="danger"
+                  @click="deleteItem(props.rowData.id)"
+                  class="mr-1"
+                  >{{ $t("delete") }}
+                </b-button>
+                <b-button
+                  size="xs"
+                  variant="light"
+                  @click="hideModal('modallg')"
+                  >{{ $t("cancel") }}
+                </b-button>
+              </template>
+            </b-modal>
           </template>
         </vuetable>
         <div class="d-flex justify-content-center">
@@ -142,6 +163,21 @@
         </div>
       </b-colxx>
     </b-row>
+    <b-modal
+      id="modalright"
+      ref="modalright"
+      title="Notification Details"
+      modal-class="modal-right"
+    >
+      <!-- {{ props.rowData.locales.en.description }},
+              {{ props.rowData.locales.ar.description }} -->
+      <template slot="modal-footer">
+        <!-- <b-button variant="primary" @click="somethingModal('modalright')" class="mr-1">Do Something</b-button> -->
+        <b-button variant="secondary" @click="hideModal('modalright')"
+          >Cancel</b-button
+        >
+      </template>
+    </b-modal>
   </div>
 </template>
 <script>
@@ -150,12 +186,16 @@ import Vuetable from "vuetable-2/src/components/Vuetable";
 import VuetablePaginationBootstrap from "../../../components/Common/VuetablePaginationBootstrap";
 import { adminRoot } from "../../../constants/config";
 import { BIconGearFill } from "bootstrap-vue";
+import Switches from "vue-switches";
+import ThumbnailImage from "../../../components/Cards/ThumbnailImage";
 
 export default {
   components: {
     vuetable: Vuetable,
     "b-icon-gear-fill": BIconGearFill,
     "vuetable-pagination-bootstrap": VuetablePaginationBootstrap,
+    switches: Switches,
+    ThumbnailImage,
   },
   data() {
     return {
@@ -171,70 +211,59 @@ export default {
       to: 0,
       fields: [
         {
-          name: "__slot:code",
-          title: "Code",
-          titleClass: "",
-          dataClass: "list-item-heading",
+          name: "__slot:image",
+          title: "Image",
+          // titleClass: "center aligned text-right",
+          // dataClass: "center aligned text-right",
           width: "20%",
         },
-        // {
-        //   name: "details",
-        //   sortField: "discount",
-        //   title: "Discount",
-        //   titleClass: "",
-        //   dataClass: "text-muted",
-        //   width: "20%",
-        //   callback: (value) => {
-        //     return value.discount;
-        //   },
-        // },
         {
-          name: "__slot:user",
-          title: "User",
+          name: "locales",
+          title: "Ar title",
           titleClass: "",
-          dataClass: "text-muted",
           width: "20%",
-          // callback: (value) => {
-          //   return value ? `${value.first_name} ${value.last_name}` ;
-          // },
-        },
-        // {
-        //   name: "type",
-        //   // sortField: "type",
-        //   title: "Type",
-        //   titleClass: "",
-        //   dataClass: "text-muted",
-        //   width: "15%",
-        // },
-        {
-          name: "__slot:discount",
-          // sortField: "discount",
-          title: "Discount",
-          titleClass: "px-1",
-          dataClass: "px-1",
-          width: "13%",
+          callback: (value) => {
+            return value.ar.title;
+          },
         },
         {
-          name: "__slot:usage",
-          sortField: "usages_left",
-          title: "Usage left",
+          name: "locales",
+          title: "En title",
+          titleClass: "",
+          width: "20%",
+          callback: (value) => {
+            return value.en.title;
+          },
+        },
+        {
+          name: "created_at",
+          sortField: "created_at",
+          title: "Created at",
+          titleClass: "",
+          width: "20%",
+        },
 
-          titleClass: "",
-          dataClass: "text-muted",
-          width: "10%",
+        {
+          name: "__slot:active",
+          title: "Active",
+          sortField: "created_at",
+          // titleClass: "center aligned text-right",
+          // dataClass: "center aligned text-right",
+          width: "20%",
         },
         {
-          name: "__slot:actions",
+          name: "__slot:action",
           title: "",
+          sortField: "created_at",
           titleClass: "center aligned text-right",
           dataClass: "center aligned text-right",
-          width: "15%",
+          width: "20%",
         },
       ],
     };
   },
   created() {
-    this.getCoupons({
+    this.getSentNotification({
       keyword: null,
       dir: null,
       order_by: null,
@@ -243,22 +272,20 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["getCoupons"]),
+    ...mapActions("notification", [
+      "getSentNotification",
+      "update_notif",
+      "deleteNotif",
+    ]),
     add_New() {
-      this.$router.push(`${adminRoot}/coupon/couponDetails`);
+      this.$router.push(`${adminRoot}/send-notification/send`);
     },
 
-    open_details(id) {
-      this.$router.push({
-        path: `${adminRoot}/coupon/couponDetails`,
-        query: { id: id },
-      });
-    },
     fetchData() {
       // fetch the table data using your API or database driver
       const limit = this.perPage;
       const offset = (this.currentPage - 1) * this.perPage;
-      this.getCoupons({
+      this.getSentNotification({
         keyword: null,
         dir: this.dir,
         order_by: this.order_by,
@@ -270,6 +297,9 @@ export default {
       this.from = (this.currentPage - 1) * this.perPage;
       this.to = this.from + this.perPage;
     },
+    hideModal(refname) {
+      this.$refs[refname].hide();
+    },
     dataManager(sortOrder, pagination) {
       const limit = this.perPage;
       const offset = (this.currentPage - 1) * this.perPage;
@@ -277,7 +307,7 @@ export default {
         if (sortOrder[0].direction == "asc") {
           this.order_by = sortOrder[0].sortField;
           this.dir = "ASC";
-          this.getCoupons({
+          this.getSentNotification({
             keyword: null,
             offset: offset,
             limit: limit,
@@ -289,7 +319,7 @@ export default {
           this.order_by = sortOrder[0].sortField;
           this.dir = "DESC";
 
-          this.getCoupons({
+          this.getSentNotification({
             keyword: null,
             dir: this.dir,
             order_by: this.order_by,
@@ -301,6 +331,19 @@ export default {
     },
     changePageSize(perPage) {
       this.perPage = perPage;
+    },
+    change_active(val) {
+      console.log(val);
+      this.update_notif({
+        active: val.active,
+        id: val.id,
+      });
+    },
+    deleteItem(id) {
+      this.deleteNotif({ id: id });
+    },
+    hideModal(refname) {
+      this.$refs[refname].hide();
     },
     calculatePagination() {
       // calculate the number of pages needed
@@ -328,27 +371,10 @@ export default {
         pages: pages,
       };
     },
-    copyToClipboard(code) {
-      navigator.clipboard
-        .writeText(code)
-        .then(() => {
-          console.log("Text copied to clipboard");
-          this.$notify("success", "CODE COPIED!", "", {
-            duration: 1000,
-            permanent: false,
-          });
-          // this.showTooltip = true;
-          // setTimeout(() => {
-          //   this.showTooltip = false;
-          // }, 30000);
-        })
-        .catch((error) => {
-          console.error("Error copying text: ", error);
-        });
-    },
+
     searchChange(val) {
       this.search = val;
-      this.getCoupons({
+      this.getSentNotification({
         keyword: val,
         offset: null,
         dir: null,
@@ -358,7 +384,13 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(["_sent_notifi"]),
+    ...mapGetters("notification", [
+      "_sent_notifi",
+      "_deleted_success",
+      "_deleted_wrong",
+      "_update_notif_er",
+      "_update_notif_su",
+    ]),
   },
   watch: {
     _sent_notifi: function (notif) {
@@ -366,6 +398,59 @@ export default {
       this.$refs.vuetable.setData(notif.data);
       this.totalItems = notif.total;
       this.calculation();
+    },
+    _update_notif_su: function (val) {
+      this.$notify("success", "Updateed Successfully", "", {
+        duration: 4000,
+        permanent: false,
+      });
+      this.getSentNotification({
+        keyword: null,
+        offset: 0,
+        dir: null,
+        order_by: null,
+        limit: 12,
+      });
+    },
+    _update_notif_er: function (val) {
+      this.$notify(
+        "warning",
+        "Something went wrong",
+        "please try again Later",
+        null,
+        { duration: 5000, permanent: false }
+      );
+      this.getSentNotification({
+        keyword: null,
+        offset: 0,
+        dir: null,
+        order_by: null,
+        limit: 12,
+      });
+    },
+    _deleted_success: function (val) {
+      this.$notify("success", "Notification created Successfuly", "", {
+        duration: 4000,
+        permanent: false,
+      });
+      this.$refs["modallg"].hide();
+      this.getSentNotification({
+        keyword: null,
+        offset: 0,
+        dir: null,
+        order_by: null,
+        limit: 12,
+      });
+    },
+    _deleted_wrong: function (val) {
+      this.$notify(
+        "warning",
+        "Something went wrong",
+        "please try again Later",
+        null,
+        { duration: 5000, permanent: false }
+      );
+      this.$refs["modallg"].hide();
     },
     currentPage: function (val) {
       this.fetchData();

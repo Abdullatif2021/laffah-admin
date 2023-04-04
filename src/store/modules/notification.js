@@ -13,6 +13,11 @@ const state = {
   notificationsTotal: null,
   isSendNotif: null,
   notSendNotif: null,
+  update_notif_er: null,
+  update_notif_su: null,
+  deleted_success: null,
+  deleted_wrong: null,
+  sent_notifi: null,
   notificationStatus: null,
   currentNotification: null,
   currentPage: 0,
@@ -35,10 +40,14 @@ const getters = {
   },
   _notSendNotif: (state) => state.notSendNotif,
   _isSendNotif: (state) => state.isSendNotif,
-
+  _sent_notifi: (state) => state.sent_notifi,
+  _deleted_success: (state) => state.deleted_success,
+  _deleted_wrong: (state) => state.deleted_wrong,
   getSortColumn: (state) => {
     return state.sort.column;
   },
+  _update_notif_er: (state) => state.update_notif_er,
+  _update_notif_su: (state) => state.update_notif_su,
   urlQuery: (state) => {
     return `?sort=${state.sort.column}&offset=${state.currentPage}&limit=${state.perPage}&search=${state.search}`;
   },
@@ -94,6 +103,21 @@ const mutations = {
   },
   send_notif_error(state, payload) {
     state.notSendNotif = payload;
+  },
+  sent_notifi(state, payload) {
+    state.sent_notifi = payload;
+  },
+  deleted_success(state, payload) {
+    state.deleted_success = payload;
+  },
+  deleted_wrong(state, payload) {
+    state.deleted_wrong = payload;
+  },
+  update_notif_success(state, payload) {
+    state.update_notif_su = payload;
+  },
+  update_notif_error(state, payload) {
+    state.update_notif_er = payload;
   },
 };
 
@@ -208,6 +232,29 @@ const actions = {
       })
       .catch((error) => console.log(error));
   },
+  getSentNotification({ commit }, payload) {
+    const params = {
+      order_dir: payload.dir,
+      order_by: payload.order_by,
+      keyword: payload?.keyword,
+      offset: payload.offset,
+      limit: payload.limit,
+    };
+    return axios
+      .get(`https://api-v2.laffahrestaurants.com/api/ads/fcm`, {
+        params,
+      })
+      .then((res) => {
+        console.log(res);
+        if (res.status === 200) {
+          console.log("here i am");
+          commit("sent_notifi", res.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
   sendNotification({ commit }, payload) {
     const formData = new FormData();
     Object.entries(payload.info).forEach((entry) => {
@@ -221,11 +268,7 @@ const actions = {
     }
 
     return axios
-      .post(
-        "https://api-v2.laffahrestaurants.com/api/sendnotification",
-        formData,
-        {}
-      )
+      .post("https://api-v2.laffahrestaurants.com/api/ads/fcm", formData, {})
       .then((res) => {
         if (res.status === 201) {
           commit("send_notif_success", res.data);
@@ -235,6 +278,47 @@ const actions = {
       })
       .catch((error) => {
         commit("send_notif_error", res.data);
+      });
+  },
+  update_notif({ commit }, payload) {
+    const formData = new FormData();
+
+    const id = payload.id;
+    const active = payload.active ? 0 : 1;
+    formData.append("active", active);
+    formData.append("_method", "PUT");
+
+    return axios
+      .post(
+        `https://api-v2.laffahrestaurants.com/api/ads/fcm/${id}`,
+        formData,
+        {}
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          commit("update_notif_success", res.data);
+        } else {
+          commit("update_notif_error", res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("update_notif_error", error);
+        commit("update_notif_error", res.data);
+      });
+  },
+  deleteNotif({ commit }, payload) {
+    return axios
+      .delete(`https://api-v2.laffahrestaurants.com/api/ads/fcm/${payload.id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          commit("deleted_success", res.data);
+        } else {
+          commit("deleted_wrong", res.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        commit("deleted_wrong", error);
       });
   },
 };

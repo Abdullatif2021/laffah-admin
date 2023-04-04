@@ -23,9 +23,7 @@ const getters = {
 
 const mutations = {
   all_coupons(state, payload) {
-    console.log("and herre i am", payload);
     state.coupons = payload;
-    console.log("and herre i am", state.coupons);
   },
   coupon(state, payload) {
     state.coupon = payload;

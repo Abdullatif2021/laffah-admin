@@ -1812,18 +1812,22 @@ export default {
       console.log("this is item", val);
       this.gridForm.published = +val.is_published;
       this.gridForm.active = +val.active;
-      this.gridForm.category = val.category[0];
+
       this.gridForm.record_order = val.record_order;
-      this.files_form.image = `${val.image_baseurl}/small/${val.image_webp}`;
+      this.files_form.image =
+        val.image_webp === ""
+          ? val.image
+          : `${val.image_baseurl}/small/${val.image_webp}`;
       this.lang_form.ar_name = val.locales.ar.name;
       this.lang_form.ar_description = val.locales.ar.description;
       this.lang_form.en_name = val.locales.en.name;
       this.lang_form.en_description = val.locales.en.description;
       this.gridForm.notes = val.notes;
-      this.gridForm.customizations = val.customizationGroups.map((el) => ({
+      this.gridForm.customizations = val.customizationGroups?.map((el) => ({
         label: el.locales.en.title,
         value: el.id,
       }));
+      this.gridForm.category = val.category ? val.category[0] : null;
       console.log(this.gridForm.customizations);
     },
     _updateItem: function (val) {

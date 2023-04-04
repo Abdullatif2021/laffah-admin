@@ -35,7 +35,7 @@ module.exports = {
   productionSourceMap: false,
   assetsDir: "./assets/",
   configureWebpack: {
-    mode: "development", // or 'production'
+    mode: "production", // or ''development
     plugins: [
       new CopyPlugin({
         patterns: [

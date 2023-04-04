@@ -413,6 +413,7 @@ export default {
       });
     },
     _update_notif_er: function (val) {
+      console.log('_update_notif_er', val)
       this.$notify(
         "warning",
         "Something went wrong",

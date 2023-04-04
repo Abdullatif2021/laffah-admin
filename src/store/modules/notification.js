@@ -117,6 +117,7 @@ const mutations = {
     state.update_notif_su = payload;
   },
   update_notif_error(state, payload) {
+    console.log("mutation");
     state.update_notif_er = payload;
   },
 };
@@ -303,7 +304,7 @@ const actions = {
       })
       .catch((error) => {
         console.log("update_notif_error", error);
-        commit("update_notif_error", res.data);
+        commit("update_notif_error", error);
       });
   },
   deleteNotif({ commit }, payload) {

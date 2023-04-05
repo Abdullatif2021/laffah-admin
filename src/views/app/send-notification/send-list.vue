@@ -99,6 +99,7 @@
                     id="edit"
                     class="d-flex align-items-center text-white px-2"
                     v-b-modal.modalright
+                    @click="show_details(props.rowData)"
                   >
                     <i
                       style="font-size: 20px"
@@ -169,10 +170,59 @@
       title="Notification Details"
       modal-class="modal-right"
     >
-      <!-- {{ props.rowData.locales.en.description }},
-              {{ props.rowData.locales.ar.description }} -->
+      <template v-if="isLoadDetails">
+        <div>
+          <b-form-group label-class="font-weight-bold" label="Image">
+            <ThumbnailImage
+              rounded
+              small
+              :src="notif_details.image"
+              class-name=""
+            />
+          </b-form-group>
+          <b-form-group
+            v-if="notif_details.refer_name"
+            label-class="font-weight-bold"
+            :label="is_item ? 'Item' : 'Category'"
+          >
+            <b-form-input
+              readonly
+              type="text"
+              v-model.trim="notif_details.refer_name"
+            />
+          </b-form-group>
+          <b-form-group label-class="font-weight-bold" label="English Title">
+            <b-form-input
+              readonly
+              type="text"
+              v-model.trim="notif_details.en_title"
+            />
+          </b-form-group>
+          <b-form-group label-class="font-weight-bold" label="English Details">
+            <b-textarea
+              readonly
+              v-model.trim="notif_details.en_description"
+            ></b-textarea>
+          </b-form-group>
+          <b-form-group label-class="font-weight-bold" label="Arabic Title">
+            <b-form-input
+              readonly
+              type="text"
+              v-model.trim="notif_details.ar_title"
+            />
+          </b-form-group>
+          <b-form-group label-class="font-weight-bold" label="Arabic Details">
+            <b-textarea
+              readonly
+              v-model.trim="notif_details.ar_description"
+            ></b-textarea>
+          </b-form-group>
+        </div>
+      </template>
+      <template v-else>
+        <div class="loading"></div>
+      </template>
       <template slot="modal-footer">
-        <!-- <b-button variant="primary" @click="somethingModal('modalright')" class="mr-1">Do Something</b-button> -->
         <b-button variant="secondary" @click="hideModal('modalright')"
           >Cancel</b-button
         >
@@ -188,6 +238,7 @@ import { adminRoot } from "../../../constants/config";
 import { BIconGearFill } from "bootstrap-vue";
 import Switches from "vue-switches";
 import ThumbnailImage from "../../../components/Cards/ThumbnailImage";
+import axios from "axios";
 
 export default {
   components: {
@@ -205,6 +256,16 @@ export default {
       totalItems: 0, // total number of items
       pageSizes: [12, 18, 25],
       from: 0,
+      isLoadDetails: true,
+      notif_details: {
+        ar_title: null,
+        en_title: null,
+        ar_description: null,
+        en_description: null,
+        refer_name: null,
+        image: null,
+      },
+      is_item: false,
       showTooltip: false,
       dir: null,
       order_by: null,
@@ -371,7 +432,50 @@ export default {
         pages: pages,
       };
     },
+    show_details(val) {
+      this.notif_details.refer_name = null;
+      console.log("show_details", val);
+      this.notif_details.ar_title = val.locales.ar.title;
+      this.notif_details.en_title = val.locales.en.title;
+      this.notif_details.ar_description = val.locales.ar.description;
+      this.notif_details.en_description = val.locales.en.description;
+      this.notif_details.image =
+        val.image_webp === ""
+          ? val.image
+          : `${val.image_baseurl}/small/${val.image_webp}`;
+      if (val.refer_id) {
+        if (val.action === "category") {
+          this.isLoadDetails = false;
+          this.is_item = false;
+          return axios
+            .get(
+              `https://api-v2.laffahrestaurants.com/public/api/categories/${val.refer_id}`
+            )
+            .then((res) => {
+              console.log(res);
+              this.notif_details.refer_name = `${res.data.data.locales.en.title} - ${res.data.data.locales.ar.title}`;
+              this.isLoadDetails = true;
+            })
+            .catch((error) => console.log(error));
+        }
+        if (val.action === "item") {
+          this.isLoadDetails = false;
+          this.is_item = true;
 
+          return axios
+            .get(
+              `https://api-v2.laffahrestaurants.com/public/api/items/${val.refer_id}`
+            )
+            .then((res) => {
+              console.log(res);
+              this.notif_details.refer_name = `${res.data.data.locales.en.name} - ${res.data.data.locales.ar.name}`;
+              this.isLoadDetails = true;
+            })
+            .catch((error) => console.log(error));
+        }
+      }
+      console.log(val);
+    },
     searchChange(val) {
       this.search = val;
       this.getSentNotification({
@@ -413,7 +517,7 @@ export default {
       });
     },
     _update_notif_er: function (val) {
-      console.log('_update_notif_er', val)
+      console.log("_update_notif_er", val);
       this.$notify(
         "warning",
         "Something went wrong",

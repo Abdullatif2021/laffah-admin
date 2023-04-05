@@ -164,6 +164,12 @@ const actions = {
                 badge: "/assets/logos/logo.png",
                 silent: true,
               });
+              Notification.onclick = function (event) {
+                event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                window.focus(); // focus the current window
+                // navigate to your app
+                window.location.href = "https://localhost:8080";
+              };
             }
           }
         }

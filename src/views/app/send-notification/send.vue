@@ -163,7 +163,7 @@
                   ></switches>
                 </b-form-group>
                 <b-button
-                  :disabled="enable_submit"
+                  :disabled="enable_btn"
                   type="submit"
                   variant="primary"
                   class="mt-4"
@@ -203,6 +203,7 @@ export default {
       en_detail: "",
       type: null,
       activate: true,
+      enable_btn: false,
       enable_submit: false,
       selected_type: null,
       specifiedType: null,
@@ -266,6 +267,7 @@ export default {
           this.activate,
           "on validation "
         );
+        this.enable_btn = true;
         this.sendNotification({
           info: {
             "ar[title]": this.ar_title,

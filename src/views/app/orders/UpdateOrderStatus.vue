@@ -11,26 +11,33 @@
       :ref="`status-${data.id}`"
       :modal-class="`modal-right ${brightness}`"
       size="sm"
-      :title-html="`Update Order Status <br> ${data.order_key}`">
+      :title-html="`Update Order Status <br> ${data.order_key}`"
+    >
       <form @submit.prevent="action(data)">
-        <b-form-group
-          class="font-weight-bold"
-          label="Status Type:">
+        <b-form-group class="font-weight-bold" label="Status Type:">
           <b-form-radio-group
+            @input="handleStatusRequests"
             v-if="statuses"
             stacked
-            v-model="data.status">
+            v-model="data.status"
+          >
             <b-form-radio
               required
-              v-for="(s, index) in Object.keys(statuses).filter(x=>parseInt(x)<8 && parseInt(x)>parseInt(initStatus)&&![3,4,5].includes(parseInt(x)))"
+              v-for="(s, index) in Object.keys(statuses).filter(
+                (x) =>
+                  parseInt(x) < 8 &&
+                  parseInt(x) > parseInt(initStatus) &&
+                  ![3, 4, 5].includes(parseInt(x))
+              )"
               :key="index"
               :value="s"
-              class="text-lowercase text-capitalize">{{ statuses[s].replace('_', ' ') }}
+              class="text-lowercase text-capitalize"
+              >{{ statuses[s].replace("_", " ") }}
             </b-form-radio>
           </b-form-radio-group>
         </b-form-group>
         <b-form-group
-          v-if="data.status==7"
+          v-if="data.status == 7"
           label="Rejection Reason"
           label-for="rejection-note"
           invalid-feedback="Rejection Reason is required"
@@ -43,63 +50,80 @@
             required
           ></b-form-textarea>
         </b-form-group>
-        <button :disabled="toggleState" id="submitStatus" type="submit" class="d-none"></button>
+        <button
+          :disabled="toggleState"
+          id="submitStatus"
+          type="submit"
+          class="d-none"
+        ></button>
       </form>
       <template v-if="toggleState">
         <div class="loading"></div>
       </template>
       <template slot="modal-footer">
-        <label class="btn btn-primary" for="submitStatus">{{ $t("update-status") }}</label>
+        <label class="btn btn-primary" for="submitStatus">{{
+          $t("update-status")
+        }}</label>
       </template>
     </b-modal>
   </div>
-
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex';
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  props: ['data', 'action'],
+  props: ["data", "action"],
   data() {
     return {
       initStatus: this.data.status,
       toggleState: false,
       brightness: "",
-      msgState: null
+      msgState: null,
       //  isLoad: false,
-    }
+    };
   },
   computed: {
     ...mapGetters({
-      statuses: 'orders/getStatuses',
-    })
+      statuses: "orders/getStatuses",
+    }),
   },
   methods: {
     ...mapActions({
-      loadOrderStatuses: 'orders/loadStatuses',
+      loadOrderStatuses: "orders/loadStatuses",
       // loadNoteStatuses: 'note/loadStatuses',
     }),
     hideModal(refname) {
-      this.$refs[refname].hide()
+      this.$refs[refname].hide();
     },
-  }
-}
+    handleStatusRequests(val) {
+      console.log(val);
+    },
+  },
+  watch: {
+    data: function (val) {
+      console.log("data", val);
+    },
+    action: function (val) {
+      console.log("action", val);
+    },
+  },
+};
 </script>
 
 <style>
 .brightness {
   animation: brightness 0.5s ease-in-out;
-  filter: brightness(0.7)
+  filter: brightness(0.7);
 }
 
 @keyframes brightness {
   from {
-    filter: brightness(1)
+    filter: brightness(1);
   }
 
   to {
-    filter: brightness(0.7)
+    filter: brightness(0.7);
   }
 }
 </style>

@@ -265,7 +265,7 @@ export default {
       const limit = this.perPage;
       const offset = (this.currentPage - 1) * this.perPage;
       const response = await axios.get(
-        `/orders?offset=${offset}&limit=${limit}&title=&name=&order_key=&orderBy[]=updated_at&orderBy[]=DESC&status_id[]=1`
+        `/orders?offset=${offset}&limit=${limit}&title=&name=&order_key=&orderBy[]=updated_at&orderBy[]=DESC&status_id[]=0`
       );
 
       this.items = response.data.data;

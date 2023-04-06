@@ -171,6 +171,33 @@
         </b-tabs>
       </b-colxx>
     </b-row>
+    <b-modal
+      id="delivery_popup"
+      ref="delivery_popup"
+      :no-close-on-backdrop="true"
+      title="Delivery"
+    >
+      <b-form-group label="Choose Delivery">
+        <v-select
+          label="fullName"
+          @input="searchOption"
+          v-model="selectedOption"
+          :options="delivery_options"
+        />
+      </b-form-group>
+      <template slot="modal-footer">
+        <b-button
+          variant="primary"
+          @click="acceptOrder(true)"
+          class="mr-1"
+          :disabled="!disable_btn"
+          >Submit</b-button
+        >
+        <b-button @click="acceptOrder(false)" variant="secondary"
+          >Skip</b-button
+        >
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -179,6 +206,8 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import DividedTable from "@/views/app/items/DividedTable";
 import UpdateOrderStatus from "@/views/app/orders/UpdateOrderStatus";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 import { adminRoot } from "../../../constants/config";
 import {
   BIconExclamationCircleFill,
@@ -195,6 +224,7 @@ export default {
   props: ["search_val", "page_size"],
   components: {
     "divided-table": DividedTable,
+    "v-select": vSelect,
     "update-order-status": UpdateOrderStatus,
     "b-icon-gear-fill": BIconGearFill,
     "b-icon-exclamation-circle-fill": BIconExclamationCircleFill,
@@ -204,6 +234,9 @@ export default {
       isLoad: false,
       tabIndex: 1,
       page: 1,
+      disable_btn: false,
+      selectedOption: null,
+
       pageSizes: [12, 18, 25],
       search_val: null,
       refresh_table: false,
@@ -214,6 +247,8 @@ export default {
       to: 0,
       total: 0,
       lastPage: 0,
+      delivery_options: [],
+
       rfq: "",
       options: [
         { text: "All", value: "", checked: true },
@@ -227,6 +262,7 @@ export default {
       modalTitle: undefined,
       activateModal: false,
       sort: "",
+      tempor_data: null,
       page: 1,
       search: "",
       from: 0,
@@ -308,6 +344,8 @@ export default {
     ...mapGetters("orders", {
       statuses: "getStatusesForTabs",
     }),
+    ...mapGetters(["_assigned", "_deliveries"]),
+
     modalData: ({
       schema,
       initData,
@@ -399,8 +437,10 @@ export default {
    </p>`;
     },
     ...mapActions("orders", ["loadStatusCount"]),
-    ...mapActions({ loadOrderStatuses: "orders/loadStatuses" }),
-    ...mapActions(["handleSubmit"]),
+    ...mapActions({
+      loadOrderStatuses: "orders/loadStatuses",
+    }),
+    ...mapActions(["handleSubmit", "getDeliveries", "assignToDelivery"]),
     formatDateTime(date, withDay = false) {
       if (isNaN(Date.parse(date.replace(/-/g, "/")))) {
         return null;
@@ -444,6 +484,15 @@ export default {
     searchChange(val) {
       this.search_val = val;
     },
+    searchOption(search, loading) {
+      if (search != null) {
+        setTimeout(() => {
+          this.delivery_options = this.delivery_options.filter((option) =>
+            option.name.toLowerCase().includes(search.toLowerCase())
+          );
+        }, 1000);
+      }
+    },
     set_to(val) {
       this.to = val;
     },
@@ -456,24 +505,28 @@ export default {
     set_total(val) {
       this.total = val;
     },
+    async acceptOrder(val) {
+      this.disable_btn = false;
+      this.print_status = val;
+      if (val) {
+        await this.assignToDelivery({
+          user_id: this.selectedOption.id,
+          order_id: this.tempor_data.id,
+        });
+        this.change_status(this.tempor_data);
+      }
+      if (!val) {
+        this.change_status(this.tempor_data);
+        this.$refs["delivery_popup"].hide();
+      }
+    },
     changePageSize(val) {
       this.page_size = val;
     },
     detailsForm(data) {
       this.$router.push(`details/${data.id}`);
     },
-    initData(data) {
-      let order = {
-        id: "",
-        status: "",
-      };
-      if (data) {
-        order = data;
-      }
-      this.modalData.isNewModel = true;
-      this.order = order;
-    },
-    onValidateFormSubmit: function (data) {
+    change_status(data) {
       let { selectedItems, tabs, tabIndex } = this;
       let url = "orders/updatestatus";
       if (data.id) {
@@ -517,6 +570,69 @@ export default {
       this.modalData.title = undefined;
       this.$bvModal.hide(`status-${data.id}`);
     },
+    initData(data) {
+      let order = {
+        id: "",
+        status: "",
+      };
+      if (data) {
+        order = data;
+      }
+      this.modalData.isNewModel = true;
+      this.order = order;
+    },
+    onValidateFormSubmit: async function (data) {
+      console.log(data);
+      if (data.status === "2") {
+        await this.getDeliveries({ branch_id: data.branch_id });
+
+        this.$bvModal.show(`delivery_popup`);
+        this.tempor_data = data;
+      } else {
+        let { selectedItems, tabs, tabIndex } = this;
+        let url = "orders/updatestatus";
+        if (data.id) {
+          this.selectedItems.push(data.id);
+          let formData = new FormData();
+          let ids = data.id;
+          formData.append("_method", "PUT");
+          if (this.tabIndex === 0) {
+            url = "payments/edit-reference-number";
+            formData.append("payment_reference", data.payment_reference);
+          } else {
+            formData.append("status", data.status);
+            formData.append("rejection_reason", data.rejection_reason);
+          }
+          this.handleSubmit({
+            url: `${url}/${ids}`,
+            obj: formData,
+          })
+            .then((response) => {
+              console.log(
+                "hi from responseeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+              );
+              selectedItems.splice(selectedItems.indexOf(data.id), 1);
+              // let ref = this.statuses[this.tabIndex].title;
+              // this.$refs.vuetable.refresh();
+              this.refresh_table = !this.refresh_table;
+              this.loadStatusCount();
+            })
+            .catch((err) => {
+              console.log(
+                "hi from errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
+              );
+
+              selectedItems.splice(selectedItems.indexOf(data.id), 1);
+              // let ref = this.statuses[this.tabIndex].title;
+              // this.$refs.vuetable.refresh();
+              this.refresh_table = !this.refresh_table;
+              this.loadStatusCount();
+            });
+        }
+        this.modalData.title = undefined;
+        this.$bvModal.hide(`status-${data.id}`);
+      }
+    },
   },
   watch: {
     tabIndex(val, oldVal) {
@@ -524,6 +640,33 @@ export default {
       if (val !== oldVal) {
         this.loadStatusCount();
       }
+    },
+    selectedOption: function (val) {
+      if (val) {
+        this.disable_btn = true;
+      }
+    },
+    _deliveries: function (data) {
+      console.log("from watcher deliveries", data);
+      this.delivery_options = [];
+      data.forEach((el) => {
+        this.delivery_options.push(
+          new Object({
+            name: el.first_name,
+            fullName: `${el.first_name} ${el.last_name}`,
+            id: el.id,
+          })
+        );
+      });
+    },
+    _assigned: function (val) {
+      console.log("_assign", val);
+      this.$notify("success", "Delivery has been assigned successfuly", null, {
+        duration: 5000,
+        permanent: false,
+      });
+      this.$refs["delivery_popup"].hide();
+      this.selectedOption = null;
     },
     perPage: function (perPage) {
       this.$emit("perPage", perPage);

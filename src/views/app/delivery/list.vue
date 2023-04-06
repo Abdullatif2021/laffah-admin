@@ -360,8 +360,7 @@ export default {
               limit: limit,
               order_by: this.order_by,
             });
-          }
-          if (sortOrder[0].sortField == "rate") {
+          } else if (sortOrder[0].sortField == "rate") {
             this.get_deliveries({
               order_dir: this.dir,
               keyword: null,
@@ -370,14 +369,15 @@ export default {
               limit: limit,
               order_by: this.order_by,
             });
+          } else {
+            this.get_deliveries({
+              order_dir: this.dir,
+              keyword: null,
+              offset: offset,
+              limit: limit,
+              order_by: this.order_by,
+            });
           }
-          this.get_deliveries({
-            order_dir: this.dir,
-            keyword: null,
-            offset: offset,
-            limit: limit,
-            order_by: this.order_by,
-          });
         }
       }
     },
